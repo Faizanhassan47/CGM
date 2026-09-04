@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="MimeKit" Version="4.17.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Userapp\Enums\*.cs" Link="Enums\%(Filename)%(Extension)" />
+    <Compile Include="..\Userapp\Models\*.cs" Link="Models\%(Filename)%(Extension)" />
+    <Compile Include="..\Userapp\Interfaces\*.cs" Link="Interfaces\%(Filename)%(Extension)" />
+    <Compile Include="..\Userapp\Services\Cgm\*.cs" Link="Services\Cgm\%(Filename)%(Extension)" />
+    <Compile Include="..\Userapp\Services\Ble\CgmDeviceFilter.cs" Link="Services\Ble\CgmDeviceFilter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.DeviceSetup"
+             x:Class="CGM.PatientApp.Views.DeviceSetup.BluetoothPermissionPage"
+             x:DataType="vm:BluetoothPermissionViewModel"
+             Title="Connect Your CGM">
+
+    <ScrollView>
+        <Grid Padding="24,30,24,24" RowDefinitions="Auto,*,Auto">
+
+            <!-- Graphic / Icon -->
+            <VerticalStackLayout Grid.Row="0" Spacing="16" HorizontalOptions="Center" Margin="0,10,0,20">
+                <Border StrokeShape="RoundRectangle 24"
+                        WidthRequest="80"
+                        HeightRequest="80"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}"
+                        Stroke="{StaticResource PrimaryLight}"
+                        StrokeThickness="1.5">
+                    <Label Text="&#xF293;" FontFamily="FontAwesomeBrands"
+                           FontSize="36"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+
+                <Label Text="Enable Bluetooth"
+                       Style="{StaticResource HeaderTitle}"
+                       FontSize="22"
+                       HorizontalTextAlignment="Center" />
+
+                <Label Text="Connect your CGM wirelessly"
+                       Style="{StaticResource SubTitle}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- Explanation Content -->
+            <VerticalStackLayout Grid.Row="1" Spacing="16">
+                
+                <Border Style="{StaticResource MedicalCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Why is Bluetooth required?"
+                               FontAttributes="Bold"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Label Text="{Binding PermissionExplanation}"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                               LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource MedicalCard}">
+                    <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                    <Label Text="&#xF023;" FontFamily="FontAwesomeSolid" FontSize="18" VerticalOptions="Center" />
+                        <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                            <Label Text="Secure &amp; Encrypted" FontAttributes="Bold" FontSize="13" />
+                            <Label Text="Your glucose telemetry is protected on device." FontSize="11" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </Border>
+
+                <!-- Error Banner if permission fails -->
+                <Border StrokeShape="RoundRectangle 12"
+                        BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                        Stroke="{StaticResource Danger}"
+                        StrokeThickness="1"
+                        Padding="12,10"
+                        IsVisible="{Binding HasError}">
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                           FontSize="13"
+                           LineBreakMode="WordWrap" />
+                </Border>
+
+            </VerticalStackLayout>
+
+            <!-- Footer Buttons -->
+            <VerticalStackLayout Grid.Row="2" Spacing="10" Margin="0,20,0,10">
+                <Button Text="Enable Bluetooth &amp; Search"
+                        Command="{Binding EnableBluetoothCommand}"
+                        IsEnabled="{Binding IsNotBusy}" />
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   HeightRequest="24"
+                                   WidthRequest="24"
+                                   HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+        </Grid>
+    </ScrollView>
+
+</ContentPage>

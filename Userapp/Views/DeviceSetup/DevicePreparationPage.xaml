@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.DeviceSetup"
+             x:Class="CGM.PatientApp.Views.DeviceSetup.DevicePreparationPage"
+             x:DataType="vm:DevicePreparationViewModel"
+             Title="Prepare Your CGM">
+
+    <ScrollView>
+        <Grid Padding="24,20,24,24" RowDefinitions="Auto,*,Auto">
+
+            <!-- Header -->
+            <VerticalStackLayout Grid.Row="0" Spacing="6" Margin="0,0,0,20">
+                <Label Text="Prepare Your Device"
+                       Style="{StaticResource HeaderTitle}"
+                       FontSize="22" />
+                <Label Text="{Binding DeviceModelName}"
+                       FontSize="14"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource PrimaryLight}" />
+            </VerticalStackLayout>
+
+            <!-- Guide Cards -->
+            <VerticalStackLayout Grid.Row="1" Spacing="16">
+
+                <!-- Step 1 Card -->
+                <Border Style="{StaticResource MedicalCard}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" VerticalOptions="Center">
+                        <Border Grid.Column="0"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}"
+                                Stroke="{StaticResource PrimaryLight}">
+                            <Label Text="1"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   TextColor="{StaticResource PrimaryLight}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Prepare your sensor package" FontAttributes="Bold" FontSize="14" />
+                            <Label Text="Check the expiration date and ensure the sterile package seal is intact." FontSize="12" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Step 2 Card -->
+                <Border Style="{StaticResource MedicalCard}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" VerticalOptions="Center">
+                        <Border Grid.Column="0"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}"
+                                Stroke="{StaticResource PrimaryLight}">
+                            <Label Text="2"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   TextColor="{StaticResource PrimaryLight}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Follow Official Instructions" FontAttributes="Bold" FontSize="14" />
+                            <Label Text="{Binding PreparationGuide}" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Step 3 Card -->
+                <Border Style="{StaticResource MedicalCard}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" VerticalOptions="Center">
+                        <Border Grid.Column="0"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}"
+                                Stroke="{StaticResource PrimaryLight}">
+                            <Label Text="3"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   TextColor="{StaticResource PrimaryLight}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Keep device nearby" FontAttributes="Bold" FontSize="14" />
+                            <Label Text="Keep your CGM device within 1 meter of your smartphone during setup." FontSize="12" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+            </VerticalStackLayout>
+
+            <!-- Footer: I'm Ready Button -->
+            <VerticalStackLayout Grid.Row="2" Spacing="10" Margin="0,24,0,10">
+                <Button Text="I'm Ready"
+                        Command="{Binding ReadyCommand}" />
+            </VerticalStackLayout>
+
+        </Grid>
+    </ScrollView>
+
+</ContentPage>

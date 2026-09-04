@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.DeviceSetup"
+             x:Class="CGM.PatientApp.Views.DeviceSetup.DeviceFoundPage"
+             x:DataType="vm:DeviceFoundViewModel"
+             Title="Device Found"
+             Shell.NavBarIsVisible="False">
+
+    <Grid Padding="24,40,24,24" RowDefinitions="*,Auto">
+
+        <!-- Center Content -->
+        <VerticalStackLayout Grid.Row="0" VerticalOptions="Center" Spacing="20">
+
+            <!-- Success Found Badge -->
+            <Border StrokeShape="RoundRectangle 24"
+                    WidthRequest="80"
+                    HeightRequest="80"
+                    HorizontalOptions="Center"
+                    BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#064E3B}"
+                    Stroke="{StaticResource Success}"
+                    StrokeThickness="1.5">
+                    <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid"
+                       FontSize="36"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource Success}"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
+
+            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                <Label Text="CGM Device Detected"
+                       Style="{StaticResource HeaderTitle}"
+                       FontSize="22"
+                       HorizontalTextAlignment="Center" />
+                <Label Text="A compatible Continuous Glucose Monitor is ready to connect."
+                       Style="{StaticResource SubTitle}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- Discovered Device Card -->
+            <Border Style="{StaticResource MedicalCard}" Margin="0,10,0,0">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" VerticalOptions="Center">
+                    <Border Grid.Column="0"
+                            StrokeShape="RoundRectangle 16"
+                            WidthRequest="50"
+                            HeightRequest="50"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}"
+                            Stroke="{StaticResource PrimaryLight}"
+                            StrokeThickness="1">
+                    <Label Text="&#xF7C0;" FontFamily="FontAwesomeSolid"
+                               FontSize="22"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="{Binding DeviceName}"
+                               FontAttributes="Bold"
+                               FontSize="16" />
+                        <Label Text="{Binding DeviceIdentifier}"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource PrimaryLight}" />
+                        <HorizontalStackLayout Spacing="6" Margin="0,2,0,0">
+                            <BoxView WidthRequest="8" HeightRequest="8" CornerRadius="4" Color="{StaticResource Success}" VerticalOptions="Center" />
+                            <Label Text="{Binding SignalStrength}"
+                                   FontSize="12"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+        </VerticalStackLayout>
+
+        <!-- Bottom Action Buttons -->
+        <VerticalStackLayout Grid.Row="1" Spacing="10" Margin="0,0,0,10">
+            <Button Text="Connect to This CGM"
+                    Command="{Binding ConnectCommand}" />
+
+            <Button Text="Scan Again"
+                    Command="{Binding RescanCommand}"
+                    Style="{StaticResource OutlineButton}" />
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

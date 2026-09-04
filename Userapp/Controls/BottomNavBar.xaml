@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:CGM.PatientApp.Converters"
+             x:Class="CGM.PatientApp.Controls.BottomNavBar">
+    <Border StrokeShape="RoundRectangle 0"
+            BackgroundColor="{StaticResource White}"
+            Stroke="{StaticResource BorderLightColor}"
+            StrokeThickness="1"
+            Padding="10,10,10,12"
+            Shadow="{AppThemeBinding Light={Shadow Brush={StaticResource Gray300}, Offset='0,-3', Radius=8, Opacity=0.15}, Dark={Shadow Brush=Transparent}}">
+        <Grid ColumnDefinitions="*,*,*,*,*">
+
+            <!-- 1. HOME -->
+            <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="2">
+                <Label Text="&#xF015;" FontFamily="FontAwesomeSolid"
+                       FontSize="18"
+                       Opacity="{Binding IsHomeSelected, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter='1.0:0.4'}"
+                       HorizontalOptions="Center" />
+                <Label Text="Home"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       TextColor="{Binding IsHomeSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#94A3B8'}"
+                       HorizontalOptions="Center" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="Home" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <!-- 2. HISTORY -->
+            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="2">
+                <Label Text="&#xF017;" FontFamily="FontAwesomeRegular"
+                       FontSize="18"
+                       Opacity="{Binding IsHistorySelected, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter='1.0:0.4'}"
+                       HorizontalOptions="Center" />
+                <Label Text="History"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       TextColor="{Binding IsHistorySelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#94A3B8'}"
+                       HorizontalOptions="Center" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="History" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <!-- 3. REPORTS -->
+            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="2">
+                <Label Text="&#xF080;" FontFamily="FontAwesomeSolid"
+                       FontSize="18"
+                       Opacity="{Binding IsReportsSelected, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter='1.0:0.4'}"
+                       HorizontalOptions="Center" />
+                <Label Text="Reports"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       TextColor="{Binding IsReportsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#94A3B8'}"
+                       HorizontalOptions="Center" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="Reports" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <!-- 4. ALERTS -->
+            <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" Spacing="2">
+                <Label Text="&#xF0F3;" FontFamily="FontAwesomeRegular"
+                       FontSize="18"
+                       Opacity="{Binding IsAlertsSelected, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter='1.0:0.4'}"
+                       HorizontalOptions="Center" />
+                <Label Text="Alerts"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       TextColor="{Binding IsAlertsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#94A3B8'}"
+                       HorizontalOptions="Center" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="Alerts" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <!-- 5. PROFILE -->
+            <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center" Spacing="2">
+                <Label Text="&#xF007;" FontFamily="FontAwesomeRegular"
+                       FontSize="18"
+                       Opacity="{Binding IsProfileSelected, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter='1.0:0.4'}"
+                       HorizontalOptions="Center" />
+                <Label Text="Profile"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       TextColor="{Binding IsProfileSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#94A3B8'}"
+                       HorizontalOptions="Center" />
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="Profile" />
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+        </Grid>
+    </Border>
+</ContentView>

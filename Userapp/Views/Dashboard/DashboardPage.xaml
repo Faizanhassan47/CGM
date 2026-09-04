@@ -1,0 +1,1057 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Dashboard"
+             xmlns:controls="clr-namespace:CGM.PatientApp.Controls"
+             x:Class="CGM.PatientApp.Views.Dashboard.DashboardPage"
+             x:DataType="vm:DashboardViewModel"
+             Title="GlucoTrack"
+             BackgroundColor="{AppThemeBinding Light=#F8FAF9, Dark=#0F172A}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- ================= MAIN SCROLLABLE CONTENT ================= -->
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- ================= TAB 1: HOME (PATIENT DASHBOARD - MOCKUP 8) ================= -->
+                <VerticalStackLayout IsVisible="{Binding IsHomeSelected}"
+                                     Spacing="16"
+                                     Padding="20,20,20,24">
+
+        <!-- TOP HEADER: Greeting, user name, and favorite button -->
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label Text="{Binding PatientGreeting}"
+                                   FontSize="15"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="{Binding PatientName, FallbackValue='Jane', TargetNullValue='Jane'}"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                    <Label Text="&#xF256;" FontFamily="FontAwesomeSolid" FontSize="22" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+
+                        <!-- Heart Outline Icon Button -->
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 20"
+                                WidthRequest="42"
+                                HeightRequest="42"
+                                BackgroundColor="{StaticResource White}"
+                                Stroke="{StaticResource BorderLightColor}"
+                                StrokeThickness="1"
+                                VerticalOptions="Center">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenDetailCommand}" CommandParameter="Personal Info" /></Border.GestureRecognizers>
+                            <Label Text="&#xF004;" FontFamily="FontAwesomeRegular"
+                                   FontSize="19"
+                                   TextColor="{StaticResource PrimaryLight}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- STATUS BADGES ROW: Connected & Battery -->
+                    <HorizontalStackLayout Spacing="10" Margin="0,0,0,4">
+                        <!-- Connected / Disconnected Badge (Interactive) -->
+                        <Border StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding StatusBadgeBgColor}"
+                                Stroke="Transparent"
+                                Padding="10,6">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding NavigateToPairingCommand}" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Label Text="{Binding StatusBadgeIcon}" FontFamily="FontAwesomeSolid" FontSize="11" TextColor="{Binding StatusBadgeTextColor}" VerticalOptions="Center" />
+                                <Label Text="{Binding DeviceStatusText}"
+                                       FontSize="12"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding StatusBadgeTextColor}"
+                                       VerticalOptions="Center" />
+                                <Label Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="9" TextColor="{Binding StatusBadgeTextColor}" VerticalOptions="Center" IsVisible="{Binding IsDeviceDisconnected}" Margin="2,0,0,0" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Battery Badge (Visible only when connected) -->
+                        <Border StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource BadgeGreenBg}"
+                                Stroke="Transparent"
+                                Padding="10,6"
+                                IsVisible="{Binding IsDeviceConnected}">
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Label Text="&#xF241;" FontFamily="FontAwesomeSolid" FontSize="11" VerticalOptions="Center" />
+                                <Label Text="{Binding BatteryPercent}"
+                                       FontSize="12"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource BadgeGreenText}"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+                    </HorizontalStackLayout>
+
+                    <!-- QUICK PAIR SENSOR BANNER (Visible when sensor is not connected) -->
+                    <Border StrokeShape="RoundRectangle 16"
+                            BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#064E3B}"
+                            Stroke="{StaticResource PrimaryLight}"
+                            StrokeThickness="1"
+                            Padding="14,12"
+                            Margin="0,2,0,6"
+                            IsVisible="{Binding IsDeviceDisconnected}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToPairingCommand}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                            <Border Grid.Column="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="{StaticResource PrimaryLight}"
+                                    WidthRequest="36"
+                                    HeightRequest="36"
+                                    Stroke="Transparent">
+                                <Label Text="&#xF0C1;" FontFamily="FontAwesomeSolid" FontSize="15" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                                <Label Text="Connect CGM Sensor" FontAttributes="Bold" FontSize="13" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                                <Label Text="Tap to scan and receive real-time glucose telemetry" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                            </VerticalStackLayout>
+                            <Button Grid.Column="2"
+                                    Text="Connect"
+                                    Command="{Binding NavigateToPairingCommand}"
+                                    BackgroundColor="{StaticResource PrimaryLight}"
+                                    TextColor="White"
+                                    FontSize="12"
+                                    FontAttributes="Bold"
+                                    CornerRadius="10"
+                                    HeightRequest="32"
+                                    Padding="14,0"
+                                    VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
+                    <!-- MODULAR HERO GLUCOSE CARD -->
+                    <controls:HeroGlucoseCard GlucoseValue="{Binding CurrentGlucose}"
+                                             GlucoseUnit="{Binding GlucoseUnit}"
+                                             TrendText="{Binding TrendStatus}"
+                                             TrendArrow="{Binding TrendArrow}"
+                                             LastUpdatedText="{Binding LastUpdatedText}"
+                                             TapCommand="{Binding OpenGlucoseDetailsCommand}" />
+
+                    <!-- MODULAR GLUCOSE TREND CHART -->
+                    <controls:GlucoseTrendChart />
+
+                    <!-- QUICK EVENT LOGGING CARD -->
+                    <Border Style="{StaticResource MedicalCard}" Padding="16,14">
+                        <VerticalStackLayout Spacing="12">
+                            <!-- Header -->
+                            <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                                <VerticalStackLayout Grid.Column="0" Spacing="1">
+                                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                        <Label Text="&#xF067;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                                        <Label Text="Quick Event Logging" FontSize="14" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                                    </HorizontalStackLayout>
+                                    <Label Text="Log meals, insulin doses &amp; workouts" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="1" Text="Tap to Log" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                            </Grid>
+
+                            <!-- 3 Quick Action Buttons -->
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                <!-- Log Meal -->
+                                <Border Grid.Column="0" StrokeShape="RoundRectangle 12"
+                                        BackgroundColor="{AppThemeBinding Light=#FEF3C7, Dark=#78350F}"
+                                        Stroke="#FDE68A" StrokeThickness="1" Padding="8,10">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding LogMealCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                        <Label Text="&#xF2E7;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="{AppThemeBinding Light=#D97706, Dark=#FDE68A}" HorizontalOptions="Center" />
+                                        <Label Text="+ Meal" FontSize="11" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#B45309, Dark=#FEF3C7}" HorizontalOptions="Center" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <!-- Log Insulin -->
+                                <Border Grid.Column="1" StrokeShape="RoundRectangle 12"
+                                        BackgroundColor="{AppThemeBinding Light=#EFF6FF, Dark=#1E3A8A}"
+                                        Stroke="#BFDBFE" StrokeThickness="1" Padding="8,10">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding LogInsulinCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                        <Label Text="&#xF48E;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="{AppThemeBinding Light=#2563EB, Dark=#93C5FD}" HorizontalOptions="Center" />
+                                        <Label Text="+ Insulin" FontSize="11" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#1D4ED8, Dark=#EFF6FF}" HorizontalOptions="Center" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <!-- Log Activity -->
+                                <Border Grid.Column="2" StrokeShape="RoundRectangle 12"
+                                        BackgroundColor="{AppThemeBinding Light=#D1FAE5, Dark=#064E3B}"
+                                        Stroke="#A7F3D0" StrokeThickness="1" Padding="8,10">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding LogActivityCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                        <Label Text="&#xF70C;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="{AppThemeBinding Light=#059669, Dark=#6EE7B7}" HorizontalOptions="Center" />
+                                        <Label Text="+ Activity" FontSize="11" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#047857, Dark=#D1FAE5}" HorizontalOptions="Center" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+
+                            <!-- Recent Logged Events Strip -->
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding RecentEvents}" Spacing="6" Margin="0,4,0,0">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:LogEventItem">
+                                        <Border StrokeShape="RoundRectangle 10"
+                                                BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#1E293B}"
+                                                Stroke="{StaticResource BorderLightColor}"
+                                                StrokeThickness="1"
+                                                Padding="10,7">
+                                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                                                <!-- Icon Badge -->
+                                                <Border Grid.Column="0" StrokeShape="RoundRectangle 8"
+                                                        BackgroundColor="{Binding IconBgColor}"
+                                                        WidthRequest="28" HeightRequest="28"
+                                                        Stroke="Transparent" VerticalOptions="Center">
+                                                    <Label Text="{Binding IconText}" FontFamily="FontAwesomeSolid"
+                                                           FontSize="12" TextColor="{Binding IconColor}"
+                                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                                </Border>
+
+                                                <!-- Title & Detail -->
+                                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                                    <Label Text="{Binding Title}" FontSize="12" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                                                    <Label Text="{Binding Detail}" FontSize="11" TextColor="{StaticResource PrimaryLight}" FontAttributes="Bold" />
+                                                </VerticalStackLayout>
+
+                                                <!-- Time -->
+                                                <Label Grid.Column="2" Text="{Binding TimeText}" FontSize="11"
+                                                       TextColor="{StaticResource TextSecondaryLight}"
+                                                       VerticalOptions="Center" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- 2x2 MODULAR METRIC CARDS GRID -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="12" ColumnSpacing="12">
+                        <!-- 1. Time in Range -->
+                        <controls:MetricCard Grid.Row="0" Grid.Column="0"
+                                            CardTitle="Time in Range"
+                                            CardValue="{Binding TimeInRange}"
+                                            CardSubValue="Goal: > 70%"
+                                     IconText="&#xF140;"
+                                            IconBgColor="{StaticResource BadgeGreenBg}"
+                                            ValueColor="{StaticResource BadgeGreenText}" />
+
+                        <!-- 2. Sensor Status -->
+                        <controls:MetricCard Grid.Row="0" Grid.Column="1"
+                                            CardTitle="Sensor Status"
+                                            CardValue="{Binding SensorStatus}"
+                                            CardSubValue="{Binding SensorDaysLeft}"
+                                     IconText="&#xF017;"
+                                            IconBgColor="{StaticResource BadgeBlueBg}"
+                                            ValueColor="{StaticResource BadgeBlueText}" />
+
+                        <!-- 3. Battery -->
+                        <controls:MetricCard Grid.Row="1" Grid.Column="0"
+                                            CardTitle="Battery"
+                                            CardValue="{Binding BatteryPercent}"
+                                            CardSubValue="{Binding BatteryDaysLeft}"
+                                     IconText="&#xF241;"
+                                            IconBgColor="{StaticResource BadgeGreenBg}"
+                                            ValueColor="{StaticResource BadgeGreenText}" />
+
+                        <!-- 4. Last Sync -->
+                        <controls:MetricCard Grid.Row="1" Grid.Column="1"
+                                            CardTitle="Last Sync"
+                                            CardValue="{Binding LastSyncTime}"
+                                            CardSubValue="{Binding LastSyncDate}"
+                                     IconText="&#xF0C2;"
+                                            IconBgColor="{StaticResource BadgeBlueBg}"
+                                            ValueColor="{StaticResource BadgeBlueText}" />
+                    </Grid>
+
+                </VerticalStackLayout>
+
+
+                <!-- ================= TAB 2: HISTORY (MOCKUP 11) ================= -->
+                <VerticalStackLayout IsVisible="{Binding IsHistorySelected}"
+                                     Spacing="16"
+                                     Padding="20,20,20,24">
+
+                    <!-- Header & Export Icon -->
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Text="Glucose History"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                        
+                        <!-- Download / Export Button -->
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 20"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                BackgroundColor="{StaticResource White}"
+                                Stroke="{StaticResource BorderLightColor}">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ExportReportCommand}" /></Border.GestureRecognizers>
+                            <Label Text="&#xF019;" FontFamily="FontAwesomeSolid" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- INTERACTIVE WEEKLY CALENDAR STRIP -->
+                    <Border Style="{StaticResource MedicalCard}" Padding="12,12">
+                        <VerticalStackLayout Spacing="8">
+                            <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                                <Label Grid.Column="0" Text="Select Day" FontSize="13" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                                <Label Grid.Column="1" Text="TIR Status Dot" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                            </Grid>
+
+                            <!-- 7 Days Strip -->
+                            <FlexLayout Direction="Row" JustifyContent="SpaceBetween" AlignItems="Center" BindableLayout.ItemsSource="{Binding WeeklyCalendarDays}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:CalendarDayItem">
+                                        <Border StrokeShape="RoundRectangle 12"
+                                                BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#F8FAFC'}"
+                                                Stroke="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E2E8F0'}"
+                                                StrokeThickness="1"
+                                                WidthRequest="42"
+                                                Padding="2,8"
+                                                HorizontalOptions="Center">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=SelectCalendarDayCommand}" CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <VerticalStackLayout Spacing="3" HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Label Text="{Binding DayName}" FontSize="10" FontAttributes="Bold"
+                                                       TextColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                                       HorizontalTextAlignment="Center" />
+                                                <Label Text="{Binding DayNumber}" FontSize="14" FontAttributes="Bold"
+                                                       TextColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#0F172A'}"
+                                                       HorizontalTextAlignment="Center" />
+                                                <!-- TIR status dot -->
+                                                <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3"
+                                                         Color="{Binding DotColor}"
+                                                         HorizontalOptions="Center" />
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Time Range Filter Pills (Today, 7D, 14D, 30D) -->
+                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+                        <!-- Today -->
+                        <Border Grid.Column="0" StrokeShape="RoundRectangle 14"
+                                BackgroundColor="{Binding IsHistoryToday, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsHistoryToday, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="12,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetHistoryFilterCommand}" CommandParameter="Today" /></Border.GestureRecognizers>
+                            <Label Text="Today" FontSize="13" FontAttributes="Bold"
+                                   TextColor="{Binding IsHistoryToday, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- 7D -->
+                        <Border Grid.Column="1" StrokeShape="RoundRectangle 14"
+                                BackgroundColor="{Binding IsHistory7D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsHistory7D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="12,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetHistoryFilterCommand}" CommandParameter="7D" /></Border.GestureRecognizers>
+                            <Label Text="7D" FontSize="13" FontAttributes="Bold"
+                                   TextColor="{Binding IsHistory7D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- 14D -->
+                        <Border Grid.Column="2" StrokeShape="RoundRectangle 14"
+                                BackgroundColor="{Binding IsHistory14D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsHistory14D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="12,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetHistoryFilterCommand}" CommandParameter="14D" /></Border.GestureRecognizers>
+                            <Label Text="14D" FontSize="13" FontAttributes="Bold"
+                                   TextColor="{Binding IsHistory14D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- 30D -->
+                        <Border Grid.Column="3" StrokeShape="RoundRectangle 14"
+                                BackgroundColor="{Binding IsHistory30D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsHistory30D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="12,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetHistoryFilterCommand}" CommandParameter="30D" /></Border.GestureRecognizers>
+                            <Label Text="30D" FontSize="13" FontAttributes="Bold"
+                                   TextColor="{Binding IsHistory30D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- Dynamic Glucose Readings List Card -->
+                    <Border Style="{StaticResource MedicalCard}" Padding="16">
+                        <VerticalStackLayout Spacing="10">
+                            <!-- Table Header -->
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                                <Label Grid.Column="0" Text="Glucose Readings" FontAttributes="Bold" FontSize="14" />
+                                <Label Grid.Column="1" Text="{Binding GlucoseUnit}" FontSize="12" TextColor="{StaticResource TextMutedLight}" />
+                            </Grid>
+
+                            <!-- Dynamic Items -->
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding HistoryReadings}" Spacing="6">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:HistoryReadingItem">
+                                        <VerticalStackLayout Spacing="6">
+                                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                                                <Label Grid.Column="0" Text="{Binding TimeText}" FontSize="12" TextColor="{StaticResource TextSecondaryLight}" VerticalOptions="Center" WidthRequest="110" />
+                                                <Label Grid.Column="1" Text="{Binding ValueText}" FontSize="16" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                                                <Border Grid.Column="2" StrokeShape="RoundRectangle 8" BackgroundColor="{Binding StatusBgColor}" Padding="8,3" VerticalOptions="Center">
+                                                    <Label Text="{Binding StatusText}" FontSize="11" FontAttributes="Bold" TextColor="{Binding StatusTextColor}" />
+                                                </Border>
+                                                <Label Grid.Column="3" Text="{Binding TrendArrow}" FontSize="16" FontAttributes="Bold" TextColor="{Binding TrendColor}" VerticalOptions="Center" WidthRequest="20" HorizontalTextAlignment="Center" />
+                                            </Grid>
+                                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource BorderLightColor}" />
+                                        </VerticalStackLayout>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+
+                            <!-- View All Footer Link -->
+                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" Margin="0,6,0,0">
+                                <HorizontalStackLayout.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenDetailCommand}" CommandParameter="All Readings" /></HorizontalStackLayout.GestureRecognizers>
+                                <Label Text="View All Readings" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" />
+                        <Label Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="15" TextColor="{StaticResource PrimaryLight}" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Daily Summary 2x2 Grid -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Daily Summary" FontAttributes="Bold" FontSize="15" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="10" ColumnSpacing="10">
+                            <!-- Average Glucose -->
+                            <controls:MetricCard Grid.Row="0" Grid.Column="0"
+                                                CardTitle="Average Glucose"
+                                                CardValue="{Binding AvgGlucose}"
+                                                CardSubValue="{Binding AvgDiffText}"
+                                     IconText="&#xF201;"
+                                                IconBgColor="{StaticResource BadgeGreenBg}"
+                                                ValueColor="{StaticResource TextPrimaryLight}" />
+
+                            <!-- Time in Range -->
+                            <controls:MetricCard Grid.Row="0" Grid.Column="1"
+                                                CardTitle="Time in Range"
+                                                CardValue="{Binding TimeInRange}"
+                                                CardSubValue="Goal: > 70%"
+                                     IconText="&#xF140;"
+                                                IconBgColor="{StaticResource BadgeGreenBg}"
+                                                ValueColor="{StaticResource BadgeGreenText}" />
+
+                            <!-- Highest -->
+                            <controls:MetricCard Grid.Row="1" Grid.Column="0"
+                                                CardTitle="Highest"
+                                                CardValue="{Binding HighestGlucose}"
+                                                CardSubValue="{Binding HighestTime}"
+                                     IconText="&#xF062;"
+                                                IconBgColor="{StaticResource BadgeRedBg}"
+                                                ValueColor="{StaticResource Danger}" />
+
+                            <!-- Lowest -->
+                            <controls:MetricCard Grid.Row="1" Grid.Column="1"
+                                                CardTitle="Lowest"
+                                                CardValue="{Binding LowestGlucose}"
+                                                CardSubValue="{Binding LowestTime}"
+                                     IconText="&#xF063;"
+                                                IconBgColor="{StaticResource BadgeBlueBg}"
+                                                ValueColor="{StaticResource BadgeBlueText}" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+
+
+                <!-- ================= TAB 3: REPORTS (MOCKUP 6) ================= -->
+                <VerticalStackLayout IsVisible="{Binding IsReportsSelected}"
+                                     Spacing="16"
+                                     Padding="20,20,20,24">
+
+                    <!-- Header & Share Button -->
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Text="Reports"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                        
+                        <!-- Share / Export PDF -->
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 20"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                BackgroundColor="{StaticResource White}"
+                                Stroke="{StaticResource BorderLightColor}">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ExportReportCommand}" /></Border.GestureRecognizers>
+                            <Label Text="&#xF093;" FontFamily="FontAwesomeSolid" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- Filter Pills: 7D, 14D, 30D, 90D, Custom -->
+                    <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="6">
+                        <!-- 7D -->
+                        <Border Grid.Column="0" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsReport7D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsReport7D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetReportFilterCommand}" CommandParameter="7D" /></Border.GestureRecognizers>
+                            <Label Text="7D" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{Binding IsReport7D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- 14D -->
+                        <Border Grid.Column="1" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsReport14D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsReport14D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetReportFilterCommand}" CommandParameter="14D" /></Border.GestureRecognizers>
+                            <Label Text="14D" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{Binding IsReport14D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- 30D -->
+                        <Border Grid.Column="2" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsReport30D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsReport30D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetReportFilterCommand}" CommandParameter="30D" /></Border.GestureRecognizers>
+                            <Label Text="30D" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{Binding IsReport30D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- 90D -->
+                        <Border Grid.Column="3" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsReport90D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsReport90D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetReportFilterCommand}" CommandParameter="90D" /></Border.GestureRecognizers>
+                            <Label Text="90D" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{Binding IsReport90D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- Custom -->
+                        <Border Grid.Column="4" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsReportCustom, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsReportCustom, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetReportFilterCommand}" CommandParameter="Custom" /></Border.GestureRecognizers>
+                            <Label Text="Custom" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{Binding IsReportCustom, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- Summary 2x3 Metric Cards Grid -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Summary" FontAttributes="Bold" FontSize="15" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="10">
+                            <!-- Average Glucose -->
+                            <controls:MetricCard Grid.Row="0" Grid.Column="0"
+                                                CardTitle="Average Glucose"
+                                                CardValue="{Binding ReportAvgGlucose}"
+                                                CardSubValue="{Binding ReportAvgDiffText}"
+                                                IconText="&#xF201;"
+                                                IconBgColor="{StaticResource BadgeGreenBg}"
+                                                ValueColor="{StaticResource TextPrimaryLight}" />
+
+                            <!-- Time in Range -->
+                            <controls:MetricCard Grid.Row="0" Grid.Column="1"
+                                                CardTitle="Time in Range"
+                                                CardValue="{Binding ReportTimeInRange}"
+                                                CardSubValue="Goal: > 70%"
+                                                IconText="&#xF140;"
+                                                IconBgColor="{StaticResource BadgeGreenBg}"
+                                                ValueColor="{StaticResource BadgeGreenText}" />
+
+                            <!-- Highest -->
+                            <controls:MetricCard Grid.Row="1" Grid.Column="0"
+                                                CardTitle="Highest"
+                                                CardValue="{Binding ReportHighest}"
+                                                CardSubValue="{Binding ReportHighestDate}"
+                                                IconText="&#xF062;"
+                                                IconBgColor="{StaticResource BadgeRedBg}"
+                                                ValueColor="{StaticResource Danger}" />
+
+                            <!-- Lowest -->
+                            <controls:MetricCard Grid.Row="1" Grid.Column="1"
+                                                CardTitle="Lowest"
+                                                CardValue="{Binding ReportLowest}"
+                                                CardSubValue="{Binding ReportLowestDate}"
+                                                IconText="&#xF063;"
+                                                IconBgColor="{StaticResource BadgeBlueBg}"
+                                                ValueColor="{StaticResource BadgeBlueText}" />
+
+                            <!-- Estimated HbA1c (GMI) -->
+                            <controls:MetricCard Grid.Row="2" Grid.Column="0"
+                                                CardTitle="Est. HbA1c (GMI)"
+                                                CardValue="{Binding ReportEstimatedA1c}"
+                                                CardSubValue="Clinical formula"
+                                                IconText="&#xF0F0;"
+                                                IconBgColor="{StaticResource BadgeGreenBg}"
+                                                ValueColor="{StaticResource TextPrimaryLight}" />
+
+                            <!-- Glucose Variability (%CV) -->
+                            <controls:MetricCard Grid.Row="2" Grid.Column="1"
+                                                CardTitle="Glucose Var. (%CV)"
+                                                CardValue="{Binding ReportGlucoseVariability}"
+                                                CardSubValue="Target: ≤ 36%"
+                                                IconText="&#xF201;"
+                                                IconBgColor="{StaticResource BadgeBlueBg}"
+                                                ValueColor="{StaticResource BadgeBlueText}" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- MODULAR WEEKLY DUAL REPORTS CHART -->
+                    <controls:WeeklyReportsChart />
+
+                    <!-- Export PDF Card -->
+                    <Border Style="{StaticResource MedicalCard}" Padding="14">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                            <Border Grid.Column="0" StrokeShape="RoundRectangle 14" WidthRequest="36" HeightRequest="36" BackgroundColor="{StaticResource PrimaryContainerLight}" Stroke="Transparent" VerticalOptions="Center">
+                                <Label Text="&#xF241;" FontFamily="FontAwesomeSolid" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Data Source: GlucoTrack CGM" FontSize="12" FontAttributes="Bold" />
+                                <Label Text="{Binding ReportDateRangeText}" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                            </VerticalStackLayout>
+                            <Button Grid.Column="2"
+                                Text="Export PDF"
+                                    Command="{Binding ExportReportCommand}"
+                                    BackgroundColor="{StaticResource White}"
+                                    TextColor="{StaticResource PrimaryLight}"
+                                    BorderColor="{StaticResource PrimaryLight}"
+                                    BorderWidth="1"
+                                    FontSize="12"
+                                    FontAttributes="Bold"
+                                    Padding="12,6"
+                                    HeightRequest="36"
+                                    CornerRadius="10" />
+                        </Grid>
+                    </Border>
+
+                </VerticalStackLayout>
+
+
+                <!-- ================= TAB 4: ALERTS (MOCKUP 9) ================= -->
+                <VerticalStackLayout IsVisible="{Binding IsAlertsSelected}"
+                                     Spacing="14"
+                                     Padding="20,20,20,24">
+
+                    <!-- Header & Bell Outline Icon -->
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Text="Alerts"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                        
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 20"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                BackgroundColor="{StaticResource White}"
+                                Stroke="{StaticResource BorderLightColor}">
+                                <Label Text="&#xF0F3;" FontFamily="FontAwesomeRegular" FontSize="17" TextColor="{StaticResource PrimaryLight}" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- Filter Pills: All, Critical, Unread, Info -->
+                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="6">
+                        <!-- All -->
+                        <Border Grid.Column="0" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsAlertAll, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsAlertAll, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetAlertFilterCommand}" CommandParameter="All" /></Border.GestureRecognizers>
+                            <Label Text="All" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{Binding IsAlertAll, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- Critical -->
+                        <Border Grid.Column="1" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsAlertCritical, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsAlertCritical, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetAlertFilterCommand}" CommandParameter="Critical" /></Border.GestureRecognizers>
+                            <Label Text="Critical" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsAlertCritical, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- Unread -->
+                        <Border Grid.Column="2" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsAlertUnread, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsAlertUnread, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetAlertFilterCommand}" CommandParameter="Unread" /></Border.GestureRecognizers>
+                            <Label Text="Unread" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsAlertUnread, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- Info -->
+                        <Border Grid.Column="3" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsAlertInfo, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#FFFFFF'}"
+                                Stroke="{Binding IsAlertInfo, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetAlertFilterCommand}" CommandParameter="Info" /></Border.GestureRecognizers>
+                            <Label Text="Info" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsAlertInfo, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- EMERGENCY PROTOCOL: RULE OF 15 CARD -->
+                    <Border StrokeShape="RoundRectangle 16"
+                            BackgroundColor="{AppThemeBinding Light=#FFF1F2, Dark=#4C0519}"
+                            Stroke="#FDA4AF"
+                            StrokeThickness="1.5"
+                            Padding="16,14">
+                        <VerticalStackLayout Spacing="10">
+                            <!-- Card Header -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                                <Border Grid.Column="0" StrokeShape="RoundRectangle 10"
+                                        BackgroundColor="#FFE4E6" WidthRequest="32" HeightRequest="32"
+                                        Stroke="Transparent" VerticalOptions="Center">
+                                    <Label Text="&#xF071;" FontFamily="FontAwesomeSolid" FontSize="15" TextColor="#E11D48" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                        <Label Text="Emergency Protocol: Rule of 15" FontSize="13" FontAttributes="Bold" TextColor="#BE123C" />
+                                        <Border StrokeShape="RoundRectangle 6" BackgroundColor="#E11D48" Padding="5,2" VerticalOptions="Center">
+                                            <Label Text="CRITICAL" FontSize="9" FontAttributes="Bold" TextColor="White" />
+                                        </Border>
+                                    </HorizontalStackLayout>
+                                    <Label Text="Immediate clinical guidance for low glucose (&lt; 70 mg/dL)" FontSize="11" TextColor="#9F1239" />
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <!-- 3 Step Protocol Cards -->
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="6">
+                                <!-- Step 1 -->
+                                <Border Grid.Column="0" StrokeShape="RoundRectangle 10" BackgroundColor="{AppThemeBinding Light=White, Dark=#1E293B}" Stroke="#FECDD3" StrokeThickness="1" Padding="8,8">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="1. 15g Carbs" FontSize="11" FontAttributes="Bold" TextColor="#BE123C" />
+                                        <Label Text="Juice (4 oz) or 3-4 glucose tabs" FontSize="9.5" TextColor="{StaticResource TextSecondaryLight}" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <!-- Step 2 -->
+                                <Border Grid.Column="1" StrokeShape="RoundRectangle 10" BackgroundColor="{AppThemeBinding Light=White, Dark=#1E293B}" Stroke="#FECDD3" StrokeThickness="1" Padding="8,8">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="2. Wait 15m" FontSize="11" FontAttributes="Bold" TextColor="#BE123C" />
+                                        <Label Text="Rest and sit calmly; avoid exertion" FontSize="9.5" TextColor="{StaticResource TextSecondaryLight}" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <!-- Step 3 -->
+                                <Border Grid.Column="2" StrokeShape="RoundRectangle 10" BackgroundColor="{AppThemeBinding Light=White, Dark=#1E293B}" Stroke="#FECDD3" StrokeThickness="1" Padding="8,8">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="3. Re-Check" FontSize="11" FontAttributes="Bold" TextColor="#BE123C" />
+                                        <Label Text="Re-test. Repeat if still &lt; 70 mg/dL" FontSize="9.5" TextColor="{StaticResource TextSecondaryLight}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+
+                            <!-- Actions Row: Timer Button & Emergency Dial -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <!-- Start Timer Button -->
+                                <Button Grid.Column="0"
+                                        Text="{Binding RuleOf15TimerText, StringFormat='⏱️ Start 15m Timer ({0})'}"
+                                        Command="{Binding StartRuleOf15TimerCommand}"
+                                        BackgroundColor="#E11D48"
+                                        TextColor="White"
+                                        FontSize="12"
+                                        FontAttributes="Bold"
+                                        CornerRadius="10"
+                                        HeightRequest="36"
+                                        Padding="10,0" />
+
+                                <!-- Emergency Assistance Button -->
+                                <Border Grid.Column="1" StrokeShape="RoundRectangle 10"
+                                        BackgroundColor="#FFE4E6" Stroke="#FDA4AF" StrokeThickness="1"
+                                        WidthRequest="44" HeightRequest="36">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding CallEmergencyCaregiverCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="&#xF095;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="#E11D48" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- 1. Low Glucose Alert -->
+                    <controls:AlertCard AlertTitle="Low Glucose"
+                                        Command="{Binding OpenAlertCommand}" CommandParameter="Low Glucose — 68 mg/dL at 4:30 AM"
+                                        AlertValue="68 mg/dL"
+                                        AlertTime="4:30 AM"
+                                        BadgeText="Low"
+                                         IconText="&#xF063;"
+                                        IconBgColor="{StaticResource BadgeBlueBg}"
+                                        IconTextColor="{StaticResource BadgeBlueText}"
+                                        BadgeBgColor="{StaticResource BadgeBlueBg}"
+                                        BadgeTextColor="{StaticResource BadgeBlueText}"
+                                        DotColor="{StaticResource BadgeBlueText}" />
+
+                    <!-- 2. Connection Lost Alert -->
+                    <controls:AlertCard AlertTitle="Connection Lost"
+                                        Command="{Binding OpenAlertCommand}" CommandParameter="Connection Lost — 3:55 AM"
+                                        AlertDescription="We couldn't connect to your CGM. Reconnect to resume real-time updates."
+                                        AlertTime="3:55 AM"
+                                        BadgeText="Warning"
+                                         IconText="&#xF012;"
+                                        IconBgColor="{StaticResource BadgeAmberBg}"
+                                        IconTextColor="{StaticResource BadgeAmberText}"
+                                        BadgeBgColor="{StaticResource BadgeAmberBg}"
+                                        BadgeTextColor="{StaticResource BadgeAmberText}"
+                                        DotColor="{StaticResource Warning}" />
+
+                    <!-- 3. Sensor Expiring Alert -->
+                    <controls:AlertCard AlertTitle="Sensor Expiring"
+                                        Command="{Binding OpenAlertCommand}" CommandParameter="Sensor Expiring — 1 day left"
+                                        AlertDescription="Your sensor will expire soon. Replace it to avoid data gaps."
+                                        AlertTime="Yesterday"
+                                        BadgeText="Info"
+                                        SubBadgeText="1 day left"
+                                         IconText="&#xF017;"
+                                        IconBgColor="#F3E8FF"
+                                        IconTextColor="#7C3AED"
+                                        BadgeBgColor="#F3E8FF"
+                                        BadgeTextColor="#7C3AED"
+                                        DotColor="#7C3AED" />
+
+                    <!-- 4. High Glucose Alert -->
+                    <controls:AlertCard AlertTitle="High Glucose"
+                                        Command="{Binding OpenAlertCommand}" CommandParameter="High Glucose — 182 mg/dL"
+                                        AlertValue="182 mg/dL"
+                                        AlertTime="Yesterday, 9:15 PM"
+                                        BadgeText="High"
+                                         IconText="&#xF062;"
+                                        IconBgColor="{StaticResource BadgeRedBg}"
+                                        IconTextColor="{StaticResource BadgeRedText}"
+                                        BadgeBgColor="{StaticResource BadgeRedBg}"
+                                        BadgeTextColor="{StaticResource BadgeRedText}"
+                                        DotColor="{StaticResource Danger}" />
+
+                    <!-- 5. Sensor Started Alert -->
+                    <controls:AlertCard AlertTitle="Sensor Started"
+                                        Command="{Binding OpenAlertCommand}" CommandParameter="Sensor Started — May 12, 8:45 AM"
+                                        AlertDescription="Your new sensor is warming up and working properly."
+                                        AlertTime="May 12, 8:45 AM"
+                                        BadgeText="Info"
+                                         IconText="&#xF00C;"
+                                        IconBgColor="{StaticResource BadgeGreenBg}"
+                                        IconTextColor="{StaticResource BadgeGreenText}"
+                                        BadgeBgColor="{StaticResource BadgeGreenBg}"
+                                        BadgeTextColor="{StaticResource BadgeGreenText}"
+                                        DotColor="{StaticResource Success}" />
+
+                </VerticalStackLayout>
+
+
+                <!-- ================= TAB 5: PROFILE & SETTINGS (MOCKUP 10) ================= -->
+                <VerticalStackLayout IsVisible="{Binding IsProfileSelected}"
+                                     Spacing="16"
+                                     Padding="20,20,20,24">
+
+                    <!-- Header -->
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Profile &amp; Settings"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                        <Label Text="Manage your profile, device and app preferences."
+                               FontSize="13"
+                               TextColor="{StaticResource TextSecondaryLight}" />
+                    </VerticalStackLayout>
+
+                    <!-- User Profile Card -->
+                    <Border Style="{StaticResource MedicalCard}" Padding="16">
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenDetailCommand}" CommandParameter="Personal Info" /></Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" VerticalOptions="Center">
+                            <!-- Avatar with Edit Badge -->
+                            <Grid Grid.Column="0">
+                                <Border StrokeShape="RoundRectangle 30" WidthRequest="60" HeightRequest="60" BackgroundColor="{StaticResource PrimaryContainerLight}" Stroke="{StaticResource PrimaryLight}" StrokeThickness="2">
+                                <Label Text="&#xF007;" FontFamily="FontAwesomeRegular" FontSize="26" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <Border HorizontalOptions="End" VerticalOptions="End" StrokeShape="RoundRectangle 10" WidthRequest="20" HeightRequest="20" BackgroundColor="{StaticResource White}" Stroke="{StaticResource BorderLightColor}">
+                                <Label Text="&#xF304;" FontFamily="FontAwesomeSolid" FontSize="10" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                            </Grid>
+
+                            <!-- User Info -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                <Label Text="{Binding UserFullName, FallbackValue='Jane Doe', TargetNullValue='Jane Doe'}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                                <Label Text="{Binding UserEmail, FallbackValue='jane.doe@email.com', TargetNullValue='jane.doe@email.com'}"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                                <Border StrokeShape="RoundRectangle 10"
+                                        BackgroundColor="{Binding StatusBadgeBgColor}"
+                                        Padding="8,3"
+                                        HorizontalOptions="Start"
+                                        Margin="0,2,0,0">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding NavigateToPairingCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                                        <Label Text="{Binding StatusBadgeIcon}" FontFamily="FontAwesomeSolid" FontSize="10" TextColor="{Binding StatusBadgeTextColor}" VerticalOptions="Center" />
+                                        <Label Text="{Binding DeviceStatusText}" FontSize="11" FontAttributes="Bold" TextColor="{Binding StatusBadgeTextColor}" />
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </VerticalStackLayout>
+
+                        <Label Grid.Column="2" Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="20" TextColor="{StaticResource TextMutedLight}" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Linked CGM Device Card (Interactive) -->
+                    <Border Style="{StaticResource MedicalCard}" Padding="16">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToPairingCommand}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" VerticalOptions="Center">
+                            <Border Grid.Column="0" StrokeShape="RoundRectangle 24" WidthRequest="48" HeightRequest="48" BackgroundColor="{StaticResource PrimaryContainerLight}" Stroke="{StaticResource PrimaryLight}" VerticalOptions="Center">
+                                <Label Text="&#xF111;" FontFamily="FontAwesomeSolid" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                <Label Text="CGM Hardware Sensor" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                <Label Text="Lianxin CxM Monitor" FontSize="15" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                                <Label Text="{Binding SensorDaysLeft}" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                            </VerticalStackLayout>
+
+                            <Border Grid.Column="2" StrokeShape="RoundRectangle 8" BackgroundColor="{Binding StatusBadgeBgColor}" Padding="8,4" VerticalOptions="Center">
+                                <Label Text="{Binding DeviceStatusText}" FontSize="11" FontAttributes="Bold" TextColor="{Binding StatusBadgeTextColor}" />
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Settings Options Card -->
+                    <Border Style="{StaticResource MedicalCard}" Padding="16,8">
+                        <VerticalStackLayout Spacing="0">
+                            
+                            <!-- Personal Info -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="0,12">
+                                <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenDetailCommand}" CommandParameter="Personal Info" /></Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Text="&#xF007;" FontFamily="FontAwesomeRegular" FontSize="17" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Personal Info" FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="Update your personal details" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource TextMutedLight}" VerticalOptions="Center" />
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource BorderLightColor}" />
+
+                            <!-- Linked CGM Device -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="0,12">
+                                <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenDetailCommand}" CommandParameter="Linked CGM Device" /></Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Text="&#xF0C1;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Linked CGM Device" FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="View device details and settings" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource TextMutedLight}" VerticalOptions="Center" />
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource BorderLightColor}" />
+
+                            <!-- Glucose Unit -->
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12" Padding="0,12">
+                                <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenDetailCommand}" CommandParameter="Glucose Unit" /></Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Text="&#xF017;" FontFamily="FontAwesomeRegular" FontSize="17" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Glucose Unit" FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="Choose your preferred unit" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="2" Text="mg/dL" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                            <Label Grid.Column="3" Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource TextMutedLight}" VerticalOptions="Center" />
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource BorderLightColor}" />
+
+                            <!-- Target Glucose Range -->
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12" Padding="0,12">
+                                <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenDetailCommand}" CommandParameter="Target Glucose Range" /></Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Text="&#xF140;" FontFamily="FontAwesomeSolid" FontSize="17" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Target Glucose Range" FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="Standard target: 70 – 180 mg/dL" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="2" Text="70-180" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                            <Label Grid.Column="3" Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource TextMutedLight}" VerticalOptions="Center" />
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource BorderLightColor}" />
+
+                            <!-- Notification Preferences -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="0,12">
+                                <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenDetailCommand}" CommandParameter="Notification Preferences" /></Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Text="&#xF0F3;" FontFamily="FontAwesomeRegular" FontSize="17" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Notification Preferences" FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="Manage alerts and reminders" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource TextMutedLight}" VerticalOptions="Center" />
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource BorderLightColor}" />
+
+                            <!-- Privacy & Security -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="0,12">
+                                <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenDetailCommand}" CommandParameter="Privacy &amp; Security" /></Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Text="&#xF023;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Privacy &amp; Security" FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="Manage your data and privacy" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource TextMutedLight}" VerticalOptions="Center" />
+                            </Grid>
+
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Support & Sign Out Card -->
+                    <Border Style="{StaticResource MedicalCard}" Padding="16,8">
+                        <VerticalStackLayout Spacing="0">
+                            <!-- Sign Out -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="0,12">
+                            <Label Grid.Column="0" Text="&#xF52B;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource Danger}" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Sign Out" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Danger}" />
+                                    <Label Text="Sign out of your account" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                </VerticalStackLayout>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding LogoutCommand}" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Version Label -->
+                    <Label Text="Version 1.0.0" FontSize="11" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" Margin="0,0,0,10" />
+
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- ================= MODULAR DOCKED 5-ITEM BOTTOM NAVIGATION BAR ================= -->
+        <controls:BottomNavBar Grid.Row="1" />
+
+    </Grid>
+
+</ContentPage>

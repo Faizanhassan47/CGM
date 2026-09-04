@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Auth"
+             x:Class="CGM.PatientApp.Views.Auth.SignUpPage"
+             x:DataType="vm:SignUpViewModel"
+             BackgroundColor="{AppThemeBinding Light=#F8FAF9, Dark=#0F172A}"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <Grid Padding="24,24,24,24" RowDefinitions="Auto,*">
+
+            <!-- 1. TOP BRANDING SECTION (GlucoTrack Logo) -->
+            <VerticalStackLayout Grid.Row="0" Spacing="6" Margin="0,4,0,20" HorizontalOptions="Center">
+                <!-- Circular Droplet Orbit Icon -->
+                <Border StrokeShape="RoundRectangle 36"
+                        WidthRequest="64"
+                        HeightRequest="64"
+                        HorizontalOptions="Center"
+                        BackgroundColor="{StaticResource White}"
+                        Stroke="{StaticResource PrimaryLight}"
+                        StrokeThickness="3"
+                        Padding="8">
+                    <Label Text="&#xF043;" FontFamily="FontAwesomeSolid"
+                           FontSize="26"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+
+                <!-- Brand Name -->
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="0" Margin="0,4,0,0">
+                    <Label Text="Gluco"
+                           FontSize="26"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                    <Label Text="Track"
+                           FontSize="26"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource PrimaryLight}" />
+                </HorizontalStackLayout>
+                
+                <Label Text="Stay informed, stay in control."
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- 2. CREATE ACCOUNT CARD -->
+            <Border Grid.Row="1"
+                    Style="{StaticResource MedicalCard}"
+                    Padding="20,20"
+                    Margin="0,0,0,10">
+                <VerticalStackLayout Spacing="14">
+
+                    <!-- Title Row with Icon -->
+                    <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                        <Border StrokeShape="RoundRectangle 16"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                BackgroundColor="{StaticResource PrimaryContainerLight}"
+                                Stroke="Transparent"
+                                VerticalOptions="Center">
+                            <Label Text="&#xF007;" FontFamily="FontAwesomeSolid" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                            <Label Text="Create Account"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                            <Label Text="Create your account to securely access your glucose data."
+                                   FontSize="11"
+                                   TextColor="{StaticResource TextSecondaryLight}"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+
+                    <!-- Error Banner -->
+                    <Border StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                            Stroke="{StaticResource Danger}"
+                            StrokeThickness="1"
+                            Padding="12,10"
+                            IsVisible="{Binding HasError}">
+                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                            <Label Text="&#xF071;" FontFamily="FontAwesomeSolid" FontSize="14" VerticalOptions="Center"/>
+                            <Label Text="{Binding ErrorMessage}"
+                                   TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                                   FontSize="13"
+                                   VerticalOptions="Center"
+                                   LineBreakMode="WordWrap" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Full Name -->
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Full Name" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource InputContainerBorder}">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="&#xF007;" FontFamily="FontAwesomeRegular" FontSize="15" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Placeholder="Enter your full name"
+                                       Text="{Binding FullName}"
+                                       ReturnType="Next" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Email -->
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Email" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource InputContainerBorder}">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="&#xF0E0;" FontFamily="FontAwesomeRegular" FontSize="15" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Placeholder="Enter your email"
+                                       Text="{Binding Email}"
+                                       Keyboard="Email"
+                                       ReturnType="Next" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Password -->
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Password" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource InputContainerBorder}">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="&#xF023;" FontFamily="FontAwesomeSolid" FontSize="15" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Placeholder="Create a password"
+                                       Text="{Binding Password}"
+                                       IsPassword="{Binding IsPasswordHidden}"
+                                       ReturnType="Next" />
+                                <Border Grid.Column="2"
+                                        WidthRequest="44"
+                                        HeightRequest="44"
+                                        Padding="0"
+                                        BackgroundColor="Transparent"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 12"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="Center"
+                                        SemanticProperties.Description="Show or hide password">
+                                    <Label Text="&#xF06E;"
+                                           FontFamily="FontAwesomeSolid"
+                                           FontSize="18"
+                                           TextColor="{AppThemeBinding Light=#334155, Dark=#CBD5E1}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding TogglePasswordVisibilityCommand}" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Confirm Password -->
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Confirm Password" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource InputContainerBorder}">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="&#xF023;" FontFamily="FontAwesomeSolid" FontSize="15" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Placeholder="Confirm your password"
+                                       Text="{Binding ConfirmPassword}"
+                                       IsPassword="{Binding IsConfirmPasswordHidden}"
+                                       ReturnType="Done" />
+                                <Border Grid.Column="2"
+                                        WidthRequest="44"
+                                        HeightRequest="44"
+                                        Padding="0"
+                                        BackgroundColor="Transparent"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 12"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="Center"
+                                        SemanticProperties.Description="Show or hide confirmation password">
+                                    <Label Text="&#xF06E;"
+                                           FontFamily="FontAwesomeSolid"
+                                           FontSize="18"
+                                           TextColor="{AppThemeBinding Light=#334155, Dark=#CBD5E1}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding ToggleConfirmPasswordVisibilityCommand}" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Terms Checkbox -->
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <CheckBox IsChecked="{Binding AgreeToTerms}" VerticalOptions="Center" />
+                        <Label Text="I agree to the Terms of Service and Privacy Policy"
+                               FontSize="11"
+                               TextColor="{StaticResource TextSecondaryLight}"
+                               VerticalOptions="Center"
+                               LineBreakMode="WordWrap" />
+                    </HorizontalStackLayout>
+
+                    <!-- Create Account Solid Button -->
+                    <Button Text="Create Account"
+                            Command="{Binding RegisterCommand}"
+                            BackgroundColor="{StaticResource PrimaryLight}"
+                            TextColor="{StaticResource White}"
+                            FontAttributes="Bold"
+                            HeightRequest="48"
+                            CornerRadius="14" />
+
+                    <!-- Already have an account? Sign In -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="6" Margin="0,4,0,0">
+                        <Label Text="Already have an account?"
+                               TextColor="{StaticResource TextSecondaryLight}"
+                               FontSize="13"
+                               VerticalOptions="Center" />
+                        <Button Text="Sign In"
+                                Command="{Binding NavigateToLoginCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource PrimaryLight}"
+                                FontAttributes="Bold"
+                                FontSize="13"
+                                Padding="0"
+                                HeightRequest="36"
+                                VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </Grid>
+    </ScrollView>
+
+</ContentPage>

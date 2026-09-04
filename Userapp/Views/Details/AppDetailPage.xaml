@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CGM.PatientApp.Views.Details.AppDetailPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#0F172A}">
+    <Grid RowDefinitions="Auto,*">
+        <Grid Padding="20,18,20,12" ColumnDefinitions="Auto,*" ColumnSpacing="14">
+            <Border StrokeShape="RoundRectangle 20" WidthRequest="40" HeightRequest="40"
+                    BackgroundColor="{StaticResource White}" Stroke="{StaticResource BorderLightColor}">
+                    <Label Text="&#xF053;" FontFamily="FontAwesomeSolid" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped" />
+                </Border.GestureRecognizers>
+            </Border>
+            <Label x:Name="TitleLabel" Grid.Column="1" FontSize="22" FontAttributes="Bold"
+                   VerticalOptions="Center" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+        </Grid>
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout x:Name="ContentHost" Padding="20,10,20,30" Spacing="14" />
+        </ScrollView>
+    </Grid>
+</ContentPage>

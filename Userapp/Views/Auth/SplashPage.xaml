@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Auth"
+             x:Class="CGM.PatientApp.Views.Auth.SplashPage"
+             x:DataType="vm:SplashViewModel"
+             BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#0F172A}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid VerticalOptions="Fill" HorizontalOptions="Fill" RowDefinitions="*,Auto" Padding="24,40,24,60">
+        
+        <!-- Center Logo & Branding -->
+        <VerticalStackLayout Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+            <!-- Circular Droplet Orbit Icon -->
+            <Border StrokeShape="RoundRectangle 45"
+                    WidthRequest="90"
+                    HeightRequest="90"
+                    HorizontalOptions="Center"
+                    BackgroundColor="{StaticResource White}"
+                    Stroke="{StaticResource PrimaryLight}"
+                    StrokeThickness="3.5"
+                    Padding="10">
+                    <Label Text="&#xF043;" FontFamily="FontAwesomeSolid"
+                       FontSize="38"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
+
+            <!-- Brand Name -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="0" Margin="0,12,0,0">
+                <Label Text="Gluco"
+                       FontSize="34"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                <Label Text="Track"
+                       FontSize="34"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource PrimaryLight}" />
+            </HorizontalStackLayout>
+            
+            <Label Text="Continuous Glucose Monitoring"
+                   FontSize="15"
+                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                   HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+
+        <!-- Bottom Loading Spinner & Caption -->
+        <VerticalStackLayout Grid.Row="1" Spacing="8" HorizontalOptions="Center">
+            <ActivityIndicator IsRunning="True"
+                               Color="{StaticResource PrimaryLight}"
+                               WidthRequest="28"
+                               HeightRequest="28" />
+            <Label Text="Loading..."
+                   FontSize="13"
+                   TextColor="{StaticResource TextSecondaryLight}"
+                   HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+        
+    </Grid>
+
+</ContentPage>

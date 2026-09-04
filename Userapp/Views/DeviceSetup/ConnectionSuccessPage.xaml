@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.DeviceSetup"
+             x:Class="CGM.PatientApp.Views.DeviceSetup.ConnectionSuccessPage"
+             x:DataType="vm:ConnectionSuccessViewModel"
+             Title="Connection Success"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <Grid Padding="24,40,24,24" RowDefinitions="*,Auto">
+
+            <!-- Center Content -->
+            <VerticalStackLayout Grid.Row="0" VerticalOptions="Center" Spacing="20">
+
+                <!-- Success Checkmark Badge -->
+                <Border StrokeShape="RoundRectangle 30"
+                        WidthRequest="88"
+                        HeightRequest="88"
+                        HorizontalOptions="Center"
+                        BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#064E3B}"
+                        Stroke="{StaticResource Success}"
+                        StrokeThickness="2">
+                    <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid"
+                           FontSize="40"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Success}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+
+                <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                    <Label Text="Your CGM Is Ready"
+                           Style="{StaticResource HeaderTitle}"
+                           FontSize="24"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Pairing verified. Continuous measurement is active."
+                           Style="{StaticResource SubTitle}"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Device & Sensor Status Card -->
+                <Border Style="{StaticResource MedicalCard}" Margin="0,10,0,0">
+                    <VerticalStackLayout Spacing="14">
+                        
+                        <Label Text="Device Summary"
+                               FontAttributes="Bold"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+
+                        <!-- Serial -->
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="Serial Number" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                            <Label Grid.Column="1" Text="{Binding DeviceIdentifier}" FontSize="13" FontAttributes="Bold" />
+                        </Grid>
+
+                        <!-- Firmware -->
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="Firmware Version" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                            <Label Grid.Column="1" Text="{Binding FirmwareVersion}" FontSize="13" FontAttributes="Bold" />
+                        </Grid>
+
+                        <!-- Battery -->
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="Battery State" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                            <Label Grid.Column="1" Text="{Binding BatteryStatus}" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Success}" />
+                        </Grid>
+
+                        <!-- Sensor State -->
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="Sensor Status" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                            <Border Grid.Column="1"
+                                    StrokeShape="RoundRectangle 6"
+                                    BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#064E3B}"
+                                    Stroke="{StaticResource Success}"
+                                    Padding="6,2">
+                                <Label Text="Active" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Success}" />
+                            </Border>
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+
+            <!-- Bottom Button -->
+            <VerticalStackLayout Grid.Row="1" Spacing="10" Margin="0,20,0,10">
+                <Button Text="Go to Dashboard"
+                        Command="{Binding GoToDashboardCommand}" />
+            </VerticalStackLayout>
+
+        </Grid>
+    </ScrollView>
+
+</ContentPage>

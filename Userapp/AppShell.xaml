@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="CGM.PatientApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:auth="clr-namespace:CGM.PatientApp.Views.Auth"
+    xmlns:device="clr-namespace:CGM.PatientApp.Views.DeviceSetup"
+    xmlns:dashboard="clr-namespace:CGM.PatientApp.Views.Dashboard"
+    Title="CGM Health"
+    FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False">
+
+    <!-- Splash / Startup Entry -->
+    <ShellItem Route="SplashPage">
+        <ShellContent ContentTemplate="{DataTemplate auth:SplashPage}" />
+    </ShellItem>
+
+    <!-- Authentication Flow -->
+    <ShellItem Route="LoginPage">
+        <ShellContent ContentTemplate="{DataTemplate auth:LoginPage}" />
+    </ShellItem>
+
+    <ShellItem Route="ResetPasswordPage">
+        <ShellContent ContentTemplate="{DataTemplate auth:ResetPasswordPage}" />
+    </ShellItem>
+
+    <!-- Onboarding Flow -->
+    <ShellItem Route="CompleteProfilePage">
+        <ShellContent ContentTemplate="{DataTemplate auth:CompleteProfilePage}" />
+    </ShellItem>
+
+    <ShellItem Route="DeviceSelectionPage">
+        <ShellContent ContentTemplate="{DataTemplate device:DeviceSelectionPage}" />
+    </ShellItem>
+
+    <!-- Main Patient Dashboard -->
+    <ShellItem Route="DashboardPage">
+        <ShellContent ContentTemplate="{DataTemplate dashboard:DashboardPage}" />
+    </ShellItem>
+
+</Shell>

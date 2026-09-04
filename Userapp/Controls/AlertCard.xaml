@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CGM.PatientApp.Controls.AlertCard"
+             x:Name="thisAlert">
+    <Border Style="{StaticResource MedicalCard}" Padding="16,14">
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding Command, Source={x:Reference thisAlert}}"
+                                  CommandParameter="{Binding CommandParameter, Source={x:Reference thisAlert}}" />
+        </Border.GestureRecognizers>
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+            
+            <!-- Left Circular Icon Badge -->
+            <Border Grid.Column="0"
+                    StrokeShape="RoundRectangle 22"
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    BackgroundColor="{Binding IconBgColor, Source={x:Reference thisAlert}}"
+                    Stroke="Transparent"
+                    VerticalOptions="Start">
+            <Label Text="{Binding IconText, Source={x:Reference thisAlert}}"
+                   FontFamily="FontAwesomeSolid"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="{Binding IconTextColor, Source={x:Reference thisAlert}}"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
+
+            <!-- Center Content -->
+            <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                <Label Text="{Binding AlertTitle, Source={x:Reference thisAlert}}"
+                       FontSize="14"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                
+                <Label Text="{Binding AlertValue, Source={x:Reference thisAlert}}"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}"
+                       IsVisible="{Binding HasValue, Source={x:Reference thisAlert}}" />
+
+                <Label Text="{Binding AlertDescription, Source={x:Reference thisAlert}}"
+                       FontSize="11"
+                       TextColor="{StaticResource TextSecondaryLight}"
+                       LineBreakMode="WordWrap"
+                       IsVisible="{Binding HasDescription, Source={x:Reference thisAlert}}" />
+
+                <!-- Badges Row -->
+                <HorizontalStackLayout Spacing="6" Margin="0,2,0,0">
+                    <Border StrokeShape="RoundRectangle 8"
+                            BackgroundColor="{Binding BadgeBgColor, Source={x:Reference thisAlert}}"
+                            Padding="8,3">
+                        <Label Text="{Binding BadgeText, Source={x:Reference thisAlert}}"
+                               FontSize="10"
+                               FontAttributes="Bold"
+                               TextColor="{Binding BadgeTextColor, Source={x:Reference thisAlert}}" />
+                    </Border>
+                    <Label Text="{Binding SubBadgeText, Source={x:Reference thisAlert}}"
+                           FontSize="11"
+                           TextColor="{StaticResource TextSecondaryLight}"
+                           VerticalOptions="Center"
+                           IsVisible="{Binding HasSubBadge, Source={x:Reference thisAlert}}" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Right Column: Time, Dot & Chevron -->
+            <VerticalStackLayout Grid.Column="2" Spacing="8" HorizontalOptions="End" VerticalOptions="Start">
+                <HorizontalStackLayout Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
+                    <Label Text="{Binding AlertTime, Source={x:Reference thisAlert}}"
+                           FontSize="11"
+                           TextColor="{StaticResource TextSecondaryLight}" />
+                    <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{Binding DotColor, Source={x:Reference thisAlert}}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                
+        <Label Text="&#xF054;" FontFamily="FontAwesomeSolid"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextMutedLight}"
+                       HorizontalOptions="End"
+                       Margin="0,4,0,0" />
+            </VerticalStackLayout>
+
+        </Grid>
+    </Border>
+</ContentView>

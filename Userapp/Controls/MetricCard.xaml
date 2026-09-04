@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CGM.PatientApp.Controls.MetricCard"
+             x:Name="thisCard">
+    <Border Style="{StaticResource MedicalCard}" Padding="14">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+            <!-- Icon Badge -->
+            <Border Grid.Column="0"
+                    StrokeShape="RoundRectangle 18"
+                    WidthRequest="38"
+                    HeightRequest="38"
+                    BackgroundColor="{Binding IconBgColor, Source={x:Reference thisCard}}"
+                    Stroke="Transparent"
+                    VerticalOptions="Center">
+            <Label Text="{Binding IconText, Source={x:Reference thisCard}}"
+                   FontFamily="FontAwesomeSolid"
+                       FontSize="18"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
+            <!-- Details -->
+            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                <Label Text="{Binding CardTitle, Source={x:Reference thisCard}}"
+                       FontSize="11"
+                       TextColor="{StaticResource TextSecondaryLight}" />
+                <Label Text="{Binding CardValue, Source={x:Reference thisCard}}"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="{Binding ValueColor, Source={x:Reference thisCard}}" />
+                <Label Text="{Binding CardSubValue, Source={x:Reference thisCard}}"
+                       FontSize="10"
+                       TextColor="{StaticResource TextMutedLight}" />
+            </VerticalStackLayout>
+        </Grid>
+    </Border>
+</ContentView>

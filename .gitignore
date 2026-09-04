@@ -1,0 +1,28 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+Userapp/.env
+Userapp/.env.*
+!Userapp/.env.example
+Userapp/Resources/Raw/app.env
+
+# Build Artifacts & Packages
+**/bin/
+**/obj/
+*.apk
+*.aab
+
+# Visual Studio & IDEs
+.vs/
+**/.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# System & Verification
+.verify/
+Thumbs.db
+[Ee]xpress/

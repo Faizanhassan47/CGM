@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.DeviceSetup"
+             x:Class="CGM.PatientApp.Views.DeviceSetup.ConnectingPage"
+             x:DataType="vm:ConnectingViewModel"
+             Title="Connecting"
+             Shell.NavBarIsVisible="False">
+
+    <Grid Padding="24,40,24,24" RowDefinitions="*,Auto">
+
+        <!-- Center Connecting Flow -->
+        <VerticalStackLayout Grid.Row="0" VerticalOptions="Center" Spacing="24">
+
+            <!-- Connecting Circle Indicator -->
+            <Border StrokeShape="RoundRectangle 50"
+                    WidthRequest="100"
+                    HeightRequest="100"
+                    HorizontalOptions="Center"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}"
+                    Stroke="{StaticResource PrimaryLight}"
+                    StrokeThickness="2">
+                <ActivityIndicator IsRunning="{Binding IsConnecting}"
+                                   IsVisible="{Binding IsConnecting}"
+                                   WidthRequest="40"
+                                   HeightRequest="40"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+            </Border>
+
+            <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                <Label Text="Establishing CGM Connection"
+                       Style="{StaticResource HeaderTitle}"
+                       FontSize="20"
+                       HorizontalTextAlignment="Center" />
+
+                <Label Text="{Binding CurrentStepDescription}"
+                       FontSize="14"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- Multi-stage Progress Bar -->
+            <ProgressBar Progress="{Binding ConnectionProgress}"
+                         ProgressColor="{StaticResource PrimaryLight}"
+                         HeightRequest="6"
+                         Margin="20,0" />
+
+            <!-- Diagnostic Protocol Checklist -->
+            <Border StrokeShape="RoundRectangle 16"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E293B}"
+                    Stroke="{StaticResource BorderLightColor}"
+                    StrokeThickness="1"
+                    Padding="16,14"
+                    Margin="10,0">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Telemetry Verification (Stage 1)" FontAttributes="Bold" FontSize="12" TextColor="{StaticResource PrimaryLight}" />
+                    
+                    <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                        <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="{Binding IsBleConnected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#059669:#94A3B8'}" VerticalOptions="Center" />
+                        <Label Text="Bluetooth Link Established" FontSize="13" TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
+                    </HorizontalStackLayout>
+                    
+                    <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                        <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="{Binding IsGattConfigured, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#059669:#94A3B8'}" VerticalOptions="Center" />
+                        <Label Text="GATT Services (FFF0 / FFF1 / FFF2)" FontSize="13" TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
+                    </HorizontalStackLayout>
+                    
+                    <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                        <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="{Binding IsTelemetryVerified, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#059669:#94A3B8'}" VerticalOptions="Center" />
+                        <Label Text="Baseline Diagnostics (E7, E8, E1, E2, E3)" FontSize="13" TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Error Banner -->
+            <Border StrokeShape="RoundRectangle 12"
+                    BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                    Stroke="{StaticResource Danger}"
+                    StrokeThickness="1"
+                    Padding="14,12"
+                    IsVisible="{Binding HasError}">
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                       FontSize="13"
+                       LineBreakMode="WordWrap" />
+            </Border>
+
+        </VerticalStackLayout>
+
+        <!-- Bottom Actions -->
+        <VerticalStackLayout Grid.Row="1" Spacing="10" Margin="0,0,0,10">
+            <Button Text="Try Again"
+                    Command="{Binding RetryCommand}"
+                    IsVisible="{Binding IsFailed}" />
+
+            <Button Text="Cancel"
+                    Command="{Binding CancelCommand}"
+                    Style="{StaticResource OutlineButton}" />
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

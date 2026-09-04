@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.DeviceSetup"
+             x:Class="CGM.PatientApp.Views.DeviceSetup.ScanningPage"
+             x:DataType="vm:ScanningViewModel"
+             Title="Searching for CGM"
+             Shell.NavBarIsVisible="False">
+
+    <Grid Padding="24,40,24,24" RowDefinitions="*,Auto">
+
+        <!-- Center Scanning Graphic & Status -->
+        <VerticalStackLayout Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center" Spacing="24">
+
+            <!-- Radar / Scan Pulse Circle -->
+            <Border StrokeShape="RoundRectangle 60"
+                    WidthRequest="120"
+                    HeightRequest="120"
+                    HorizontalOptions="Center"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}"
+                    Stroke="{StaticResource PrimaryLight}"
+                    StrokeThickness="2">
+                <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                    <ActivityIndicator IsRunning="{Binding IsScanning}"
+                                       IsVisible="{Binding IsScanning}"
+                                       WidthRequest="50"
+                                       HeightRequest="50"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                        <Label Text="&#xF7C0;" FontFamily="FontAwesomeSolid"
+                           FontSize="28"
+                           IsVisible="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Grid>
+            </Border>
+
+            <!-- Status Header -->
+            <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                <Label Text="{Binding StatusText}"
+                       Style="{StaticResource HeaderTitle}"
+                       FontSize="20"
+                       HorizontalTextAlignment="Center" />
+                
+                <Label Text="{Binding HelperText}"
+                       Style="{StaticResource SubTitle}"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+
+            <!-- Error / Timeout Banner -->
+            <Border StrokeShape="RoundRectangle 12"
+                    BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                    Stroke="{StaticResource Danger}"
+                    StrokeThickness="1"
+                    Padding="14,12"
+                    IsVisible="{Binding HasError}">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Scan Timeout" FontAttributes="Bold" FontSize="13" TextColor="{StaticResource Danger}" />
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                           FontSize="12"
+                           LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+
+        <!-- Bottom Action Buttons -->
+        <VerticalStackLayout Grid.Row="1" Spacing="10" Margin="0,0,0,10">
+            <!-- Retry Button (Visible on timeout/error) -->
+            <Button Text="Retry Scan"
+                    Command="{Binding StartScanCommand}"
+                    IsVisible="{Binding HasTimedOut}" />
+
+            <Button Text="Cancel"
+                    Command="{Binding CancelCommand}"
+                    Style="{StaticResource OutlineButton}" />
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

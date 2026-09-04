@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Auth"
+             x:Class="CGM.PatientApp.Views.Auth.CompleteProfilePage"
+             x:DataType="vm:CompleteProfileViewModel"
+             Title="Complete Profile"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <Grid Padding="24,30,24,24" RowDefinitions="Auto,*,Auto">
+
+            <!-- Header Section -->
+            <VerticalStackLayout Grid.Row="0" Spacing="6" Margin="0,0,0,20">
+                <Label Text="Set Up Your Patient Profile"
+                       Style="{StaticResource HeaderTitle}"
+                       FontSize="22" />
+                <Label Text="Personalize your CGM experience and monitoring preferences."
+                       Style="{StaticResource SubTitle}" />
+            </VerticalStackLayout>
+
+            <!-- Form Section -->
+            <VerticalStackLayout Grid.Row="1" Spacing="16">
+
+                <!-- Error Banner -->
+                <Border StrokeShape="RoundRectangle 12"
+                        BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                        Stroke="{StaticResource Danger}"
+                        StrokeThickness="1"
+                        Padding="12,10"
+                        IsVisible="{Binding HasError}">
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Label Text="&#xF071;" FontFamily="FontAwesomeSolid" FontSize="14" VerticalOptions="Center"/>
+                        <Label Text="{Binding ErrorMessage}"
+                               TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                               FontSize="13"
+                               VerticalOptions="Center"
+                               LineBreakMode="WordWrap" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <!-- Full Name -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Your Name" Style="{StaticResource FieldLabel}" />
+                    <Border Style="{StaticResource InputContainerBorder}">
+                        <Entry Placeholder="e.g. Jane Doe"
+                               Text="{Binding FullName}"
+                               ReturnType="Next" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Phone Number (Optional) -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Phone Number (Optional)" Style="{StaticResource FieldLabel}" />
+                    <Border Style="{StaticResource InputContainerBorder}">
+                        <Entry Placeholder="e.g. +1 (555) 000-0000"
+                               Text="{Binding PhoneNumber}"
+                               Keyboard="Telephone"
+                               ReturnType="Done" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Preferred Glucose Unit Selection -->
+                <VerticalStackLayout Spacing="8" Margin="0,4,0,4">
+                    <Label Text="Preferred Glucose Unit" Style="{StaticResource FieldLabel}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        
+                        <!-- mg/dL Card Button -->
+                        <Border Grid.Column="0"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="16,14"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource CardBgLight}, Dark={StaticResource CardBgDark}}"
+                                Stroke="{AppThemeBinding Light={StaticResource BorderLightColor}, Dark={StaticResource BorderDarkColor}}"
+                                StrokeThickness="1">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectMgDlCommand}" />
+                            </Border.GestureRecognizers>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsMgDlSelected}" Value="True">
+                                    <Setter Property="Stroke" Value="{StaticResource PrimaryLight}" />
+                                    <Setter Property="StrokeThickness" Value="2" />
+                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsMgDlSelected}" Value="False">
+                                    <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource BorderLightColor}, Dark={StaticResource BorderDarkColor}}" />
+                                    <Setter Property="StrokeThickness" Value="1" />
+                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource CardBgLight}, Dark={StaticResource CardBgDark}}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                <VerticalStackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectMgDlCommand}" />
+                                </VerticalStackLayout.GestureRecognizers>
+                                <HorizontalStackLayout Spacing="4" HorizontalOptions="Center">
+                                    <Label Text="mg/dL"
+                                           FontAttributes="Bold"
+                                           FontSize="16"
+                                           HorizontalTextAlignment="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsMgDlSelected}" Value="True">
+                                                <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsMgDlSelected}" Value="False">
+                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                    <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid"
+                                           TextColor="{StaticResource PrimaryLight}"
+                                           FontAttributes="Bold"
+                                           FontSize="14"
+                                           VerticalOptions="Center"
+                                           IsVisible="{Binding IsMgDlSelected}" />
+                                </HorizontalStackLayout>
+                                <Label Text="Standard US/Intl"
+                                       FontSize="11"
+                                       HorizontalTextAlignment="Center"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- mmol/L Card Button -->
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="16,14"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource CardBgLight}, Dark={StaticResource CardBgDark}}"
+                                Stroke="{AppThemeBinding Light={StaticResource BorderLightColor}, Dark={StaticResource BorderDarkColor}}"
+                                StrokeThickness="1">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectMmolLCommand}" />
+                            </Border.GestureRecognizers>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsMmolLSelected}" Value="True">
+                                    <Setter Property="Stroke" Value="{StaticResource PrimaryLight}" />
+                                    <Setter Property="StrokeThickness" Value="2" />
+                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsMmolLSelected}" Value="False">
+                                    <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource BorderLightColor}, Dark={StaticResource BorderDarkColor}}" />
+                                    <Setter Property="StrokeThickness" Value="1" />
+                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource CardBgLight}, Dark={StaticResource CardBgDark}}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                <VerticalStackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectMmolLCommand}" />
+                                </VerticalStackLayout.GestureRecognizers>
+                                <HorizontalStackLayout Spacing="4" HorizontalOptions="Center">
+                                    <Label Text="mmol/L"
+                                           FontAttributes="Bold"
+                                           FontSize="16"
+                                           HorizontalTextAlignment="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsMmolLSelected}" Value="True">
+                                                <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsMmolLSelected}" Value="False">
+                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                    <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid"
+                                           TextColor="{StaticResource PrimaryLight}"
+                                           FontAttributes="Bold"
+                                           FontSize="14"
+                                           VerticalOptions="Center"
+                                           IsVisible="{Binding IsMmolLSelected}" />
+                                </HorizontalStackLayout>
+                                <Label Text="UK / Canada / EU"
+                                       FontSize="11"
+                                       HorizontalTextAlignment="Center"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </Grid>
+                </VerticalStackLayout>
+
+                <!-- Notifications & Alert Preferences -->
+                <Border Style="{StaticResource MedicalCard}" Margin="0,6,0,0">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Monitoring &amp; Alert Preferences"
+                               FontAttributes="Bold"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+
+                        <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="Push Notifications" FontSize="14" FontAttributes="Bold" />
+                                <Label Text="Receive background glucose sync alerts" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                            </VerticalStackLayout>
+                            <Switch Grid.Column="1" IsToggled="{Binding EnableNotifications}" VerticalOptions="Center" />
+                        </Grid>
+
+                        <BoxView HeightRequest="1" BackgroundColor="{AppThemeBinding Light={StaticResource BorderLightColor}, Dark={StaticResource BorderDarkColor}}" />
+
+                        <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="Critical Glucose Alerts" FontSize="14" FontAttributes="Bold" />
+                                <Label Text="Urgent low and high threshold alerts" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                            </VerticalStackLayout>
+                            <Switch Grid.Column="1" IsToggled="{Binding EnableCriticalAlerts}" VerticalOptions="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+
+            <!-- Footer: Save & Continue -->
+            <VerticalStackLayout Grid.Row="2" Spacing="10" Margin="0,24,0,10">
+                <Button Text="Save &amp; Continue to Device Setup"
+                        Command="{Binding SaveAndContinueCommand}"
+                        IsEnabled="{Binding IsNotBusy}" />
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   HeightRequest="24"
+                                   WidthRequest="24"
+                                   HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+        </Grid>
+    </ScrollView>
+
+</ContentPage>

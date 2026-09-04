@@ -1,0 +1,28 @@
+using CGM.PatientApp.Views.Auth;
+using CGM.PatientApp.Views.DeviceSetup;
+using CGM.PatientApp.Views.Dashboard;
+using CGM.PatientApp.Views.Details;
+
+namespace CGM.PatientApp;
+
+public partial class AppShell : Shell
+{
+	public AppShell()
+	{
+		InitializeComponent();
+
+		// Register push routes
+		Routing.RegisterRoute("SignUpPage", typeof(SignUpPage));
+		Routing.RegisterRoute("ForgotPasswordPage", typeof(ForgotPasswordPage));
+		Routing.RegisterRoute("ResetPasswordPage", typeof(ResetPasswordPage));
+
+		// Device Pairing & Onboarding routes
+		Routing.RegisterRoute("DevicePreparationPage", typeof(DevicePreparationPage));
+		Routing.RegisterRoute("BluetoothPermissionPage", typeof(BluetoothPermissionPage));
+		Routing.RegisterRoute("ScanningPage", typeof(ScanningPage));
+		Routing.RegisterRoute("DeviceFoundPage", typeof(DeviceFoundPage));
+		Routing.RegisterRoute("ConnectingPage", typeof(ConnectingPage));
+		Routing.RegisterRoute("ConnectionSuccessPage", typeof(ConnectionSuccessPage));
+		Routing.RegisterRoute("AppDetailPage", typeof(AppDetailPage));
+	}
+}

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Auth"
+             x:Class="CGM.PatientApp.Views.Auth.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             BackgroundColor="{AppThemeBinding Light=#F8FAF9, Dark=#0F172A}"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <Grid Padding="24,30,24,24" RowDefinitions="Auto,*,Auto">
+            
+            <!-- 1. TOP BRANDING SECTION (GlucoTrack Logo) -->
+            <VerticalStackLayout Grid.Row="0" Spacing="6" Margin="0,10,0,24" HorizontalOptions="Center">
+                <!-- Circular Droplet Orbit Icon -->
+                <Border StrokeShape="RoundRectangle 36"
+                        WidthRequest="72"
+                        HeightRequest="72"
+                        HorizontalOptions="Center"
+                        BackgroundColor="{StaticResource White}"
+                        Stroke="{StaticResource PrimaryLight}"
+                        StrokeThickness="3"
+                        Padding="8">
+                    <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                        <!-- Droplet Shape -->
+                    <Label Text="&#xF043;" FontFamily="FontAwesomeSolid"
+                               FontSize="30"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Brand Name -->
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="0" Margin="0,8,0,0">
+                    <Label Text="Gluco"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                    <Label Text="Track"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource PrimaryLight}" />
+                </HorizontalStackLayout>
+                
+                <Label Text="Stay informed, stay in control."
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- 2. WELCOME BACK CARD -->
+            <Border Grid.Row="1"
+                    Style="{StaticResource MedicalCard}"
+                    Padding="20,24"
+                    Margin="0,0,0,16">
+                <VerticalStackLayout Spacing="16">
+
+                    <!-- Title -->
+                    <VerticalStackLayout Spacing="4">
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="Welcome back!"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                    <Label Text="&#xF256;" FontFamily="FontAwesomeSolid" FontSize="20" />
+                        </HorizontalStackLayout>
+                        <Label Text="Sign in to continue to your dashboard."
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                    </VerticalStackLayout>
+
+                    <!-- Error Banner -->
+                    <Border StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                            Stroke="{StaticResource Danger}"
+                            StrokeThickness="1"
+                            Padding="12,10"
+                            IsVisible="{Binding HasError}">
+                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Label Text="&#xF071;" FontFamily="FontAwesomeSolid" FontSize="14" VerticalOptions="Center"/>
+                            <Label Text="{Binding ErrorMessage}"
+                                   TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                                   FontSize="13"
+                                   VerticalOptions="Center"
+                                   LineBreakMode="WordWrap" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Email Input with Envelope Icon -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Email" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource InputContainerBorder}">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="&#xF0E0;" FontFamily="FontAwesomeRegular" FontSize="15" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Placeholder="you@example.com"
+                                       Text="{Binding Email}"
+                                       Keyboard="Email"
+                                       ReturnType="Next"
+                                       ClearButtonVisibility="WhileEditing" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Password Input with Lock & Eye Toggle -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Password" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource InputContainerBorder}">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="&#xF023;" FontFamily="FontAwesomeSolid" FontSize="16" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Placeholder="Enter your password"
+                                       Text="{Binding Password}"
+                                       IsPassword="{Binding IsPasswordHidden}"
+                                       ReturnType="Done" />
+                                <Border Grid.Column="2"
+                                        WidthRequest="44"
+                                        HeightRequest="44"
+                                        Padding="0"
+                                        BackgroundColor="Transparent"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 12"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="Center"
+                                        SemanticProperties.Description="Show or hide password">
+                                    <Label Text="&#xF06E;"
+                                           FontFamily="FontAwesomeSolid"
+                                           FontSize="18"
+                                           TextColor="{AppThemeBinding Light=#334155, Dark=#CBD5E1}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding TogglePasswordVisibilityCommand}" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Forgot Password Link -->
+                        <Button Text="Forgot password?"
+                                Command="{Binding ForgotPasswordCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource PrimaryLight}"
+                                FontSize="12"
+                                HorizontalOptions="End"
+                                Padding="0"
+                                HeightRequest="30" />
+                    </VerticalStackLayout>
+
+                    <!-- Sign In Solid Button -->
+                    <Button Text="Sign In"
+                            Command="{Binding LoginCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="{StaticResource PrimaryLight}"
+                            TextColor="{StaticResource White}"
+                            FontAttributes="Bold"
+                            HeightRequest="48"
+                            CornerRadius="14" />
+
+                    <!-- Activity Indicator -->
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       HeightRequest="24"
+                                       WidthRequest="24"
+                                       HorizontalOptions="Center" />
+
+                    <!-- Create Account Footer -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="6" Margin="0,4,0,0">
+                        <Label Text="Don't have an account?"
+                               TextColor="{StaticResource TextSecondaryLight}"
+                               FontSize="13"
+                               VerticalOptions="Center" />
+                        <Button Text="Create Account"
+                                Command="{Binding NavigateToSignUpCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource PrimaryLight}"
+                                FontAttributes="Bold"
+                                FontSize="13"
+                                Padding="0"
+                                HeightRequest="36"
+                                VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 3. BOTTOM SECURITY ASSURANCE CARD -->
+            <Border Grid.Row="2"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="{StaticResource PrimaryContainerLight}"
+                    Stroke="{StaticResource PrimaryContainerLight}"
+                    Padding="16,12"
+                    Margin="0,0,0,10">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" VerticalOptions="Center">
+                    <Border Grid.Column="0"
+                            StrokeShape="RoundRectangle 12"
+                            WidthRequest="38"
+                            HeightRequest="38"
+                            BackgroundColor="{StaticResource White}"
+                            Stroke="Transparent"
+                            VerticalOptions="Center">
+                    <Label Text="&#xF3ED;" FontFamily="FontAwesomeSolid"
+                               FontSize="18"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="Your health data is secure"
+                               FontAttributes="Bold"
+                               FontSize="13"
+                               TextColor="{StaticResource BadgeGreenText}" />
+                        <Label Text="We protect your privacy and keep your data safe at all times."
+                               FontSize="11"
+                               TextColor="{StaticResource TextSecondaryLight}"
+                               LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+        </Grid>
+    </ScrollView>
+
+</ContentPage>

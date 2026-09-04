@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.DeviceSetup"
+             x:Class="CGM.PatientApp.Views.DeviceSetup.DeviceSelectionPage"
+             x:DataType="vm:DeviceSelectionViewModel"
+             Title="Device Setup"
+             BackgroundColor="{AppThemeBinding Light=#F8FAF9, Dark=#0F172A}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid Padding="20,20,20,16" RowDefinitions="Auto,*,Auto">
+
+        <!-- ================= TOP HEADER (Step 1 of 3) ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center" Margin="0,0,0,16">
+            <!-- Back Arrow -->
+            <Border Grid.Column="0"
+                    SemanticProperties.Description="Go back"
+                    StrokeShape="RoundRectangle 20"
+                    WidthRequest="38"
+                    HeightRequest="38"
+                    BackgroundColor="{StaticResource White}"
+                    Stroke="{StaticResource BorderLightColor}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding BackCommand}" />
+                </Border.GestureRecognizers>
+                        <Label Text="&#xF060;" FontFamily="FontAwesomeSolid"
+                       FontSize="17"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
+
+            <!-- Title -->
+            <Label Grid.Column="1"
+                   Text="Device Setup"
+                   FontAttributes="Bold"
+                   FontSize="16"
+                   HorizontalTextAlignment="Center"
+                   VerticalOptions="Center" />
+
+            <!-- Step Pill Badge (1 of 3) -->
+            <Border Grid.Column="2"
+                    StrokeShape="RoundRectangle 12"
+                    BackgroundColor="{StaticResource BadgeGreenBg}"
+                    Padding="10,4"
+                    VerticalOptions="Center">
+                <Label Text="1 of 3"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource BadgeGreenText}" />
+            </Border>
+        </Grid>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="16">
+
+                <!-- Title & Subtitle -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Choose Your CGM"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                    <Label Text="Select the type of CGM device you'll be using. You can change this later in Settings."
+                           FontSize="13"
+                           TextColor="{StaticResource TextSecondaryLight}"
+                           LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+
+                <!-- SIDE-BY-SIDE CGM DEVICE CARDS (Disposable vs Reusable) -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,6,0,0">
+
+                    <!-- Card 1: Disposable CGM -->
+                    <Border Grid.Column="0"
+                            SemanticProperties.Description="Select disposable CGM sensor"
+                            StrokeShape="RoundRectangle 20"
+                            BackgroundColor="{StaticResource White}"
+                            Stroke="{StaticResource PrimaryLight}"
+                            StrokeThickness="2"
+                            Padding="14,16">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectDisposableCommand}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsDisposableSelected}" Value="True">
+                                <Setter Property="Stroke" Value="{StaticResource PrimaryLight}" />
+                                <Setter Property="StrokeThickness" Value="2" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsDisposableSelected}" Value="False">
+                                <Setter Property="Stroke" Value="{StaticResource BorderLightColor}" />
+                                <Setter Property="StrokeThickness" Value="1" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <VerticalStackLayout Spacing="10">
+                            <!-- Top Selection Checkmark Badge -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    WidthRequest="24"
+                                    HeightRequest="24"
+                                    BackgroundColor="{StaticResource PrimaryLight}"
+                                    Stroke="Transparent"
+                                    HorizontalOptions="End"
+                                    IsVisible="{Binding IsDisposableSelected}">
+                                            <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="14" TextColor="{StaticResource White}" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <!-- Top Empty Circle Selection Badge -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    WidthRequest="24"
+                                    HeightRequest="24"
+                                    BackgroundColor="Transparent"
+                                    Stroke="{StaticResource BorderLightColor}"
+                                    StrokeThickness="1.5"
+                                    HorizontalOptions="End">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsDisposableSelected}" Value="True">
+                                        <Setter Property="IsVisible" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsDisposableSelected}" Value="False">
+                                        <Setter Property="IsVisible" Value="True" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+
+                            <!-- Disposable all-in-one sensor product image -->
+                            <Image Source="device_disposable.png"
+                                   WidthRequest="92"
+                                   HeightRequest="92"
+                                   Aspect="AspectFit"
+                                   HorizontalOptions="Center"
+                                   SemanticProperties.Description="Round disposable continuous glucose monitor sensor" />
+
+                            <!-- Name & Description -->
+                            <Label Text="Disposable CGM"
+                                   FontAttributes="Bold"
+                                   FontSize="15"
+                                   TextColor="{StaticResource PrimaryLight}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="Wear for up to 14 days. Small, all-in-one sensor."
+                                   FontSize="11"
+                                   TextColor="{StaticResource TextSecondaryLight}"
+                                   HorizontalTextAlignment="Center"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Card 2: Reusable CGM -->
+                    <Border Grid.Column="1"
+                            SemanticProperties.Description="Select reusable CGM transmitter"
+                            StrokeShape="RoundRectangle 20"
+                            BackgroundColor="{StaticResource White}"
+                            Stroke="{StaticResource BorderLightColor}"
+                            StrokeThickness="1"
+                            Padding="14,16">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectReusableCommand}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsReusableSelected}" Value="True">
+                                <Setter Property="Stroke" Value="{StaticResource PrimaryLight}" />
+                                <Setter Property="StrokeThickness" Value="2" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsReusableSelected}" Value="False">
+                                <Setter Property="Stroke" Value="{StaticResource BorderLightColor}" />
+                                <Setter Property="StrokeThickness" Value="1" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <VerticalStackLayout Spacing="10">
+                            <!-- Top Selection Checkmark Badge -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    WidthRequest="24"
+                                    HeightRequest="24"
+                                    BackgroundColor="{StaticResource PrimaryLight}"
+                                    Stroke="Transparent"
+                                    HorizontalOptions="End"
+                                    IsVisible="{Binding IsReusableSelected}">
+                                            <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="14" TextColor="{StaticResource White}" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <!-- Top Empty Circle Selection Badge -->
+                            <Border StrokeShape="RoundRectangle 12"
+                                    WidthRequest="24"
+                                    HeightRequest="24"
+                                    BackgroundColor="Transparent"
+                                    Stroke="{StaticResource BorderLightColor}"
+                                    StrokeThickness="1.5"
+                                    HorizontalOptions="End">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsReusableSelected}" Value="True">
+                                        <Setter Property="IsVisible" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsReusableSelected}" Value="False">
+                                        <Setter Property="IsVisible" Value="True" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+
+                            <!-- Reusable transmitter product image -->
+                            <Image Source="device_reusable.png"
+                                   WidthRequest="92"
+                                   HeightRequest="92"
+                                   Aspect="AspectFit"
+                                   HorizontalOptions="Center"
+                                   SemanticProperties.Description="Reusable continuous glucose monitor transmitter and sensor base" />
+
+                            <!-- Name & Description -->
+                            <Label Text="Reusable CGM"
+                                   FontAttributes="Bold"
+                                   FontSize="15"
+                                   TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="Wear with replaceable sensors. Rechargeable transmitter."
+                                   FontSize="11"
+                                   TextColor="{StaticResource TextSecondaryLight}"
+                                   HorizontalTextAlignment="Center"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                </Grid>
+
+                <!-- BLUETOOTH CONNECTION PREPARATION CHECKLIST CARD -->
+                <Border Style="{StaticResource MedicalCard}" Padding="16,14" Margin="0,4,0,0">
+                    <VerticalStackLayout Spacing="12">
+                        
+                        <!-- Header with Bluetooth Icon -->
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                            <Border Grid.Column="0"
+                                    StrokeShape="RoundRectangle 18"
+                                    WidthRequest="40"
+                                    HeightRequest="40"
+                                    BackgroundColor="{StaticResource PrimaryContainerLight}"
+                                    Stroke="Transparent"
+                                    VerticalOptions="Center">
+                                <Label Text="&#xF293;" FontFamily="FontAwesomeBrands" FontSize="17" TextColor="{StaticResource PrimaryLight}" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Bluetooth Connection" FontAttributes="Bold" FontSize="14" TextColor="{StaticResource PrimaryLight}" />
+                                <Label Text="We'll use Bluetooth to connect to your CGM device." FontSize="11" TextColor="{StaticResource TextSecondaryLight}" LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <BoxView HeightRequest="1" BackgroundColor="{StaticResource BorderLightColor}" />
+
+                        <!-- Checklist Items -->
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                                <Label Grid.Column="0" Text="&#xF017;" FontFamily="FontAwesomeSolid" FontSize="14" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Turn on Bluetooth" FontSize="12" TextColor="{StaticResource TextPrimaryLight}" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="14" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                                <Label Grid.Column="0" Text="&#xF3CD;" FontFamily="FontAwesomeSolid" FontSize="14" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Keep device nearby" FontSize="12" TextColor="{StaticResource TextPrimaryLight}" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="14" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                                <Label Grid.Column="0" Text="&#xF013;" FontFamily="FontAwesomeSolid" FontSize="14" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Allow app permissions" FontSize="12" TextColor="{StaticResource TextPrimaryLight}" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="14" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- ================= BOTTOM ACTION & STEPPER (SCREEN 4) ================= -->
+        <VerticalStackLayout Grid.Row="2" Spacing="12" Margin="0,8,0,0">
+            <!-- Connect Device Solid Teal Button -->
+            <Button Text="Connect Device"
+                    Command="{Binding ContinueWithSelectedDeviceCommand}"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    TextColor="{StaticResource White}"
+                    FontAttributes="Bold"
+                    HeightRequest="48"
+                    CornerRadius="14" />
+
+            <!-- I'll do this later -->
+            <Button Text="I'll do this later"
+                    Command="{Binding SkipCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource PrimaryLight}"
+                    FontAttributes="Bold"
+                    FontSize="13"
+                    Padding="0"
+                    HeightRequest="32" />
+
+            <!-- Bottom 3-Step Stepper -->
+            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto" Margin="24,4,24,0" VerticalOptions="Center">
+                <!-- Step 1: Device (Active) -->
+                <VerticalStackLayout Grid.Column="0" Spacing="2" HorizontalOptions="Center">
+                    <Border StrokeShape="RoundRectangle 12" WidthRequest="24" HeightRequest="24" BackgroundColor="{StaticResource PrimaryContainerLight}" Stroke="{StaticResource PrimaryLight}" HorizontalOptions="Center">
+                                    <Label Text="&#xF3CD;" FontFamily="FontAwesomeSolid" FontSize="11" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <Label Text="Device" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Line 1-2 -->
+                <BoxView Grid.Column="1" HeightRequest="2" BackgroundColor="{StaticResource BorderLightColor}" VerticalOptions="Center" Margin="6,0,6,12" />
+
+                <!-- Step 2: Pairing -->
+                <VerticalStackLayout Grid.Column="2" Spacing="2" HorizontalOptions="Center">
+                    <Border StrokeShape="RoundRectangle 12" WidthRequest="24" HeightRequest="24" BackgroundColor="{StaticResource SurfaceVariantLight}" Stroke="{StaticResource BorderLightColor}" HorizontalOptions="Center">
+                                    <Label Text="&#xF293;" FontFamily="FontAwesomeBrands" FontSize="11" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <Label Text="Pairing" FontSize="10" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Line 2-3 -->
+                <BoxView Grid.Column="3" HeightRequest="2" BackgroundColor="{StaticResource BorderLightColor}" VerticalOptions="Center" Margin="6,0,6,12" />
+
+                <!-- Step 3: Ready -->
+                <VerticalStackLayout Grid.Column="4" Spacing="2" HorizontalOptions="Center">
+                    <Border StrokeShape="RoundRectangle 12" WidthRequest="24" HeightRequest="24" BackgroundColor="{StaticResource SurfaceVariantLight}" Stroke="{StaticResource BorderLightColor}" HorizontalOptions="Center">
+                                    <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="11" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <Label Text="Ready" FontSize="10" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </Grid>
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

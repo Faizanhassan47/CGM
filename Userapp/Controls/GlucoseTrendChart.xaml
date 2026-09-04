@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CGM.PatientApp.Controls.GlucoseTrendChart">
+    <Border Style="{StaticResource MedicalCard}" Padding="16,14">
+        <VerticalStackLayout Spacing="12">
+            <!-- Header & Filter Pills -->
+            <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                <Label Grid.Column="0"
+                       Text="Glucose Trend"
+                       FontAttributes="Bold"
+                       FontSize="15"
+                       TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}"
+                       VerticalOptions="Center" />
+
+                <!-- Filter Pills (3H, 6H, 12H, 24H) -->
+                <HorizontalStackLayout Grid.Column="1" Spacing="6">
+                    <!-- 3H -->
+                    <Border StrokeShape="RoundRectangle 10" Padding="8,4">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsTrend3H}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource BadgeGreenBg}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SetTrendFilterCommand}" CommandParameter="3H" />
+                        </Border.GestureRecognizers>
+                        <Label Text="3H" FontSize="11">
+                            <Label.Style>
+                                <Style TargetType="Label">
+                                    <Setter Property="TextColor" Value="{StaticResource TextMutedLight}" />
+                                    <Setter Property="FontAttributes" Value="None" />
+                                    <Style.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsTrend3H}" Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource BadgeGreenText}" />
+                                            <Setter Property="FontAttributes" Value="Bold" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Label.Style>
+                        </Label>
+                    </Border>
+
+                    <!-- 6H -->
+                    <Border StrokeShape="RoundRectangle 10" Padding="8,4">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsTrend6H}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource BadgeGreenBg}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SetTrendFilterCommand}" CommandParameter="6H" />
+                        </Border.GestureRecognizers>
+                        <Label Text="6H" FontSize="11">
+                            <Label.Style>
+                                <Style TargetType="Label">
+                                    <Setter Property="TextColor" Value="{StaticResource TextMutedLight}" />
+                                    <Setter Property="FontAttributes" Value="None" />
+                                    <Style.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsTrend6H}" Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource BadgeGreenText}" />
+                                            <Setter Property="FontAttributes" Value="Bold" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Label.Style>
+                        </Label>
+                    </Border>
+
+                    <!-- 12H -->
+                    <Border StrokeShape="RoundRectangle 10" Padding="8,4">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsTrend12H}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource BadgeGreenBg}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SetTrendFilterCommand}" CommandParameter="12H" />
+                        </Border.GestureRecognizers>
+                        <Label Text="12H" FontSize="11">
+                            <Label.Style>
+                                <Style TargetType="Label">
+                                    <Setter Property="TextColor" Value="{StaticResource TextMutedLight}" />
+                                    <Setter Property="FontAttributes" Value="None" />
+                                    <Style.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsTrend12H}" Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource BadgeGreenText}" />
+                                            <Setter Property="FontAttributes" Value="Bold" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Label.Style>
+                        </Label>
+                    </Border>
+
+                    <!-- 24H -->
+                    <Border StrokeShape="RoundRectangle 10" Padding="8,4">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BackgroundColor" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsTrend24H}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource BadgeGreenBg}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SetTrendFilterCommand}" CommandParameter="24H" />
+                        </Border.GestureRecognizers>
+                        <Label Text="24H" FontSize="11">
+                            <Label.Style>
+                                <Style TargetType="Label">
+                                    <Setter Property="TextColor" Value="{StaticResource TextMutedLight}" />
+                                    <Setter Property="FontAttributes" Value="None" />
+                                    <Style.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsTrend24H}" Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource BadgeGreenText}" />
+                                            <Setter Property="FontAttributes" Value="Bold" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Label.Style>
+                        </Label>
+                    </Border>
+                </HorizontalStackLayout>
+            </Grid>
+
+            <!-- Chart Graphic Area with Target Band (70 - 180 mg/dL) -->
+            <Grid HeightRequest="130" Margin="0,4,0,0">
+                <!-- Target Range Band Background (70-180 mg/dL) -->
+                <Border Margin="0,32,45,36"
+                        StrokeShape="RoundRectangle 8"
+                        BackgroundColor="{StaticResource ChartTargetBandFill}"
+                        Stroke="{StaticResource ChartTargetBandStroke}"
+                        StrokeThickness="1" />
+
+                <!-- Target Reference Labels on Right Side -->
+                <Label Text="High" FontSize="10" TextColor="{StaticResource Danger}" FontAttributes="Bold" HorizontalOptions="End" VerticalOptions="Start" Margin="0,2,0,0" />
+                <Label Text="Target" FontSize="10" TextColor="{StaticResource BadgeGreenText}" FontAttributes="Bold" HorizontalOptions="End" VerticalOptions="Center" />
+                <Label Text="Low" FontSize="10" TextColor="{StaticResource BadgeBlueText}" FontAttributes="Bold" HorizontalOptions="End" VerticalOptions="End" Margin="0,0,0,10" />
+
+                <!-- Dynamic Glucose Trend Spline Path -->
+                <Path Data="{Binding TrendPathData}"
+                      Stroke="{Binding TrendLineColor}"
+                      StrokeThickness="2.5"
+                      StrokeLineCap="Round"
+                      Margin="0,0,45,0"
+                      HorizontalOptions="Fill" />
+
+                <!-- Dynamic Pulse Endpoint Dot at Latest Reading -->
+                <Border HorizontalOptions="End"
+                        VerticalOptions="Start"
+                        Margin="{Binding TrendDotMargin}"
+                        StrokeShape="RoundRectangle 8"
+                        WidthRequest="14"
+                        HeightRequest="14"
+                        BackgroundColor="{Binding TrendDotColor}"
+                        Stroke="{StaticResource White}"
+                        StrokeThickness="2" />
+            </Grid>
+
+            <!-- Dynamic Time Axis Row -->
+            <Grid ColumnDefinitions="*,*,*,*" Margin="0,0,45,0">
+                <Label Grid.Column="0" Text="{Binding TrendTime1}" FontSize="10" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                <Label Grid.Column="1" Text="{Binding TrendTime2}" FontSize="10" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                <Label Grid.Column="2" Text="{Binding TrendTime3}" FontSize="10" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                <Label Grid.Column="3" Text="{Binding TrendTime4}" FontSize="10" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" HorizontalTextAlignment="Center" />
+            </Grid>
+        </VerticalStackLayout>
+    </Border>
+</ContentView>
