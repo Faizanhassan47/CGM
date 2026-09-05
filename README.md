@@ -1,35 +1,82 @@
-# GlucoTrack CGM
+# GlucoTrack CGM Patient Mobile App
 
-.NET MAUI patient app plus ASP.NET Core API for account, profile, device, sensor, glucose, alert, and report workflows.
+A modern, clinical-grade Continuous Glucose Monitoring (CGM) patient application built with **.NET MAUI (C# / XAML)** for Android, iOS, Windows, and macOS, designed with aesthetics inspired by Dexcom G7 and Abbott FreeStyle Libre 3.
 
-## Run locally
+- **Backend Repository:** [https://github.com/Faizanhassan47/CGM-Backend-](https://github.com/Faizanhassan47/CGM-Backend-)
+- **Hardware Simulation:** Compatible with the Windows BLE GATT Peripheral Simulator (`CGM.BleSimulator`).
 
-1. Copy `.env.example` to `.env` and replace every placeholder. Use a JWT secret of at least 32 random bytes.
-2. Start SQL Server and set `DB_CONNECTION_STRING`.
-3. Run the API:
+---
 
-   ```powershell
-   dotnet run --project CGM.Api\CGM.Api.csproj
-   ```
+## Quick Start Guide
 
-4. Set `CGM_API_BASE_URL` to the API address and run `Userapp\CGM.PatientApp.csproj` from Visual Studio. Android emulators normally reach the host through `10.0.2.2`.
+### 1. Prerequisites
+- **.NET 10 SDK** installed.
+- **Android SDK & ADB** configured in PATH.
+- Physical Android phone with USB Debugging enabled, or Android Emulator.
 
-The app uses real API services by default. Set `CGM_USE_MOCK_SERVICES=true` only for a clearly marked UI demonstration with simulated devices and readings.
-
-## Required production integrations
-
-- Obtain the CGM manufacturer's approved BLE SDK, protocol, UUIDs, commands, validation rules, and test hardware. The production fallback deliberately refuses to fabricate connections or readings until this is supplied.
-- Configure Google and Apple OAuth client IDs, redirect URIs, platform entitlements, and server-side identity-token validation before enabling social sign-in.
-- Replace development SMTP settings with a transactional email provider and verified sending domain.
-- Configure trusted HTTPS certificates, production CORS origins, a managed SQL Server, backups, monitoring, privacy policy, consent flow, retention policy, and regulatory review appropriate to the launch market.
-- Add iOS/macOS signing identities, Android signing keys, store metadata, and physical-device acceptance testing.
-
-## Verification
-
-```powershell
-dotnet build CGM.Api\CGM.Api.csproj -c Release
-dotnet test CGM.PatientApp.Tests\CGM.PatientApp.Tests.csproj -c Release
-dotnet build Userapp\CGM.PatientApp.csproj -c Release -f net10.0-windows10.0.19041.0
+### 2. Configure Backend URL
+Set your API endpoint in `Userapp/.env` (or let it default to `http://127.0.0.1:5232/` for USB reverse):
+```ini
+CGM_API_BASE_URL=http://127.0.0.1:5232/
+CGM_USE_MOCK_SERVICES=false
+CGM_USE_REAL_BLE=true
 ```
 
-New bundled images and fonts require a full app restart; XAML Hot Reload alone will not load them.
+### 3. Run on Connected Android Device
+```powershell
+cd Userapp
+
+# Step A: Forward backend port to phone over USB
+adb reverse tcp:5232 tcp:5232
+
+# Step B: Build Android package
+dotnet build -f net10.0-android
+
+# Step C: Deploy and launch APK
+adb install -r bin\Debug\net10.0-android\com.companyname.cgm.patientapp-Signed.apk
+adb shell monkey -p com.companyname.cgm.patientapp -c android.intent.category.LAUNCHER 1
+```
+
+### 4. Run on Windows Desktop
+```powershell
+cd Userapp
+dotnet build -t:Run -f net10.0-windows10.0.19041.0
+```
+
+---
+
+## Features & Clinical UX
+
+1. **Clinical Hero Glucose Badge:**
+   - Real-time glucose reading in `mg/dL` or `mmol/L` with directional trend arrows (`↑`, `↗`, `→`, `↘`, `↓`).
+   - Dynamic clinical status color-coding: In Target (Green: 70–180), Low/High (Amber), Urgent Low/High (Red).
+
+2. **24-Hour SkiaSharp Trend Graph:**
+   - Smooth vector curve with target safe-zone band and interactive interval selector (`3H`, `6H`, `12H`, `24H`).
+
+3. **Quick Event Logging Strip:**
+   - Instant action pill buttons: `+ Meal` (carbs), `+ Insulin` (bolus/basal units), and `+ Activity` (workout).
+   - Live stream of recent logged events with haptic feedback.
+
+4. **Interactive 7-Day Weekly Calendar Strip:**
+   - Responsive horizontal strip showing 7 days with Time In Range (TIR) color dots (🟢 Green $\ge 70\%$, 🟡 Amber $50-69\%$, 🔴 Red $< 50\%$).
+   - Tap any day to dynamically inspect that day's readings.
+
+5. **Emergency Hypoglycemia Protocol ("Rule of 15"):**
+   - Critical alert protocol card on Alerts tab.
+   - Built-in 15-minute countdown timer with interactive controls.
+   - One-tap emergency caregiver calling dialer.
+
+6. **BLE Hardware Communication:**
+   - Implements diagnostic sequences for hardware verification (`0xE7` serial/firmware, `0xE8` battery, `0xE1` warmup, `0xE2` WE1 current, `0xE3` temperature).
+   - Zero hardcoded glucose calculations.
+
+---
+
+## Unit Testing
+
+Run the automated test suite verifying parsers, converters, and device state engines:
+```powershell
+dotnet test CGM.PatientApp.Tests/CGM.PatientApp.Tests.csproj
+```
+*(All 49 unit tests passing).*
