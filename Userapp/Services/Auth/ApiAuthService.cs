@@ -107,19 +107,48 @@ public sealed class ApiAuthService(HttpClient client) : IAuthService
     {
         try
         {
+            if (!await IsAuthenticatedAsync())
+                return Unavailable("Your session has expired. Please sign in again before deleting your account.");
+
             using var request = new HttpRequestMessage(HttpMethod.Delete, "api/auth/account");
             var accessToken = await SecureStorage.Default.GetAsync(AccessTokenKey);
             if (!string.IsNullOrWhiteSpace(accessToken))
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
             using var response = await client.SendAsync(request);
             if (!response.IsSuccessStatusCode)
-                return Unavailable("Account deletion could not be completed.");
+                return Unavailable($"Account deletion could not be completed ({(int)response.StatusCode}).");
             ClearSession();
+            Preferences.Default.Set("cgm_device_configured", false);
             return new() { Success = true, Message = "Account deleted.", Data = true };
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             return Unavailable("Account deletion service is unavailable.");
+        }
+    }
+
+    public async Task<(bool Success, string Message)> ChangePasswordAsync(string currentPassword, string newPassword)
+    {
+        try
+        {
+            if (!await IsAuthenticatedAsync())
+                return (false, "Your session has expired. Please sign in again.");
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, "api/auth/change-password");
+            var accessToken = await SecureStorage.Default.GetAsync(AccessTokenKey);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            request.Content = JsonContent.Create(new { CurrentPassword = currentPassword, NewPassword = newPassword });
+            using var response = await client.SendAsync(request);
+            var body = await response.Content.ReadFromJsonAsync<ResetDto>(JsonOptions);
+            if (!response.IsSuccessStatusCode || body?.Success != true)
+                return (false, body?.Message ?? "Password could not be changed.");
+
+            ClearSession();
+            return (true, body.Message);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            return (false, "Password service is unavailable. Check your connection.");
         }
     }
 

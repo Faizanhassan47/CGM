@@ -12,5 +12,7 @@ public sealed class CgmCommandBuilder
     public byte[] BuildE1() => Build(CgmProtocolParser.CmdReadBatteryVoltage);
     public byte[] BuildE2() => Build(CgmProtocolParser.CmdReadDeviceTemperature);
     public byte[] BuildE3() => Build(CgmProtocolParser.CmdReadMeasurementState);
+    public byte[] BuildD1() => Build(CgmProtocolParser.CmdStartMeasurement);
+    public byte[] BuildD3() => Build(CgmProtocolParser.CmdReadHistoricalData);
     private byte[] Build(byte command) => _parser.BuildCommand(command, ReadOnlySpan<byte>.Empty);
 }

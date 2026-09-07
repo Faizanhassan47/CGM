@@ -11,7 +11,7 @@ using CGM.PatientApp.Enums;
 using CGM.PatientApp.Interfaces;
 using CGM.PatientApp.Models;
 using Microsoft.Maui.ApplicationModel;
-
+using CGM.PatientApp.Services.Config;
 namespace CGM.PatientApp.Services.Ble;
 
 public sealed class AndroidBleService : IBleService, IDisposable
@@ -222,8 +222,12 @@ public sealed class AndroidBleService : IBleService, IDisposable
         catch { }
 
         bool advertisesService = result.ScanRecord?.ServiceUuids?.Any(x => x.Uuid?.Equals(ServiceUuid) == true) == true;
+        bool allowSimulator = EnvConfig.GetBool("CGM_ALLOW_BLE_SIMULATOR", false);
 
-        if (!CgmDeviceFilter.IsCandidateName(name) && !advertisesService)
+        bool isProductionDevice = CgmDeviceFilter.IsCandidateName(name);
+        bool isSimulatorDevice = CgmDeviceFilter.IsSimulator(name, advertisesService, allowSimulator);
+
+        if (!isProductionDevice && !isSimulatorDevice)
             return;
 
         if (result.Device?.Address is not { } address)
@@ -235,12 +239,14 @@ public sealed class AndroidBleService : IBleService, IDisposable
                 return;
         }
 
-        System.Diagnostics.Debug.WriteLine($"[BLE] Candidate CGM found: '{name}' ({address}), RSSI: {result.Rssi}, AdvertisesService: {advertisesService}");
+        string finalName = isSimulatorDevice ? "CGM Development Simulator" : (!string.IsNullOrWhiteSpace(name) ? name : "CGM Sensor");
+
+        System.Diagnostics.Debug.WriteLine($"[BLE] Candidate CGM found: '{finalName}' ({address}), RSSI: {result.Rssi}, AdvertisesService: {advertisesService}");
         SetState(CgmConnectionState.DeviceFound);
         callback(new CgmDeviceInfo
         {
             BluetoothId = address,
-            DeviceName = !string.IsNullOrWhiteSpace(name) ? name : "CGM Sensor",
+            DeviceName = finalName,
             Rssi = result.Rssi,
             AdvertisesCgmService = advertisesService,
             ConnectionState = CgmConnectionState.DeviceFound

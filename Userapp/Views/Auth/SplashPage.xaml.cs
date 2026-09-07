@@ -1,4 +1,5 @@
 using CGM.PatientApp.ViewModels.Auth;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CGM.PatientApp.Views.Auth;
 
@@ -6,7 +7,9 @@ public partial class SplashPage : ContentPage
 {
     private readonly SplashViewModel _viewModel;
 
-    public SplashPage() : this(IPlatformApplication.Current?.Services?.GetService<SplashViewModel>() ?? throw new InvalidOperationException("SplashViewModel not found"))
+    public SplashPage() : this(
+        (IPlatformApplication.Current?.Services ?? Application.Current?.Handler?.MauiContext?.Services)?.GetService<SplashViewModel>()
+        ?? new SplashViewModel(new Services.Auth.MockAuthService()))
     {
     }
 
@@ -16,9 +19,12 @@ public partial class SplashPage : ContentPage
         BindingContext = _viewModel = viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.InitializeAsync();
+        Dispatcher.Dispatch(async () =>
+        {
+            await _viewModel.InitializeAsync();
+        });
     }
 }

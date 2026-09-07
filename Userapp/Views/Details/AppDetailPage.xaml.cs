@@ -111,8 +111,6 @@ public partial class AppDetailPage : ContentPage
                 break;
             case "Privacy & Security":
                 AddCard("Your health data", "Your glucose and account information is protected and is only available after authentication.");
-                AddButton("Change password", () => DisplayAlertAsync("Change password", "A password reset request can be sent from the login screen.", "OK"));
-                AddButton("Export my data", () => DisplayAlertAsync("Data export", "Your data export is being prepared.", "OK"));
                 AddButton("Delete account", ConfirmDeleteAsync, true);
                 break;
             case "Help & Support":
@@ -136,13 +134,16 @@ public partial class AppDetailPage : ContentPage
     private void AddCard(string title, string text) => ContentHost.Add(new Border
     {
         StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 16 },
-        Stroke = Color.FromArgb("#E2E8F0"), BackgroundColor = Colors.White, Padding = 18,
+        Stroke = Color.FromArgb("#E2E8F0"),
+        BackgroundColor = Colors.White,
+        Padding = 18,
         Content = new VerticalStackLayout { Spacing = 7, Children = { new Label { Text = title, FontSize = 17, FontAttributes = FontAttributes.Bold }, new Label { Text = text, FontSize = 13, TextColor = Color.FromArgb("#64748B") } } }
     });
 
     private void AddEntry(string label, string value, Keyboard? keyboard = null) => ContentHost.Add(new VerticalStackLayout
     {
-        Spacing = 5, Children = { new Label { Text = label, FontAttributes = FontAttributes.Bold }, new Entry { Text = value, Keyboard = keyboard ?? Keyboard.Default, BackgroundColor = Colors.White } }
+        Spacing = 5,
+        Children = { new Label { Text = label, FontAttributes = FontAttributes.Bold }, new Entry { Text = value, Keyboard = keyboard ?? Keyboard.Default, BackgroundColor = Colors.White } }
     });
 
     private void AddSwitch(string label, string key, bool defaultValue)

@@ -10,6 +10,7 @@ public partial class ConnectingViewModel : BaseViewModel
     private readonly IBleService _bleService;
     private readonly ICgmDeviceService _cgmDeviceService;
     private readonly IDeviceService _deviceService;
+    private readonly ISensorService _sensorService;
 
     [ObservableProperty]
     private string _currentStepDescription = "Initiating secure connection...";
@@ -32,11 +33,12 @@ public partial class ConnectingViewModel : BaseViewModel
     [ObservableProperty]
     private bool _isTelemetryVerified = false;
 
-    public ConnectingViewModel(IBleService bleService, ICgmDeviceService cgmDeviceService, IDeviceService deviceService)
+    public ConnectingViewModel(IBleService bleService, ICgmDeviceService cgmDeviceService, IDeviceService deviceService, ISensorService sensorService)
     {
         _bleService = bleService;
         _cgmDeviceService = cgmDeviceService;
         _deviceService = deviceService;
+        _sensorService = sensorService;
         Title = "Connecting";
     }
 
@@ -84,6 +86,17 @@ public partial class ConnectingViewModel : BaseViewModel
             Preferences.Default.Set("cgm_device_configured", true);
 
             await _deviceService.SaveConfiguredDeviceAsync(device);
+
+            // Fetch measurement state again or assume from the E3 verification (we don't store it in CgmDeviceInfo but we can read it)
+            var (isMeasuring, latestSn) = await _cgmDeviceService.ReadMeasurementStateAsync();
+            if (!isMeasuring)
+            {
+                System.Diagnostics.Debug.WriteLine("[CGM] Sensor is not measuring. Starting sensor (D1)...");
+                await _cgmDeviceService.StartMeasurementAsync();
+            }
+
+            // Always ensure the backend sensor session is active
+            await _sensorService.StartSensorSessionAsync(device.SerialNumber);
 
             // Small delay so user sees all checkmarks complete
             await Task.Delay(400);

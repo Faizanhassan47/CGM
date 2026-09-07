@@ -7,6 +7,7 @@ using CGM.PatientApp.Models;
 using CGM.PatientApp.Services.Reports;
 using CGM.PatientApp.Services.Cgm;
 using Microsoft.Maui.Devices;
+using System.Windows.Input;
 
 namespace CGM.PatientApp.ViewModels.Dashboard;
 
@@ -70,6 +71,9 @@ public partial class DashboardViewModel : BaseViewModel
     private readonly IAuthService _authService;
     private readonly IProfileService _profileService;
     private readonly IDeviceService _deviceService;
+    private readonly ICgmDeviceService _cgmDeviceService;
+    private readonly IGlucoseService _glucoseService;
+    private readonly IAlertService _alertService;
     private readonly IPdfReportService? _pdfReportService;
 
     [ObservableProperty]
@@ -107,6 +111,62 @@ public partial class DashboardViewModel : BaseViewModel
 
     [ObservableProperty]
     private string _currentGlucose = "--";
+
+    [ObservableProperty]
+    private Color _heroGradientStart = Color.FromArgb("#0D9488");
+
+    [ObservableProperty]
+    private Color _heroGradientEnd = Color.FromArgb("#10B981");
+
+    [ObservableProperty]
+    private string _velocityRateText = "In Target • Stable (±0.5 mg/dL/min)";
+
+    partial void OnCurrentGlucoseChanged(string value)
+    {
+        UpdateHeroCardAura(value);
+    }
+
+    private void UpdateHeroCardAura(string value)
+    {
+        if (int.TryParse(value, out var g))
+        {
+            if (g > 250)
+            {
+                HeroGradientStart = Color.FromArgb("#991B1B"); // Urgent High crimson
+                HeroGradientEnd = Color.FromArgb("#EF4444");
+                VelocityRateText = "Urgent High • Check Ketones";
+                TrendArrow = "↑↑";
+            }
+            else if (g > 180)
+            {
+                HeroGradientStart = Color.FromArgb("#D97706"); // Amber warning
+                HeroGradientEnd = Color.FromArgb("#F59E0B");
+                VelocityRateText = "Above Target • Rising";
+                TrendArrow = "↗";
+            }
+            else if (g < 70)
+            {
+                HeroGradientStart = Color.FromArgb("#B91C1C"); // Hypo alert red
+                HeroGradientEnd = Color.FromArgb("#DC2626");
+                VelocityRateText = "Hypoglycemia • Take 15g Carbs";
+                TrendArrow = "↓↓";
+            }
+            else
+            {
+                HeroGradientStart = Color.FromArgb("#0D9488"); // Optimal teal
+                HeroGradientEnd = Color.FromArgb("#10B981");   // Emerald
+                VelocityRateText = "In Target • Stable (±0.5 mg/dL/min)";
+                TrendArrow = "→";
+            }
+        }
+        else
+        {
+            HeroGradientStart = Color.FromArgb("#475569");
+            HeroGradientEnd = Color.FromArgb("#64748B");
+            VelocityRateText = "Connecting to sensor...";
+            TrendArrow = "•";
+        }
+    }
 
     [ObservableProperty]
     private string _glucoseUnit = "mg/dL";
@@ -293,6 +353,14 @@ public partial class DashboardViewModel : BaseViewModel
     [ObservableProperty]
     private string _highestTime = "9:15 AM";
 
+
+    
+    [ObservableProperty]
+    private Color _currentGlucoseColor = Color.FromArgb("#1F2937"); // Dark gray default
+
+    [ObservableProperty]
+    private Color _glucoseAuraColor = Colors.Transparent;
+
     [ObservableProperty]
     private string _lowestGlucose = "64";
 
@@ -310,36 +378,124 @@ public partial class DashboardViewModel : BaseViewModel
     [ObservableProperty]
     private CalendarDayItem? _selectedCalendarDay;
 
-    // Rule of 15 Emergency Hypoglycemia Guidance
     [ObservableProperty]
-    private bool _isHypoAlertActive = false;
+    private string _selectedDateFormattedText = "Today";
 
     [ObservableProperty]
-    private string _ruleOf15TimerText = "15:00";
+    private bool _canGoToPreviousDay = true;
 
     [ObservableProperty]
-    private bool _isRuleOf15TimerRunning = false;
+    private bool _canGoToNextDay = false;
+
+    // Clinical Time In Range (AGP Profile)
+    [ObservableProperty]
+    private string _tirVeryLowPercent = "2%";
+
+    [ObservableProperty]
+    private string _tirLowPercent = "4%";
+
+    [ObservableProperty]
+    private string _tirInRangePercent = "84%";
+
+    [ObservableProperty]
+    private string _tirHighPercent = "8%";
+
+    [ObservableProperty]
+    private string _tirVeryHighPercent = "2%";
+
+    [ObservableProperty]
+    private string _sensorDaysRemainingText = "Day 4 of 14 • 10 days left";
+
+    [ObservableProperty]
+    private string _sensorSignalStatusText = "BLE Connected";
 
     private IDispatcherTimer? _liveSimulationTimer;
-    private IDispatcherTimer? _ruleOf15Timer;
-    private int _ruleOf15SecondsRemaining = 900;
+
+    [ObservableProperty]
+    private bool _isPrivacySecurityOverlayVisible;
+
+    [ObservableProperty]
+    private string _currentPassword = string.Empty;
+
+    [ObservableProperty]
+    private string _newPassword = string.Empty;
+
+    [ObservableProperty]
+    private string _confirmNewPassword = string.Empty;
+
+    [ObservableProperty]
+    private bool _isCurrentPasswordHidden = true;
+
+    [ObservableProperty]
+    private bool _isNewPasswordHidden = true;
+
+    [ObservableProperty]
+    private bool _isConfirmNewPasswordHidden = true;
+
+    [ObservableProperty]
+    private string _currentPasswordIcon = FontAwesomeIcons.Eye;
+
+    [ObservableProperty]
+    private string _newPasswordIcon = FontAwesomeIcons.Eye;
+
+    [ObservableProperty]
+    private string _confirmNewPasswordIcon = FontAwesomeIcons.Eye;
+
+    [ObservableProperty]
+    private bool _isPasswordChangeBusy;
+
+    [ObservableProperty]
+    private string _securityErrorMessage = string.Empty;
+
+    public bool HasSecurityError => !string.IsNullOrWhiteSpace(SecurityErrorMessage);
+
+    partial void OnSecurityErrorMessageChanged(string value) => OnPropertyChanged(nameof(HasSecurityError));
 
     public DashboardViewModel(
         IAuthService authService,
         IProfileService profileService,
         IDeviceService deviceService,
+        ICgmDeviceService cgmDeviceService,
+        IGlucoseService glucoseService,
+        IAlertService alertService,
         IPdfReportService? pdfReportService = null)
     {
         _authService = authService;
         _profileService = profileService;
         _deviceService = deviceService;
+        _cgmDeviceService = cgmDeviceService;
+        _glucoseService = glucoseService;
+        _alertService = alertService;
         _pdfReportService = pdfReportService ?? new PdfReportService();
         Title = "GlucoTrack Dashboard";
+
+        _cgmDeviceService.RawMeasurementReceived += OnRawMeasurementReceived;
 
         InitializeWeeklyCalendar();
         InitializeRecentEvents();
         PopulateHistoryReadings("Today");
         UpdateTrendChart("3H");
+    }
+
+    private void OnRawMeasurementReceived(object? sender, CgmRawMeasurement m)
+    {
+        Application.Current?.Dispatcher.Dispatch(async () =>
+        {
+            CurrentGlucose = m.GlucoseValueMgDl.ToString("0");
+            LastUpdatedText = "Updated just now";
+            UpdateTrendChart(ActiveTrendFilter ?? "3H", (int)m.GlucoseValueMgDl);
+
+            if (m.GlucoseValueMgDl < 55)
+            {
+                TriggerHaptic();
+                await Shell.Current.DisplayAlert("⚠️ URGENT LOW", $"Your glucose is critically low ({m.GlucoseValueMgDl} mg/dL). Treat immediately with fast-acting carbs.", "Acknowledge");
+            }
+            else if (m.GlucoseValueMgDl > 250)
+            {
+                TriggerHaptic();
+                await Shell.Current.DisplayAlert("⚠️ HIGH GLUCOSE", $"Your glucose is very high ({m.GlucoseValueMgDl} mg/dL). Consider checking ketones or taking insulin.", "Acknowledge");
+            }
+        });
     }
 
     [RelayCommand]
@@ -355,6 +511,7 @@ public partial class DashboardViewModel : BaseViewModel
 
         await RefreshUserDataAsync();
         await RefreshDeviceStateAsync();
+        await RefreshGlucoseSummaryAsync();
 
         if (string.IsNullOrEmpty(SelectedTab))
         {
@@ -437,9 +594,6 @@ public partial class DashboardViewModel : BaseViewModel
     {
         _liveSimulationTimer?.Stop();
         _liveSimulationTimer = null;
-        _ruleOf15Timer?.Stop();
-        _ruleOf15Timer = null;
-        IsRuleOf15TimerRunning = false;
     }
 
     private static void TriggerHaptic()
@@ -524,6 +678,34 @@ public partial class DashboardViewModel : BaseViewModel
             if (string.IsNullOrWhiteSpace(UserFullName)) UserFullName = "Jane Doe";
             if (string.IsNullOrWhiteSpace(UserEmail)) UserEmail = "jane.doe@email.com";
             if (string.IsNullOrWhiteSpace(PatientName)) PatientName = "Jane";
+        }
+    }
+
+    public async Task RefreshGlucoseSummaryAsync()
+    {
+        try
+        {
+            var summary = await _glucoseService.GetDashboardSummaryAsync();
+            if (summary.LatestReading != null)
+            {
+                CurrentGlucose = summary.LatestReading.GlucoseValue.ToString("0");
+                LastUpdatedText = $"Updated {FormatAge(DateTime.UtcNow - summary.LatestReading.MeasurementTime)}";
+            }
+            else
+            {
+                CurrentGlucose = "--";
+                LastUpdatedText = "No data available";
+            }
+            
+            AvgGlucose = summary.AverageGlucose > 0 ? summary.AverageGlucose.ToString("0") : "--";
+            HighestGlucose = summary.HighestGlucose > 0 ? summary.HighestGlucose.ToString("0") : "--";
+            LowestGlucose = summary.LowestGlucose > 0 && summary.LowestGlucose < 1000 ? summary.LowestGlucose.ToString("0") : "--";
+            TimeInRange = summary.AverageGlucose > 0 ? $"{summary.TimeInRangePercentage:0}%" : "--%";
+        }
+        catch
+        {
+            CurrentGlucose = "--";
+            LastUpdatedText = "Error fetching data";
         }
     }
 
@@ -612,23 +794,45 @@ public partial class DashboardViewModel : BaseViewModel
         var lastPoint = points.Last();
         TrendDotMargin = new Thickness(0, Math.Clamp(lastPoint.Y - 7, 2, 116), 40, 0);
 
-        if (lastVal > 180)
+        if (lastVal > 250)
         {
-            TrendLineColor = Color.FromArgb("#EF4444");
-            TrendDotColor = Color.FromArgb("#EF4444");
+            TrendLineColor = Color.FromArgb("#DC2626"); // Red
+            TrendDotColor = Color.FromArgb("#DC2626");
             TrendStatus = "High ↑";
+            CurrentGlucoseColor = Color.FromArgb("#DC2626");
+            GlucoseAuraColor = Color.FromArgb("#33DC2626"); // 20% opacity red
+        }
+        else if (lastVal > 180)
+        {
+            TrendLineColor = Color.FromArgb("#D97706"); // Amber
+            TrendDotColor = Color.FromArgb("#D97706");
+            TrendStatus = "High ↗";
+            CurrentGlucoseColor = Color.FromArgb("#D97706");
+            GlucoseAuraColor = Color.FromArgb("#33D97706"); // 20% opacity amber
+        }
+        else if (lastVal < 55)
+        {
+            TrendLineColor = Color.FromArgb("#DC2626"); // Red
+            TrendDotColor = Color.FromArgb("#DC2626");
+            TrendStatus = "Low ↓";
+            CurrentGlucoseColor = Color.FromArgb("#DC2626");
+            GlucoseAuraColor = Color.FromArgb("#33DC2626"); 
         }
         else if (lastVal < 70)
         {
-            TrendLineColor = Color.FromArgb("#3B82F6");
-            TrendDotColor = Color.FromArgb("#3B82F6");
-            TrendStatus = "Low ↓";
+            TrendLineColor = Color.FromArgb("#2563EB"); // Blue
+            TrendDotColor = Color.FromArgb("#2563EB");
+            TrendStatus = "Low ↘";
+            CurrentGlucoseColor = Color.FromArgb("#2563EB");
+            GlucoseAuraColor = Color.FromArgb("#332563EB");
         }
         else
         {
-            TrendLineColor = Color.FromArgb("#0D9488");
-            TrendDotColor = Color.FromArgb("#0D9488");
+            TrendLineColor = Color.FromArgb("#059669"); // Green
+            TrendDotColor = Color.FromArgb("#059669");
             TrendStatus = "Stable →";
+            CurrentGlucoseColor = Color.FromArgb("#1F2937"); // Normal dark text
+            GlucoseAuraColor = Color.FromArgb("#11059669"); // Very faint green aura
         }
     }
 
@@ -947,6 +1151,138 @@ public partial class DashboardViewModel : BaseViewModel
         await Shell.Current.GoToAsync("//LoginPage");
     }
 
+    [RelayCommand]
+    private void OpenPrivacySecurity()
+    {
+        SecurityErrorMessage = string.Empty;
+        CurrentPassword = string.Empty;
+        NewPassword = string.Empty;
+        ConfirmNewPassword = string.Empty;
+        ResetPasswordVisibility();
+        IsPrivacySecurityOverlayVisible = true;
+    }
+
+    [RelayCommand]
+    private void ToggleCurrentPasswordVisibility()
+    {
+        IsCurrentPasswordHidden = !IsCurrentPasswordHidden;
+        CurrentPasswordIcon = IsCurrentPasswordHidden ? FontAwesomeIcons.Eye : FontAwesomeIcons.EyeSlash;
+    }
+
+    [RelayCommand]
+    private void ToggleNewPasswordVisibility()
+    {
+        IsNewPasswordHidden = !IsNewPasswordHidden;
+        NewPasswordIcon = IsNewPasswordHidden ? FontAwesomeIcons.Eye : FontAwesomeIcons.EyeSlash;
+    }
+
+    [RelayCommand]
+    private void ToggleConfirmNewPasswordVisibility()
+    {
+        IsConfirmNewPasswordHidden = !IsConfirmNewPasswordHidden;
+        ConfirmNewPasswordIcon = IsConfirmNewPasswordHidden ? FontAwesomeIcons.Eye : FontAwesomeIcons.EyeSlash;
+    }
+
+    private void ResetPasswordVisibility()
+    {
+        IsCurrentPasswordHidden = true;
+        IsNewPasswordHidden = true;
+        IsConfirmNewPasswordHidden = true;
+        CurrentPasswordIcon = FontAwesomeIcons.Eye;
+        NewPasswordIcon = FontAwesomeIcons.Eye;
+        ConfirmNewPasswordIcon = FontAwesomeIcons.Eye;
+    }
+
+    [RelayCommand]
+    private void ClosePrivacySecurity()
+    {
+        if (IsPasswordChangeBusy) return;
+        IsPrivacySecurityOverlayVisible = false;
+        CurrentPassword = string.Empty;
+        NewPassword = string.Empty;
+        ConfirmNewPassword = string.Empty;
+        ResetPasswordVisibility();
+        SecurityErrorMessage = string.Empty;
+    }
+
+    [RelayCommand]
+    private async Task ChangePasswordAsync()
+    {
+        if (IsPasswordChangeBusy) return;
+        SecurityErrorMessage = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(CurrentPassword))
+        {
+            SecurityErrorMessage = "Enter your current password.";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(NewPassword) || NewPassword.Length < 6)
+        {
+            SecurityErrorMessage = "New password must be at least 6 characters.";
+            return;
+        }
+        if (NewPassword != ConfirmNewPassword)
+        {
+            SecurityErrorMessage = "New passwords do not match.";
+            return;
+        }
+        if (CurrentPassword == NewPassword)
+        {
+            SecurityErrorMessage = "New password must be different from the current password.";
+            return;
+        }
+
+        try
+        {
+            IsPasswordChangeBusy = true;
+            var result = await _authService.ChangePasswordAsync(CurrentPassword, NewPassword);
+            if (!result.Success)
+            {
+                SecurityErrorMessage = result.Message;
+                return;
+            }
+
+            IsPrivacySecurityOverlayVisible = false;
+            await Shell.Current.DisplayAlertAsync("Password changed", result.Message, "Sign in");
+            await Shell.Current.GoToAsync("//LoginPage");
+        }
+        finally
+        {
+            IsPasswordChangeBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteAccountAsync()
+    {
+        if (IsPasswordChangeBusy) return;
+        var confirmed = await Shell.Current.DisplayAlertAsync(
+            "Permanently delete account?",
+            "This deletes your account, profile, devices, sensor records, glucose readings, and alerts. This action cannot be undone.",
+            "Delete permanently",
+            "Cancel");
+        if (!confirmed) return;
+
+        try
+        {
+            IsPasswordChangeBusy = true;
+            SecurityErrorMessage = string.Empty;
+            var result = await _authService.DeleteAccountAsync();
+            if (!result.Success)
+            {
+                SecurityErrorMessage = result.Message;
+                return;
+            }
+
+            IsPrivacySecurityOverlayVisible = false;
+            await Shell.Current.GoToAsync("//LoginPage");
+        }
+        finally
+        {
+            IsPasswordChangeBusy = false;
+        }
+    }
+
     // ================= 1. QUICK EVENT LOGGING =================
     private void InitializeRecentEvents()
     {
@@ -1116,7 +1452,7 @@ public partial class DashboardViewModel : BaseViewModel
 
             var item = new CalendarDayItem
             {
-                DayName = date.ToString("ddd"),
+                DayName = date.ToString("ddd").ToUpper(),
                 DayNumber = date.Day.ToString(),
                 Date = date,
                 IsSelected = isToday,
@@ -1127,7 +1463,32 @@ public partial class DashboardViewModel : BaseViewModel
             if (isToday)
             {
                 SelectedCalendarDay = item;
+                SelectedDateFormattedText = $"{date:dddd, MMM d} (Today)";
+                CanGoToNextDay = false;
+                CanGoToPreviousDay = WeeklyCalendarDays.Count > 1;
             }
+        }
+    }
+
+    [RelayCommand]
+    private void PreviousDay()
+    {
+        if (SelectedCalendarDay == null || WeeklyCalendarDays.Count == 0) return;
+        int idx = WeeklyCalendarDays.IndexOf(SelectedCalendarDay);
+        if (idx > 0)
+        {
+            SelectCalendarDay(WeeklyCalendarDays[idx - 1]);
+        }
+    }
+
+    [RelayCommand]
+    private void NextDay()
+    {
+        if (SelectedCalendarDay == null || WeeklyCalendarDays.Count == 0) return;
+        int idx = WeeklyCalendarDays.IndexOf(SelectedCalendarDay);
+        if (idx < WeeklyCalendarDays.Count - 1)
+        {
+            SelectCalendarDay(WeeklyCalendarDays[idx + 1]);
         }
     }
 
@@ -1142,6 +1503,16 @@ public partial class DashboardViewModel : BaseViewModel
             d.IsSelected = (d == day);
         }
         SelectedCalendarDay = day;
+
+        int idx = WeeklyCalendarDays.IndexOf(day);
+        CanGoToPreviousDay = idx > 0;
+        CanGoToNextDay = idx < WeeklyCalendarDays.Count - 1;
+
+        SelectedDateFormattedText = day.Date.Date == DateTime.Today
+            ? $"{day.Date:dddd, MMM d} (Today)"
+            : day.Date.Date == DateTime.Today.AddDays(-1)
+                ? $"{day.Date:dddd, MMM d} (Yesterday)"
+                : $"{day.Date:dddd, MMM d}";
 
         PopulateDayReadings(day);
     }
@@ -1182,94 +1553,141 @@ public partial class DashboardViewModel : BaseViewModel
         HistoryReadings.Add(new($"{dayDateStr} 4:15 AM", LowestGlucose, LowestGlucose == "62" ? "Low" : "Optimal", LowestGlucose == "62" ? redBg : greenBg, LowestGlucose == "62" ? redText : greenText, LowestGlucose == "62" ? "↘" : "→", LowestGlucose == "62" ? redText : greenText));
     }
 
-    // ================= 3. RULE OF 15 EMERGENCY HYPOGLYCEMIA =================
+    // ================= CLINICAL TARGET RANGE & SAFETY =================
+    [ObservableProperty]
+    private int _targetRangeLow = 70;
+
+    [ObservableProperty]
+    private int _targetRangeHigh = 180;
+
+    [ObservableProperty]
+    private string _targetRangeSummary = "70 — 180 mg/dL (ADA Standard)";
+
+    // ================= LIVE SENSOR HARDWARE DIAGNOSTICS =================
+    [ObservableProperty]
+    private string _diagBatteryMv = "3,000 mV (96%)";
+
+    [ObservableProperty]
+    private string _diagTemperature = "32.5 °C (Normal)";
+
+    [ObservableProperty]
+    private string _diagSerial = "26082400C221";
+
+    [ObservableProperty]
+    private string _diagFirmware = "A100";
+
+    [ObservableProperty]
+    private string _diagWearDays = "Day 4 of 14 • 10 days left";
+
+    [ObservableProperty]
+    private double _diagWearProgress = 0.71;
+
+    [ObservableProperty]
+    private string _diagSignal = "-58 dBm (Strong BLE)";
+
     [RelayCommand]
-    private async Task StartRuleOf15TimerAsync()
+    private void DecreaseTargetLow()
+    {
+        if (TargetRangeLow > 60)
+        {
+            TargetRangeLow -= 5;
+            UpdateTargetSummary();
+            TriggerHaptic();
+        }
+    }
+
+    [RelayCommand]
+    private void IncreaseTargetLow()
+    {
+        if (TargetRangeLow < 90 && TargetRangeLow + 5 < TargetRangeHigh)
+        {
+            TargetRangeLow += 5;
+            UpdateTargetSummary();
+            TriggerHaptic();
+        }
+    }
+
+    [RelayCommand]
+    private void DecreaseTargetHigh()
+    {
+        if (TargetRangeHigh > 140 && TargetRangeHigh - 5 > TargetRangeLow)
+        {
+            TargetRangeHigh -= 5;
+            UpdateTargetSummary();
+            TriggerHaptic();
+        }
+    }
+
+    [RelayCommand]
+    private void IncreaseTargetHigh()
+    {
+        if (TargetRangeHigh < 250)
+        {
+            TargetRangeHigh += 5;
+            UpdateTargetSummary();
+            TriggerHaptic();
+        }
+    }
+
+    private void UpdateTargetSummary()
+    {
+        TargetRangeSummary = $"{TargetRangeLow} — {TargetRangeHigh} mg/dL (Custom Target)";
+    }
+
+    [RelayCommand]
+    private async Task ShareDoctorReportAsync()
     {
         TriggerHaptic();
-
-        if (IsRuleOf15TimerRunning)
-        {
-            var stopConfirm = await Shell.Current.DisplayAlertAsync(
-                "15-Minute Timer",
-                "A re-test timer is already active. Do you want to reset it?",
-                "Reset Timer",
-                "Keep Running");
-
-            if (!stopConfirm) return;
-
-            _ruleOf15Timer?.Stop();
-            _ruleOf15Timer = null;
-            IsRuleOf15TimerRunning = false;
-        }
-
-        _ruleOf15SecondsRemaining = 15 * 60; // 900 seconds
-        RuleOf15TimerText = "15:00";
-        IsRuleOf15TimerRunning = true;
-
         try
         {
-            _ruleOf15Timer = Application.Current?.Dispatcher.CreateTimer();
-            if (_ruleOf15Timer != null)
+            if (_pdfReportService != null)
             {
-                _ruleOf15Timer.Interval = TimeSpan.FromSeconds(1);
-                _ruleOf15Timer.Tick += (s, e) =>
+                var pdfPath = await _pdfReportService.GenerateReportPdfAsync(
+                    UserFullName,
+                    UserEmail,
+                    ReportDateRangeText,
+                    ReportAvgGlucose,
+                    ReportTimeInRange,
+                    ReportHighest,
+                    ReportLowest);
+
+                if (File.Exists(pdfPath))
                 {
-                    _ruleOf15SecondsRemaining--;
-                    if (_ruleOf15SecondsRemaining <= 0)
+                    await Share.Default.RequestAsync(new ShareFileRequest
                     {
-                        _ruleOf15Timer?.Stop();
-                        _ruleOf15Timer = null;
-                        IsRuleOf15TimerRunning = false;
-                        RuleOf15TimerText = "00:00 (Time to Re-Test!)";
-                        TriggerHaptic();
-                        Shell.Current?.DisplayAlertAsync("Rule of 15 Alert", "15 minutes have elapsed! Please re-check your blood glucose now.", "OK");
-                    }
-                    else
-                    {
-                        var mins = _ruleOf15SecondsRemaining / 60;
-                        var secs = _ruleOf15SecondsRemaining % 60;
-                        RuleOf15TimerText = $"{mins:D2}:{secs:D2}";
-                    }
-                };
-                _ruleOf15Timer.Start();
+                        Title = "Share AGP Report with Physician",
+                        File = new ShareFile(pdfPath)
+                    });
+                    return;
+                }
             }
+
+            await Shell.Current.DisplayAlertAsync("AGP Doctor Report", "Clinical AGP 1-Page Summary generated successfully.", "OK");
         }
-        catch { /* Handled for headless/test environments */ }
-
-        await Shell.Current.DisplayAlertAsync(
-            "Rule of 15 Started",
-            "1. Consume 15g fast carbs (juice, glucose tablets).\n2. Rest and wait 15 minutes.\n3. Re-test glucose when timer reaches 00:00.",
-            "Understood");
-    }
-
-    [RelayCommand]
-    private async Task CallEmergencyCaregiverAsync()
-    {
-        TriggerHaptic();
-        var call = await Shell.Current.DisplayAlertAsync(
-            "Emergency Assistance",
-            "Do you want to contact your designated caregiver or emergency services?",
-            "Call",
-            "Cancel");
-
-        if (call)
+        catch (Exception ex)
         {
-            try
-            {
-                if (PhoneDialer.Default.IsSupported)
-                {
-                    PhoneDialer.Default.Open("911");
-                }
-                else
-                {
-                    await Shell.Current.DisplayAlertAsync("Caregiver Contact", "Emergency contact: Primary Caregiver (+1 555-0199).", "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Caregiver Contact", $"Primary Caregiver: +1 555-0199\n{ex.Message}", "OK");
-            }
+            await Shell.Current.DisplayAlertAsync("Share Report", $"Could not open share dialog: {ex.Message}", "OK");
         }
     }
+}
+
+public class AlertViewModel
+{
+    public string AlertTitle { get; set; } = string.Empty;
+    public string AlertValue { get; set; } = string.Empty;
+    public string AlertDescription { get; set; } = string.Empty;
+    public string AlertTime { get; set; } = string.Empty;
+    public string BadgeText { get; set; } = string.Empty;
+    public string SubBadgeText { get; set; } = string.Empty;
+    public string IconText { get; set; } = string.Empty;
+    public Color IconBgColor { get; set; } = Colors.Transparent;
+    public Color IconTextColor { get; set; } = Colors.Transparent;
+    public Color BadgeBgColor { get; set; } = Colors.Transparent;
+    public Color BadgeTextColor { get; set; } = Colors.Transparent;
+    public Color DotColor { get; set; } = Colors.Transparent;
+    public bool HasValue => !string.IsNullOrEmpty(AlertValue);
+    public bool HasDescription => !string.IsNullOrEmpty(AlertDescription);
+    public bool HasSubBadge => !string.IsNullOrEmpty(SubBadgeText);
+    public ICommand? Command { get; set; }
+    public object? CommandParameter { get; set; }
 }

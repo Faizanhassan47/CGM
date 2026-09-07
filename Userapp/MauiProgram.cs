@@ -28,6 +28,12 @@ public static class MauiProgram
 			.UseMauiApp<App>()
 			.UseMauiCommunityToolkit()
 			.UseSkiaSharp()
+			.ConfigureMauiHandlers(handlers =>
+			{
+#if ANDROID
+				handlers.AddHandler(typeof(Shell), typeof(CGM.PatientApp.Platforms.Android.CustomShellRenderer));
+#endif
+			})
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("FontAwesomeSolid.otf", "FontAwesomeSolid");
@@ -97,6 +103,26 @@ public static class MauiProgram
 				? new MockBleService()
 				: new UnavailableBleService());
 #endif
+		builder.Services.AddSingleton<ApiSensorService>();
+		builder.Services.AddSingleton<MockSensorService>();
+		builder.Services.AddSingleton<ISensorService>(sp => useMockServices
+			? sp.GetRequiredService<MockSensorService>()
+			: sp.GetRequiredService<ApiSensorService>());
+
+		builder.Services.AddSingleton<ApiGlucoseService>();
+		builder.Services.AddSingleton<MockGlucoseService>();
+		builder.Services.AddSingleton<IGlucoseService>(sp => useMockServices
+			? sp.GetRequiredService<MockGlucoseService>()
+			: sp.GetRequiredService<ApiGlucoseService>());
+
+		builder.Services.AddSingleton<ApiAlertService>();
+		builder.Services.AddSingleton<MockAlertService>();
+		builder.Services.AddSingleton<IAlertService>(sp => useMockServices
+			? sp.GetRequiredService<MockAlertService>()
+			: sp.GetRequiredService<ApiAlertService>());
+
+        builder.Services.AddSingleton<CGM.PatientApp.Services.Sync.ISyncService, CGM.PatientApp.Services.Sync.SyncService>();
+
 		builder.Services.AddSingleton<ICgmProtocolParser>(sp => new CgmProtocolParser());
 		builder.Services.AddSingleton<CgmCommandBuilder>();
 		builder.Services.AddSingleton<ICgmDeviceService, CgmDeviceService>();

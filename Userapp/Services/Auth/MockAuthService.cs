@@ -305,6 +305,15 @@ public class MockAuthService : IAuthService, ISocialAuthService, IProfileService
         };
     }
 
+    public async Task<(bool Success, string Message)> ChangePasswordAsync(string currentPassword, string newPassword)
+    {
+        await Task.Delay(250);
+        if (string.IsNullOrWhiteSpace(currentPassword)) return (false, "Enter your current password.");
+        if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6) return (false, "New password must be at least 6 characters.");
+        await LogoutAsync();
+        return (true, "Password changed successfully. Please sign in again.");
+    }
+
     public Task<bool> HasCompletedProfileAsync()
     {
         var completed = Preferences.Default.Get(ProfileCompleteKey, false);

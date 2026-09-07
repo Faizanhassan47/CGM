@@ -10,8 +10,8 @@
             Shadow="{AppThemeBinding Light={Shadow Brush={StaticResource PrimaryBrush}, Offset='0,6', Radius=16, Opacity=0.25}, Dark={Shadow Brush=Transparent}}">
         <Border.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="{StaticResource TealGradientStart}" Offset="0.0" />
-                <GradientStop Color="{StaticResource TealGradientEnd}" Offset="1.0" />
+                <GradientStop Color="{Binding GradientStartColor, Source={x:Reference thisHero}}" Offset="0.0" />
+                <GradientStop Color="{Binding GradientEndColor, Source={x:Reference thisHero}}" Offset="1.0" />
             </LinearGradientBrush>
         </Border.Background>
 
@@ -19,7 +19,7 @@
             <TapGestureRecognizer Command="{Binding TapCommand, Source={x:Reference thisHero}}" />
         </Border.GestureRecognizers>
 
-        <VerticalStackLayout Spacing="14">
+        <VerticalStackLayout Spacing="12">
             <!-- Top Row: Title & Trend Status Badge -->
             <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
                 <Label Grid.Column="0"
@@ -73,6 +73,21 @@
                            VerticalOptions="Center" />
                 </Border>
             </Grid>
+
+            <!-- Velocity / Clinical Status Pill -->
+            <Border StrokeShape="RoundRectangle 8"
+                    BackgroundColor="#26FFFFFF"
+                    Padding="9,3"
+                    HorizontalOptions="Start"
+                    Margin="0,-4,0,2">
+                <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                    <Label Text="&#xF06E;" FontFamily="FontAwesomeSolid" FontSize="10" TextColor="#E0F2FE" VerticalOptions="Center" />
+                    <Label Text="{Binding VelocityText, Source={x:Reference thisHero}}"
+                           FontSize="11"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource White}" />
+                </HorizontalStackLayout>
+            </Border>
 
             <!-- Bottom Row: Last Updated & Hint -->
             <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">

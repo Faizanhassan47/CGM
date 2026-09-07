@@ -15,6 +15,7 @@ public interface IAuthService
     Task<ApiResponse<bool>> RefreshTokenAsync();
     Task LogoutAsync();
     Task<ApiResponse<bool>> DeleteAccountAsync();
+    Task<(bool Success, string Message)> ChangePasswordAsync(string currentPassword, string newPassword);
     Task<bool> HasCompletedProfileAsync();
     Task<bool> HasConfiguredDeviceAsync();
     Task<(bool Success, string Message)> ForgotPasswordAsync(string email);

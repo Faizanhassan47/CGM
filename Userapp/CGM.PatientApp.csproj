@@ -25,6 +25,7 @@
 		     For individual files, you can override by setting Inflator metadata:
 		       <MauiXaml Update="MyPage.xaml" Inflator="Default" /> (reverts to defaults: Runtime for Debug, XamlC for Release)
 		       <MauiXaml Update="MyPage.xaml" Inflator="Runtime" /> (force runtime inflation) -->
+		<!-- Compile XAML into generated code so startup does not depend on runtime embedded-resource lookup. -->
 		<MauiXamlInflator>SourceGen</MauiXamlInflator>
 
 		<!-- Display name -->
@@ -82,5 +83,15 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.90" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 	</ItemGroup>
+
+	<!-- Prevent a future project edit from restoring the startup XAML resource crash. -->
+	<Target Name="ValidateAndroidStartupPackaging"
+	        BeforeTargets="PrepareForBuild"
+	        Condition="'$(TargetFramework)' == 'net10.0-android'">
+		<Error Condition="'$(MauiXamlInflator)' != 'SourceGen'"
+		       Text="Android builds require MauiXamlInflator=SourceGen to prevent missing App.xaml resources at startup." />
+		<Error Condition="!Exists('$(MSBuildProjectDirectory)\App.xaml')"
+		       Text="App.xaml is required for Android startup." />
+	</Target>
 
 </Project>

@@ -2,7 +2,7 @@ using CGM.PatientApp.Enums;
 using CGM.PatientApp.Interfaces;
 using CGM.PatientApp.Models;
 using CGM.PatientApp.Services.Ble;
-
+using CGM.PatientApp.Services.Config;
 namespace CGM.PatientApp.Services.Cgm;
 
 public sealed class CgmDeviceService : ICgmDeviceService, IDisposable
@@ -10,13 +10,14 @@ public sealed class CgmDeviceService : ICgmDeviceService, IDisposable
     private readonly IBleService _ble;
     private readonly ICgmProtocolParser _parser;
     private readonly CgmCommandBuilder _commands;
+    private readonly CGM.PatientApp.Services.Sync.ISyncService? _syncService;
     private readonly object _responseGate = new();
     private TaskCompletionSource<byte[]>? _pendingResponse;
     private byte _pendingCommand;
 
-    public CgmDeviceService(IBleService ble, ICgmProtocolParser parser, CgmCommandBuilder commands)
+    public CgmDeviceService(IBleService ble, ICgmProtocolParser parser, CgmCommandBuilder commands, CGM.PatientApp.Services.Sync.ISyncService? syncService = null)
     {
-        _ble = ble; _parser = parser; _commands = commands;
+        _ble = ble; _parser = parser; _commands = commands; _syncService = syncService;
         _ble.NotificationReceived += OnNotification;
         _ble.ConnectionStateChanged += (_, state) => ConnectionStateChanged?.Invoke(this, state);
     }
@@ -28,7 +29,10 @@ public sealed class CgmDeviceService : ICgmDeviceService, IDisposable
 
     public async Task<CgmDeviceInfo?> ConnectAndVerifyAsync(string bluetoothId, string advertisedName, CancellationToken cancellationToken = default)
     {
-        if (!CgmDeviceFilter.IsCandidateName(advertisedName))
+        bool allowSimulator = EnvConfig.GetBool("CGM_ALLOW_BLE_SIMULATOR", false);
+        bool isSimulator = allowSimulator && advertisedName == "CGM Development Simulator";
+
+        if (!CgmDeviceFilter.IsCandidateName(advertisedName) && !isSimulator)
         {
             System.Diagnostics.Debug.WriteLine($"[CGM] '{advertisedName}' is not a candidate CGM name.");
             return null;
@@ -154,6 +158,18 @@ public sealed class CgmDeviceService : ICgmDeviceService, IDisposable
             System.Diagnostics.Debug.WriteLine($"[CGM] Frame header or error command mismatch (Header=0x{frame[0]:X2}, Cmd=0x{frame[2]:X2})");
             return;
         }
+        
+        // Handle B0 asynchronous notifications
+        if (frame[2] == CgmProtocolParser.CmdLiveMeasurementReport)
+        {
+            var measurement = _parser.ParseLiveMeasurement(frame);
+            if (measurement != null)
+            {
+                RawMeasurementReceived?.Invoke(this, measurement);
+                _syncService?.EnqueueMeasurementAsync(measurement);
+            }
+            return;
+        }
 
         TaskCompletionSource<byte[]>? pending = null;
         lock (_responseGate)
@@ -174,7 +190,32 @@ public sealed class CgmDeviceService : ICgmDeviceService, IDisposable
     public async Task<double> ReadDeviceTemperatureAsync() => (await ReadParsed(_commands.BuildE2(), CgmProtocolParser.CmdReadDeviceTemperature, x => _parser.ParseDeviceTemperatureResult(x)?.DeviceTemperatureC)).GetValueOrDefault();
     public async Task<(bool isMeasuring, ushort latestSn)> ReadMeasurementStateAsync() { var value = await ReadParsed(_commands.BuildE3(), CgmProtocolParser.CmdReadMeasurementState, x => _parser.ParseMeasurementStateResult(x)); return value is null ? default : (value.IsMeasuring, value.LatestSequenceNumber); }
     private async Task<T?> ReadParsed<T>(byte[] command, byte cmd, Func<byte[], T?> parse) => parse(await ExchangeAsync(command, cmd, CancellationToken.None));
-    public Task<bool> StartMeasurementAsync() => throw new NotSupportedException("D1 is outside the current implementation stage.");
-    public Task<IReadOnlyList<CgmRawMeasurement>> ReadHistoricalDataAsync(ushort startSn, ushort endSn) => throw new NotSupportedException("D3 is outside the current implementation stage.");
+    
+    public async Task<bool> StartMeasurementAsync() 
+    {
+        try 
+        {
+            await ExchangeAsync(_commands.BuildD1(), CgmProtocolParser.CmdStartMeasurement, CancellationToken.None);
+            return true;
+        }
+        catch 
+        {
+            return false;
+        }
+    }
+    
+    public async Task<IReadOnlyList<CgmRawMeasurement>> ReadHistoricalDataAsync(ushort startSn, ushort endSn)
+    {
+        try 
+        {
+            var response = await ExchangeAsync(_commands.BuildD3(), CgmProtocolParser.CmdReadHistoricalData, CancellationToken.None);
+            return _parser.ParseHistoricalMeasurements(response);
+        }
+        catch 
+        {
+            return Array.Empty<CgmRawMeasurement>();
+        }
+    }
+    
     public void Dispose() => _ble.NotificationReceived -= OnNotification;
 }

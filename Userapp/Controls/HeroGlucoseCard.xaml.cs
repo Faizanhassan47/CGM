@@ -22,6 +22,15 @@ public partial class HeroGlucoseCard : ContentView
     public static readonly BindableProperty LastUpdatedTextProperty =
         BindableProperty.Create(nameof(LastUpdatedText), typeof(string), typeof(HeroGlucoseCard), "Updated just now");
 
+    public static readonly BindableProperty GradientStartColorProperty =
+        BindableProperty.Create(nameof(GradientStartColor), typeof(Color), typeof(HeroGlucoseCard), Color.FromArgb("#0D9488"));
+
+    public static readonly BindableProperty GradientEndColorProperty =
+        BindableProperty.Create(nameof(GradientEndColor), typeof(Color), typeof(HeroGlucoseCard), Color.FromArgb("#10B981"));
+
+    public static readonly BindableProperty VelocityTextProperty =
+        BindableProperty.Create(nameof(VelocityText), typeof(string), typeof(HeroGlucoseCard), "Stable velocity (±0.5 mg/dL/min)");
+
     public static readonly BindableProperty TapCommandProperty =
         BindableProperty.Create(nameof(TapCommand), typeof(ICommand), typeof(HeroGlucoseCard), null);
 
@@ -59,6 +68,24 @@ public partial class HeroGlucoseCard : ContentView
     {
         get => (string)GetValue(LastUpdatedTextProperty);
         set => SetValue(LastUpdatedTextProperty, value);
+    }
+
+    public Color GradientStartColor
+    {
+        get => (Color)GetValue(GradientStartColorProperty);
+        set => SetValue(GradientStartColorProperty, value);
+    }
+
+    public Color GradientEndColor
+    {
+        get => (Color)GetValue(GradientEndColorProperty);
+        set => SetValue(GradientEndColorProperty, value);
+    }
+
+    public string VelocityText
+    {
+        get => (string)GetValue(VelocityTextProperty);
+        set => SetValue(VelocityTextProperty, value);
     }
 
     public ICommand? TapCommand

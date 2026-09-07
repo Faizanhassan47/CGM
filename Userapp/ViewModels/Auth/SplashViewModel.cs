@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CGM.PatientApp.Interfaces;
+using Microsoft.Maui.ApplicationModel;
 
 namespace CGM.PatientApp.ViewModels.Auth;
 
@@ -24,9 +25,19 @@ public partial class SplashViewModel : BaseViewModel
         {
             IsBusy = true;
             StatusMessage = "Checking session status...";
-            await Task.Delay(800); // Smooth branded transition
+            await Task.Delay(400); // Smooth branded transition
 
-            bool isAuthenticated = await _authService.IsAuthenticatedAsync();
+            string targetRoute = "//LoginPage";
+            bool isAuthenticated = false;
+
+            try
+            {
+                isAuthenticated = await _authService.IsAuthenticatedAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[SplashViewModel] Auth check error: {ex.Message}");
+            }
 
             if (isAuthenticated)
             {
@@ -34,33 +45,37 @@ public partial class SplashViewModel : BaseViewModel
                 bool hasProfile = await _authService.HasCompletedProfileAsync();
                 if (!hasProfile)
                 {
-                    await Shell.Current.GoToAsync("//CompleteProfilePage");
-                    return;
+                    targetRoute = "//CompleteProfilePage";
                 }
-
-                StatusMessage = "Checking device connection...";
-                bool hasDevice = await _authService.HasConfiguredDeviceAsync();
-                if (!hasDevice)
+                else
                 {
-                    await Shell.Current.GoToAsync("//DeviceSelectionPage");
-                    return;
+                    StatusMessage = "Checking device connection...";
+                    bool hasDevice = await _authService.HasConfiguredDeviceAsync();
+                    targetRoute = hasDevice ? "//DashboardPage" : "//DeviceSelectionPage";
                 }
+            }
 
-                await Shell.Current.GoToAsync("//DashboardPage");
-            }
-            else
-            {
-                await Shell.Current.GoToAsync("//LoginPage");
-            }
+            await NavigateToTargetAsync(targetRoute);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Fail-safe to login on any unexpected error
-            await Shell.Current.GoToAsync("//LoginPage");
+            System.Diagnostics.Debug.WriteLine($"[SplashViewModel] Navigation error: {ex.Message}");
+            await NavigateToTargetAsync("//LoginPage");
         }
         finally
         {
             IsBusy = false;
         }
+    }
+
+    private static async Task NavigateToTargetAsync(string route)
+    {
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            if (Shell.Current != null)
+            {
+                await Shell.Current.GoToAsync(route);
+            }
+        });
     }
 }
