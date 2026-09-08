@@ -74,19 +74,20 @@ public partial class DashboardViewModel : BaseViewModel
     private readonly ICgmDeviceService _cgmDeviceService;
     private readonly IGlucoseService _glucoseService;
     private readonly IAlertService _alertService;
+    private double? _latestGlucoseMgDl;
     private readonly IPdfReportService? _pdfReportService;
 
     [ObservableProperty]
     private string _patientGreeting = "Good morning,";
 
     [ObservableProperty]
-    private string _patientName = "Jane";
+    private string _patientName = "Patient";
 
     [ObservableProperty]
-    private string _userFullName = "Jane Doe";
+    private string _userFullName = "Account";
 
     [ObservableProperty]
-    private string _userEmail = "jane.doe@email.com";
+    private string _userEmail = string.Empty;
 
     [ObservableProperty]
     private string _deviceStatusText = "Not connected";
@@ -172,13 +173,13 @@ public partial class DashboardViewModel : BaseViewModel
     private string _glucoseUnit = "mg/dL";
 
     [ObservableProperty]
-    private string _trendStatus = "Stable";
+    private string _trendStatus = "No reading";
 
     [ObservableProperty]
     private string _trendArrow = "→";
 
     [ObservableProperty]
-    private string _lastUpdatedText = "Updated just now";
+    private string _lastUpdatedText = "No recent reading";
 
     [ObservableProperty]
     private string _activeTrendFilter = "3H";
@@ -220,22 +221,22 @@ public partial class DashboardViewModel : BaseViewModel
     private Color _trendDotColor = Color.FromArgb("#0D9488");
 
     [ObservableProperty]
-    private string _timeInRange = "82%";
+    private string _timeInRange = "--";
 
     [ObservableProperty]
-    private string _sensorStatus = "Good";
+    private string _sensorStatus = "Not connected";
 
     [ObservableProperty]
-    private string _sensorDaysLeft = "7 days left";
+    private string _sensorDaysLeft = "No active sensor";
 
     [ObservableProperty]
-    private string _batteryDaysLeft = "About 2 days left";
+    private string _batteryDaysLeft = "Unavailable";
 
     [ObservableProperty]
-    private string _lastSyncTime = "9:41 AM";
+    private string _lastSyncTime = "--";
 
     [ObservableProperty]
-    private string _lastSyncDate = "Today";
+    private string _lastSyncDate = "Not synchronized";
 
     // 5 Navigation Tabs
     [ObservableProperty]
@@ -298,31 +299,31 @@ public partial class DashboardViewModel : BaseViewModel
     private string _reportDateRangeText = "May 2 – May 8, 2025";
 
     [ObservableProperty]
-    private string _reportAvgGlucose = "96 mg/dL";
+    private string _reportAvgGlucose = "--";
 
     [ObservableProperty]
     private string _reportAvgDiffText = "↓ 6 vs previous 7 days";
 
     [ObservableProperty]
-    private string _reportHighest = "152 mg/dL";
+    private string _reportHighest = "--";
 
     [ObservableProperty]
-    private string _reportHighestDate = "May 10, 9:15 AM";
+    private string _reportHighestDate = "No reading";
 
     [ObservableProperty]
-    private string _reportLowest = "64 mg/dL";
+    private string _reportLowest = "--";
 
     [ObservableProperty]
-    private string _reportLowestDate = "May 8, 4:12 AM";
+    private string _reportLowestDate = "No reading";
 
     [ObservableProperty]
-    private string _reportTimeInRange = "82%";
+    private string _reportTimeInRange = "--";
 
     [ObservableProperty]
-    private string _reportEstimatedA1c = "5.6%";
+    private string _reportEstimatedA1c = "--";
 
     [ObservableProperty]
-    private string _reportGlucoseVariability = "28%";
+    private string _reportGlucoseVariability = "--";
 
     // Alerts Filters & State
     [ObservableProperty]
@@ -340,18 +341,24 @@ public partial class DashboardViewModel : BaseViewModel
     [ObservableProperty]
     private bool _isAlertInfo = false;
 
+    public ObservableCollection<Alert> VisibleAlerts { get; } = new();
+    private IReadOnlyList<Alert> _allAlerts = Array.Empty<Alert>();
+
+    [ObservableProperty]
+    private bool _hasGlucoseData;
+
     // Daily Summary Stats
     [ObservableProperty]
-    private string _avgGlucose = "96";
+    private string _avgGlucose = "--";
 
     [ObservableProperty]
     private string _avgDiffText = "↓ 6 vs yesterday";
 
     [ObservableProperty]
-    private string _highestGlucose = "152";
+    private string _highestGlucose = "--";
 
     [ObservableProperty]
-    private string _highestTime = "9:15 AM";
+    private string _highestTime = "No reading";
 
 
     
@@ -362,10 +369,10 @@ public partial class DashboardViewModel : BaseViewModel
     private Color _glucoseAuraColor = Colors.Transparent;
 
     [ObservableProperty]
-    private string _lowestGlucose = "64";
+    private string _lowestGlucose = "--";
 
     [ObservableProperty]
-    private string _lowestTime = "4:12 AM";
+    private string _lowestTime = "No reading";
 
     // Quick Event Logging
     [ObservableProperty]
@@ -389,19 +396,19 @@ public partial class DashboardViewModel : BaseViewModel
 
     // Clinical Time In Range (AGP Profile)
     [ObservableProperty]
-    private string _tirVeryLowPercent = "2%";
+    private string _tirVeryLowPercent = "--";
 
     [ObservableProperty]
-    private string _tirLowPercent = "4%";
+    private string _tirLowPercent = "--";
 
     [ObservableProperty]
-    private string _tirInRangePercent = "84%";
+    private string _tirInRangePercent = "--";
 
     [ObservableProperty]
-    private string _tirHighPercent = "8%";
+    private string _tirHighPercent = "--";
 
     [ObservableProperty]
-    private string _tirVeryHighPercent = "2%";
+    private string _tirVeryHighPercent = "--";
 
     [ObservableProperty]
     private string _sensorDaysRemainingText = "Day 4 of 14 • 10 days left";
@@ -470,10 +477,10 @@ public partial class DashboardViewModel : BaseViewModel
         Title = "GlucoTrack Dashboard";
 
         _cgmDeviceService.RawMeasurementReceived += OnRawMeasurementReceived;
+        _cgmDeviceService.ConnectionStateChanged += OnCgmConnectionStateChanged;
 
         InitializeWeeklyCalendar();
-        InitializeRecentEvents();
-        PopulateHistoryReadings("Today");
+        RecentEvents.Clear();
         UpdateTrendChart("3H");
     }
 
@@ -481,7 +488,10 @@ public partial class DashboardViewModel : BaseViewModel
     {
         Application.Current?.Dispatcher.Dispatch(async () =>
         {
-            CurrentGlucose = m.GlucoseValueMgDl.ToString("0");
+            ApplyConnectionState(CgmConnectionState.Ready);
+            _latestGlucoseMgDl = m.GlucoseValueMgDl;
+            CurrentGlucose = ConvertMgDlForDisplay(m.GlucoseValueMgDl);
+            HasGlucoseData = true;
             LastUpdatedText = "Updated just now";
             UpdateTrendChart(ActiveTrendFilter ?? "3H", (int)m.GlucoseValueMgDl);
 
@@ -498,6 +508,9 @@ public partial class DashboardViewModel : BaseViewModel
         });
     }
 
+    private void OnCgmConnectionStateChanged(object? sender, CgmConnectionState state) =>
+        Application.Current?.Dispatcher.Dispatch(() => ApplyConnectionState(state));
+
     [RelayCommand]
     public async Task InitializeAsync()
     {
@@ -512,6 +525,8 @@ public partial class DashboardViewModel : BaseViewModel
         await RefreshUserDataAsync();
         await RefreshDeviceStateAsync();
         await RefreshGlucoseSummaryAsync();
+        await LoadHistoryReadingsAsync(ActiveHistoryFilter ?? "Today");
+        await LoadAlertsAsync();
 
         if (string.IsNullOrEmpty(SelectedTab))
         {
@@ -525,6 +540,14 @@ public partial class DashboardViewModel : BaseViewModel
 
     private async Task RefreshDeviceStateAsync()
     {
+        // The live BLE transport is authoritative. A backend device record may not
+        // exist yet even though verified telemetry is already being received.
+        if (IsLiveConnection(_cgmDeviceService.State))
+        {
+            ApplyConnectionState(_cgmDeviceService.State);
+            return;
+        }
+
         var device = await _deviceService.GetConfiguredDeviceAsync();
         if (device is null)
         {
@@ -556,6 +579,36 @@ public partial class DashboardViewModel : BaseViewModel
         LastUpdatedText = device.LastCommunicationTime.HasValue
             ? $"Updated {FormatAge(DateTime.UtcNow - device.LastCommunicationTime.Value)}"
             : "Connected";
+    }
+
+    private static bool IsLiveConnection(CgmConnectionState state) => state is
+        CgmConnectionState.Connected or CgmConnectionState.DiscoveringServices or
+        CgmConnectionState.Ready or CgmConnectionState.Synchronizing;
+
+    private void ApplyConnectionState(CgmConnectionState state)
+    {
+        var connected = IsLiveConnection(state);
+        IsDeviceConnected = connected;
+        IsDeviceDisconnected = !connected;
+        StatusBadgeBgColor = Color.FromArgb(connected ? "#D1FAE5" : "#FEF3C7");
+        StatusBadgeTextColor = Color.FromArgb(connected ? "#065F46" : "#D97706");
+        StatusBadgeIcon = connected ? "\uF0C1" : "\uF127";
+        DeviceStatusText = connected ? (state == CgmConnectionState.Ready ? "Connected" : state.ToString()) : "Not connected";
+        if (connected)
+        {
+            SensorStatus = "Active";
+            LastUpdatedText = "Updated just now";
+            var liveDevice = _cgmDeviceService.ConnectedDevice;
+            if (liveDevice != null) BatteryPercent = $"{liveDevice.BatteryVoltageMv} mV";
+        }
+    }
+
+    private string ConvertMgDlForDisplay(double mgDl)
+    {
+        var unit = string.Equals(GlucoseUnit, "mmol/L", StringComparison.OrdinalIgnoreCase)
+            ? Enums.GlucoseUnit.MmolL : Enums.GlucoseUnit.MgDl;
+        return GlucoseUnitConverter.Convert(mgDl, Enums.GlucoseUnit.MgDl, unit)
+            .ToString(unit == Enums.GlucoseUnit.MmolL ? "0.0" : "0");
     }
 
     private static string FormatAge(TimeSpan age) => age.TotalMinutes < 1
@@ -661,16 +714,12 @@ public partial class DashboardViewModel : BaseViewModel
             if (profile != null)
             {
                 GlucoseUnit = profile.PreferredGlucoseUnit == Enums.GlucoseUnit.MmolL ? "mmol/L" : "mg/dL";
-                if (IsDeviceConnected)
-                {
-                    CurrentGlucose = GlucoseUnitConverter.Convert(112, Enums.GlucoseUnit.MgDl, profile.PreferredGlucoseUnit)
-                        .ToString(profile.PreferredGlucoseUnit == Enums.GlucoseUnit.MmolL ? "0.0" : "0");
-                }
+                if (_latestGlucoseMgDl.HasValue) CurrentGlucose = ConvertMgDlForDisplay(_latestGlucoseMgDl.Value);
             }
             else
             {
                 GlucoseUnit = "mg/dL";
-                if (IsDeviceConnected) CurrentGlucose = "112";
+                if (_latestGlucoseMgDl.HasValue) CurrentGlucose = ConvertMgDlForDisplay(_latestGlucoseMgDl.Value);
             }
         }
         catch
@@ -688,11 +737,16 @@ public partial class DashboardViewModel : BaseViewModel
             var summary = await _glucoseService.GetDashboardSummaryAsync();
             if (summary.LatestReading != null)
             {
-                CurrentGlucose = summary.LatestReading.GlucoseValue.ToString("0");
+                HasGlucoseData = true;
+                _latestGlucoseMgDl = summary.LatestReading.Unit == Enums.GlucoseUnit.MmolL
+                    ? GlucoseUnitConverter.Convert(summary.LatestReading.GlucoseValue, Enums.GlucoseUnit.MmolL, Enums.GlucoseUnit.MgDl)
+                    : summary.LatestReading.GlucoseValue;
+                CurrentGlucose = ConvertMgDlForDisplay(_latestGlucoseMgDl.Value);
                 LastUpdatedText = $"Updated {FormatAge(DateTime.UtcNow - summary.LatestReading.MeasurementTime)}";
             }
             else
             {
+                HasGlucoseData = false;
                 CurrentGlucose = "--";
                 LastUpdatedText = "No data available";
             }
@@ -704,6 +758,7 @@ public partial class DashboardViewModel : BaseViewModel
         }
         catch
         {
+            HasGlucoseData = false;
             CurrentGlucose = "--";
             LastUpdatedText = "Error fetching data";
         }
@@ -867,7 +922,7 @@ public partial class DashboardViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void SetHistoryFilter(string filter)
+    private async Task SetHistoryFilterAsync(string filter)
     {
         TriggerHaptic();
         ActiveHistoryFilter = filter;
@@ -876,7 +931,46 @@ public partial class DashboardViewModel : BaseViewModel
         IsHistory14D = filter == "14D";
         IsHistory30D = filter == "30D";
 
-        PopulateHistoryReadings(filter);
+        await LoadHistoryReadingsAsync(filter);
+    }
+
+    private async Task LoadHistoryReadingsAsync(string filter)
+    {
+        HistoryReadings.Clear();
+        var range = filter switch
+        {
+            "7D" => TimeSpan.FromDays(7),
+            "14D" => TimeSpan.FromDays(14),
+            "30D" => TimeSpan.FromDays(30),
+            _ => TimeSpan.FromDays(1)
+        };
+
+        var readings = await _glucoseService.GetRecentReadingsAsync(range);
+        foreach (var reading in readings.OrderByDescending(x => x.MeasurementTime).Take(100))
+        {
+            var (background, foreground) = reading.Status switch
+            {
+                GlucoseStatus.Low => (Color.FromArgb("#EFF6FF"), Color.FromArgb("#2563EB")),
+                GlucoseStatus.UrgentLow or GlucoseStatus.UrgentHigh => (Color.FromArgb("#FEE2E2"), Color.FromArgb("#B91C1C")),
+                GlucoseStatus.High => (Color.FromArgb("#FEF3C7"), Color.FromArgb("#B45309")),
+                _ => (Color.FromArgb("#E6F4EA"), Color.FromArgb("#047857"))
+            };
+            var arrow = reading.Trend switch
+            {
+                GlucoseTrend.RisingRapidly => "↑",
+                GlucoseTrend.Rising => "↗",
+                GlucoseTrend.Falling => "↘",
+                GlucoseTrend.FallingRapidly => "↓",
+                _ => "→"
+            };
+            HistoryReadings.Add(new(
+                filter == "Today"
+                    ? reading.MeasurementTime.ToLocalTime().ToString("h:mm tt")
+                    : reading.MeasurementTime.ToLocalTime().ToString("ddd, MMM d h:mm tt"),
+                reading.GlucoseValue.ToString("0"),
+                reading.Status == GlucoseStatus.Normal ? "In range" : reading.Status.ToString(),
+                background, foreground, arrow, foreground));
+        }
     }
 
     private void PopulateHistoryReadings(string filter)
@@ -1058,7 +1152,30 @@ public partial class DashboardViewModel : BaseViewModel
         IsAlertAll = filter == "All";
         IsAlertCritical = filter == "Critical";
         IsAlertUnread = filter == "Unread";
+        ApplyAlertFilter();
         IsAlertInfo = filter == "Info" || filter == "ℹ️ Info";
+    }
+
+    private async Task LoadAlertsAsync()
+    {
+        _allAlerts = await _alertService.GetAlertsAsync();
+        ApplyAlertFilter();
+    }
+
+    private void ApplyAlertFilter()
+    {
+        IEnumerable<Alert> alerts = _allAlerts;
+
+        if (IsAlertCritical)
+            alerts = alerts.Where(alert => alert.IsCritical);
+        else if (IsAlertUnread)
+            alerts = alerts.Where(alert => !alert.IsRead);
+        else if (IsAlertInfo)
+            alerts = alerts.Where(alert => !alert.IsCritical);
+
+        VisibleAlerts.Clear();
+        foreach (var alert in alerts.OrderByDescending(alert => alert.Timestamp))
+            VisibleAlerts.Add(alert);
     }
 
     [RelayCommand]
@@ -1142,6 +1259,9 @@ public partial class DashboardViewModel : BaseViewModel
         TriggerHaptic();
         await Shell.Current.GoToAsync("//DeviceSelectionPage");
     }
+
+    [RelayCommand]
+    private async Task NavigateToFamilyAsync() => await Shell.Current.GoToAsync("FamilyPage");
 
     [RelayCommand]
     private async Task LogoutAsync()

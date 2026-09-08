@@ -164,13 +164,33 @@ public partial class AppDetailPage : ContentPage
 
     private async Task SavePreference(string key, string value)
     {
-        Preferences.Default.Set(key, value);
         if (key == "glucose_unit")
         {
             var unit = value.Equals("mmol/L", StringComparison.OrdinalIgnoreCase) ? CGM.PatientApp.Enums.GlucoseUnit.MmolL : CGM.PatientApp.Enums.GlucoseUnit.MgDl;
+            var profileService = IPlatformApplication.Current?.Services?.GetService<CGM.PatientApp.Interfaces.IProfileService>();
+            if (profileService is null)
+            {
+                await DisplayAlertAsync("Not saved", "Profile service is unavailable.", "OK");
+                return;
+            }
+            var profile = await profileService.GetProfileAsync();
+            if (profile is null)
+            {
+                await DisplayAlertAsync("Not saved", "Your profile could not be loaded.", "OK");
+                return;
+            }
+            profile.PreferredGlucoseUnit = unit;
+            var result = await profileService.SaveProfileAsync(profile);
+            if (!result.Success)
+            {
+                await DisplayAlertAsync("Not saved", result.Message, "OK");
+                return;
+            }
+            Preferences.Default.Set(key, value);
             Preferences.Default.Set(nameof(CGM.PatientApp.Enums.GlucoseUnit), (int)unit);
         }
         await DisplayAlertAsync("Saved", $"Glucose unit changed to {value}.", "OK");
+        await Shell.Current.GoToAsync("..");
     }
     private async Task SetTheme(AppTheme theme) { Application.Current!.UserAppTheme = theme; await DisplayAlertAsync("Theme changed", "Your theme preference has been applied.", "OK"); }
     private async Task ConfirmDeleteAsync()

@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Dashboard"
+             xmlns:models="clr-namespace:CGM.PatientApp.Models"
              xmlns:controls="clr-namespace:CGM.PatientApp.Controls"
              x:Class="CGM.PatientApp.Views.Dashboard.DashboardPage"
              x:DataType="vm:DashboardViewModel"
@@ -896,6 +897,41 @@
                         </VerticalStackLayout>
                     </Border>
 
+                    <CollectionView ItemsSource="{Binding VisibleAlerts}"
+                                    SelectionMode="None"
+                                    MaximumHeightRequest="560">
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout Padding="0,32" Spacing="6">
+                                <Label Text="No alerts in this category"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Center" />
+                                <Label Text="New sensor and glucose alerts will appear here."
+                                       FontSize="12"
+                                       TextColor="{StaticResource TextSecondaryLight}"
+                                       HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Alert">
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto"
+                                      Padding="0,12" RowSpacing="4">
+                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Title}"
+                                           FontAttributes="Bold" />
+                                    <Label Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding Timestamp, StringFormat='{0:g}'}"
+                                           FontSize="11" TextColor="{StaticResource TextMutedLight}" />
+                                    <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Message}"
+                                           FontSize="12" TextColor="{StaticResource TextSecondaryLight}"
+                                           LineBreakMode="WordWrap" />
+                                    <BoxView Grid.Row="2" Grid.ColumnSpan="2" HeightRequest="1"
+                                             Margin="0,8,0,0" Color="{StaticResource BorderLightColor}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Legacy preview alerts are intentionally hidden; live API alerts are rendered above. -->
+                    <VerticalStackLayout IsVisible="False">
                     <!-- 1. Low Glucose Alert -->
                     <controls:AlertCard AlertTitle="Low Glucose"
                                         Command="{Binding OpenAlertCommand}" CommandParameter="Low Glucose — 68 mg/dL at 4:30 AM"
@@ -961,6 +997,7 @@
                                         BadgeBgColor="{StaticResource BadgeGreenBg}"
                                         BadgeTextColor="{StaticResource BadgeGreenText}"
                                         DotColor="{StaticResource Success}" />
+                    </VerticalStackLayout>
 
                 </VerticalStackLayout>
 
@@ -1136,6 +1173,18 @@
                                     <Label Text="Update your personal details" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
                                 </VerticalStackLayout>
                             <Label Grid.Column="2" Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource TextMutedLight}" VerticalOptions="Center" />
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource BorderLightColor}" />
+
+                            <!-- Family Monitoring -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="0,12">
+                                <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding NavigateToFamilyCommand}" /></Grid.GestureRecognizers>
+                                <Label Grid.Column="0" Text="&#xF0C0;" FontFamily="FontAwesomeSolid" FontSize="17" TextColor="{StaticResource PrimaryLight}" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Family Monitoring" FontSize="14" FontAttributes="Bold" />
+                                    <Label Text="Share alerts with trusted family" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="2" Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource TextMutedLight}" VerticalOptions="Center" />
                             </Grid>
                             <BoxView HeightRequest="1" BackgroundColor="{StaticResource BorderLightColor}" />
 

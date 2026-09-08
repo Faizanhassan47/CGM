@@ -2,6 +2,7 @@ using CGM.PatientApp.Views.Auth;
 using CGM.PatientApp.Views.DeviceSetup;
 using CGM.PatientApp.Views.Dashboard;
 using CGM.PatientApp.Views.Details;
+using CGM.PatientApp.Views;
 
 namespace CGM.PatientApp;
 
@@ -24,5 +25,6 @@ public partial class AppShell : Shell
 		Routing.RegisterRoute("ConnectingPage", typeof(ConnectingPage));
 		Routing.RegisterRoute("ConnectionSuccessPage", typeof(ConnectionSuccessPage));
 		Routing.RegisterRoute("AppDetailPage", typeof(AppDetailPage));
+		Routing.RegisterRoute("FamilyPage", typeof(FamilyPage));
 	}
 }

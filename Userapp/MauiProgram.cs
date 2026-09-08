@@ -12,10 +12,13 @@ using CGM.PatientApp.Services.Device;
 using CGM.PatientApp.ViewModels.Auth;
 using CGM.PatientApp.ViewModels.Dashboard;
 using CGM.PatientApp.ViewModels.DeviceSetup;
+using CGM.PatientApp.ViewModels;
 using CGM.PatientApp.Views.Auth;
 using CGM.PatientApp.Views.Dashboard;
 using CGM.PatientApp.Views.DeviceSetup;
 using CGM.PatientApp.Views.Details;
+using CGM.PatientApp.Services.Family;
+using CGM.PatientApp.Views;
 
 namespace CGM.PatientApp;
 
@@ -127,6 +130,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<CgmCommandBuilder>();
 		builder.Services.AddSingleton<ICgmDeviceService, CgmDeviceService>();
 		builder.Services.AddSingleton<CGM.PatientApp.Services.Reports.IPdfReportService, CGM.PatientApp.Services.Reports.PdfReportService>();
+		builder.Services.AddSingleton<IFamilyService, ApiFamilyService>();
 
 		// Register ViewModels
 		builder.Services.AddTransient<SplashViewModel>();
@@ -143,6 +147,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<ConnectingViewModel>();
 		builder.Services.AddTransient<ConnectionSuccessViewModel>();
 		builder.Services.AddTransient<DashboardViewModel>();
+		builder.Services.AddTransient<FamilyViewModel>();
 
 		// Register Pages
 		builder.Services.AddTransient<SplashPage>();
@@ -151,6 +156,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<ForgotPasswordPage>();
 		builder.Services.AddTransient<ResetPasswordPage>();
 		builder.Services.AddTransient<CompleteProfilePage>();
+		builder.Services.AddTransient<FamilyPage>();
 		builder.Services.AddTransient<DeviceSelectionPage>();
 		builder.Services.AddTransient<DevicePreparationPage>();
 		builder.Services.AddTransient<BluetoothPermissionPage>();
