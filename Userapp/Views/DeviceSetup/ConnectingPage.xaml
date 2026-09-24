@@ -48,7 +48,7 @@
 
             <!-- Diagnostic Protocol Checklist -->
             <Border StrokeShape="RoundRectangle 16"
-                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E293B}"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
                     Stroke="{StaticResource BorderLightColor}"
                     StrokeThickness="1"
                     Padding="16,14"
@@ -57,31 +57,31 @@
                     <Label Text="Telemetry Verification (Stage 1)" FontAttributes="Bold" FontSize="12" TextColor="{StaticResource PrimaryLight}" />
                     
                     <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-                        <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="{Binding IsBleConnected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#059669:#94A3B8'}" VerticalOptions="Center" />
-                        <Label Text="Bluetooth Link Established" FontSize="13" TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
+                        <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="{Binding IsBleConnected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#583295:#583295'}" VerticalOptions="Center" />
+                        <Label Text="Bluetooth Link Established" FontSize="13" TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
                     </HorizontalStackLayout>
                     
                     <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-                        <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="{Binding IsGattConfigured, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#059669:#94A3B8'}" VerticalOptions="Center" />
-                        <Label Text="GATT Services (FFF0 / FFF1 / FFF2)" FontSize="13" TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
+                        <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="{Binding IsGattConfigured, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#583295:#583295'}" VerticalOptions="Center" />
+                        <Label Text="GATT Services (FFF0 / FFF1 / FFF2)" FontSize="13" TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
                     </HorizontalStackLayout>
                     
                     <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-                        <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="{Binding IsTelemetryVerified, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#059669:#94A3B8'}" VerticalOptions="Center" />
-                        <Label Text="Baseline Diagnostics (E7, E8, E1, E2, E3)" FontSize="13" TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
+                        <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="{Binding IsTelemetryVerified, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#583295:#583295'}" VerticalOptions="Center" />
+                        <Label Text="Baseline Diagnostics (E7, E8, E1, E2, E3)" FontSize="13" TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Border>
 
             <!-- Error Banner -->
             <Border StrokeShape="RoundRectangle 12"
-                    BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
                     Stroke="{StaticResource Danger}"
                     StrokeThickness="1"
                     Padding="14,12"
                     IsVisible="{Binding HasError}">
                 <Label Text="{Binding ErrorMessage}"
-                       TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                       TextColor="{AppThemeBinding Light=#583295, Dark=#583295}"
                        FontSize="13"
                        LineBreakMode="WordWrap" />
             </Border>

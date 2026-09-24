@@ -12,6 +12,7 @@ using CGM.PatientApp.Interfaces;
 using CGM.PatientApp.Models;
 using Microsoft.Maui.ApplicationModel;
 using CGM.PatientApp.Services.Config;
+using CGM.PatientApp.Platforms.Android.Services;
 namespace CGM.PatientApp.Services.Ble;
 
 public sealed class AndroidBleService : IBleService, IDisposable
@@ -160,6 +161,7 @@ public sealed class AndroidBleService : IBleService, IDisposable
     {
         _commandCharacteristic = null;
         _multiFrameCharacteristic = null;
+        try { CgmBleForegroundService.Stop(Android.App.Application.Context); } catch { }
         try { _gatt?.Disconnect(); _gatt?.Close(); } catch { }
         _gatt?.Dispose(); _gatt = null;
         _gattCallback?.Dispose(); _gattCallback = null;
@@ -446,6 +448,7 @@ public sealed class AndroidBleService : IBleService, IDisposable
             {
                 System.Diagnostics.Debug.WriteLine($"[BLE] GATT disconnected (status: {status}).");
                 _owner?.SetState(CgmConnectionState.Disconnected);
+                try { CgmBleForegroundService.Stop(Android.App.Application.Context); } catch { }
                 Ready.TrySetResult(false);
             }
             else
@@ -471,6 +474,7 @@ public sealed class AndroidBleService : IBleService, IDisposable
             if (status == GattStatus.Success)
             {
                 _owner?.SetState(CgmConnectionState.Ready);
+                try { CgmBleForegroundService.Start(Android.App.Application.Context); } catch { }
                 Ready.TrySetResult(true);
             }
             else

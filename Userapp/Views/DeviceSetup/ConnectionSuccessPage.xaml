@@ -18,7 +18,7 @@
                         WidthRequest="88"
                         HeightRequest="88"
                         HorizontalOptions="Center"
-                        BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#064E3B}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
                         Stroke="{StaticResource Success}"
                         StrokeThickness="2">
                     <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid"
@@ -71,7 +71,7 @@
                             <Label Grid.Column="0" Text="Sensor Status" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
                             <Border Grid.Column="1"
                                     StrokeShape="RoundRectangle 6"
-                                    BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#064E3B}"
+                                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
                                     Stroke="{StaticResource Success}"
                                     Padding="6,2">
                                 <Label Text="Active" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Success}" />

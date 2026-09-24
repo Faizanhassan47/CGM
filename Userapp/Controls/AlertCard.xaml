@@ -18,8 +18,8 @@
                     BackgroundColor="{Binding IconBgColor, Source={x:Reference thisAlert}}"
                     Stroke="Transparent"
                     VerticalOptions="Start">
-            <Label Text="{Binding IconText, Source={x:Reference thisAlert}}"
-                   FontFamily="FontAwesomeSolid"
+                <Label Text="{Binding IconText, Source={x:Reference thisAlert}}"
+                       FontFamily="FontAwesomeSolid"
                        FontSize="20"
                        FontAttributes="Bold"
                        TextColor="{Binding IconTextColor, Source={x:Reference thisAlert}}"
@@ -32,17 +32,17 @@
                 <Label Text="{Binding AlertTitle, Source={x:Reference thisAlert}}"
                        FontSize="14"
                        FontAttributes="Bold"
-                       TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                       TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
                 
                 <Label Text="{Binding AlertValue, Source={x:Reference thisAlert}}"
                        FontSize="20"
                        FontAttributes="Bold"
-                       TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}"
+                       TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
                        IsVisible="{Binding HasValue, Source={x:Reference thisAlert}}" />
 
                 <Label Text="{Binding AlertDescription, Source={x:Reference thisAlert}}"
                        FontSize="11"
-                       TextColor="{StaticResource TextSecondaryLight}"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
                        LineBreakMode="WordWrap"
                        IsVisible="{Binding HasDescription, Source={x:Reference thisAlert}}" />
 
@@ -58,7 +58,7 @@
                     </Border>
                     <Label Text="{Binding SubBadgeText, Source={x:Reference thisAlert}}"
                            FontSize="11"
-                           TextColor="{StaticResource TextSecondaryLight}"
+                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
                            VerticalOptions="Center"
                            IsVisible="{Binding HasSubBadge, Source={x:Reference thisAlert}}" />
                 </HorizontalStackLayout>
@@ -69,14 +69,14 @@
                 <HorizontalStackLayout Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
                     <Label Text="{Binding AlertTime, Source={x:Reference thisAlert}}"
                            FontSize="11"
-                           TextColor="{StaticResource TextSecondaryLight}" />
+                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
                     <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{Binding DotColor, Source={x:Reference thisAlert}}" VerticalOptions="Center" />
                 </HorizontalStackLayout>
                 
         <Label Text="&#xF054;" FontFamily="FontAwesomeSolid"
                        FontSize="20"
                        FontAttributes="Bold"
-                       TextColor="{StaticResource TextMutedLight}"
+                       TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}"
                        HorizontalOptions="End"
                        Margin="0,4,0,0" />
             </VerticalStackLayout>

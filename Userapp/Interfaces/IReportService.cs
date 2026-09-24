@@ -4,7 +4,7 @@ namespace CGM.PatientApp.Interfaces;
 
 public interface IReportService
 {
-    Task<ReportSummary> GetReportSummaryAsync(DateTime startDate, DateTime endDate);
-    Task<string> ExportReportPdfAsync(DateTime startDate, DateTime endDate);
+    Task<PdfReportSummary> GetDetailedReportAsync(int? targetUserId = null, DateTime? startDate = null, DateTime? endDate = null);
+    Task<string> ExportReportPdfAsync(DateTime startDate, DateTime endDate, int? targetUserId = null);
     Task ShareReportAsync(string filePath);
 }

@@ -1,4 +1,5 @@
 using CGM.PatientApp.ViewModels.Auth;
+using CGM.PatientApp.Services.Diagnostics;
 
 namespace CGM.PatientApp.Views.Auth;
 
@@ -6,7 +7,9 @@ public partial class CompleteProfilePage : ContentPage
 {
     private readonly CompleteProfileViewModel _viewModel;
 
-    public CompleteProfilePage() : this(IPlatformApplication.Current?.Services?.GetService<CompleteProfileViewModel>() ?? throw new InvalidOperationException("CompleteProfileViewModel not found"))
+    public CompleteProfilePage() : this(
+        (IPlatformApplication.Current?.Services ?? Application.Current?.Handler?.MauiContext?.Services)?.GetService<CompleteProfileViewModel>() 
+        ?? throw new InvalidOperationException("CompleteProfileViewModel not found"))
     {
     }
 
@@ -16,9 +19,9 @@ public partial class CompleteProfilePage : ContentPage
         BindingContext = _viewModel = viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.InitializeAsync();
+        SafeAsync.Run(_viewModel.InitializeAsync, "CompleteProfilePage.OnAppearing");
     }
 }

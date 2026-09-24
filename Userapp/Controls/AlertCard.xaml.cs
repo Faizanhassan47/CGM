@@ -31,19 +31,19 @@ public partial class AlertCard : ContentView
         BindableProperty.Create(nameof(IconText), typeof(string), typeof(AlertCard), FontAwesomeIcons.Info);
 
     public static readonly BindableProperty IconBgColorProperty =
-        BindableProperty.Create(nameof(IconBgColor), typeof(Color), typeof(AlertCard), Color.FromArgb("#EFF6FF"));
+        BindableProperty.Create(nameof(IconBgColor), typeof(Color), typeof(AlertCard), Color.FromArgb("#FFFFFF"));
 
     public static readonly BindableProperty IconTextColorProperty =
-        BindableProperty.Create(nameof(IconTextColor), typeof(Color), typeof(AlertCard), Color.FromArgb("#2563EB"));
+        BindableProperty.Create(nameof(IconTextColor), typeof(Color), typeof(AlertCard), Color.FromArgb("#01B4F1"));
 
     public static readonly BindableProperty BadgeBgColorProperty =
-        BindableProperty.Create(nameof(BadgeBgColor), typeof(Color), typeof(AlertCard), Color.FromArgb("#EFF6FF"));
+        BindableProperty.Create(nameof(BadgeBgColor), typeof(Color), typeof(AlertCard), Color.FromArgb("#FFFFFF"));
 
     public static readonly BindableProperty BadgeTextColorProperty =
-        BindableProperty.Create(nameof(BadgeTextColor), typeof(Color), typeof(AlertCard), Color.FromArgb("#2563EB"));
+        BindableProperty.Create(nameof(BadgeTextColor), typeof(Color), typeof(AlertCard), Color.FromArgb("#01B4F1"));
 
     public static readonly BindableProperty DotColorProperty =
-        BindableProperty.Create(nameof(DotColor), typeof(Color), typeof(AlertCard), Color.FromArgb("#2563EB"));
+        BindableProperty.Create(nameof(DotColor), typeof(Color), typeof(AlertCard), Color.FromArgb("#01B4F1"));
 
     public static readonly BindableProperty HasValueProperty =
         BindableProperty.Create(nameof(HasValue), typeof(bool), typeof(AlertCard), false);

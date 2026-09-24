@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Dashboard"
+             xmlns:models="clr-namespace:CGM.PatientApp.Models"
+             xmlns:controls="clr-namespace:CGM.PatientApp.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
+             x:Class="CGM.PatientApp.Views.Dashboard.ReportsDashboardView"
+             x:DataType="vm:DashboardViewModel">
+<VerticalStackLayout IsVisible="{Binding IsReportsSelected}"
+                                     Spacing="16"
+                                     Padding="20,20,20,24">
+
+                    <!-- Header & Share Button -->
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Text="Reports"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                        
+                        <!-- Share / Export PDF -->
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 20"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                BackgroundColor="{StaticResource White}"
+                                Stroke="{StaticResource BorderLightColor}">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ExportReportCommand}" /></Border.GestureRecognizers>
+                            <Label Text="&#xF093;" FontFamily="FontAwesomeSolid" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- Filter Pills: Today, 7D, 30D, 90D, Custom -->
+                    <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="6">
+                        <!-- Today -->
+                        <Border Grid.Column="0" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsReportToday, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#FFFFFF'}"
+                                Stroke="{Binding IsReportToday, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#E6F0EB'}"
+                                Padding="6,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetReportFilterCommand}" CommandParameter="Today" /></Border.GestureRecognizers>
+                            <Label Text="Today" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsReportToday, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- 7D -->
+                        <Border Grid.Column="1" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsReport7D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#FFFFFF'}"
+                                Stroke="{Binding IsReport7D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#E6F0EB'}"
+                                Padding="6,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetReportFilterCommand}" CommandParameter="7D" /></Border.GestureRecognizers>
+                            <Label Text="7D" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsReport7D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- 30D -->
+                        <Border Grid.Column="2" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsReport30D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#FFFFFF'}"
+                                Stroke="{Binding IsReport30D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#E6F0EB'}"
+                                Padding="6,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetReportFilterCommand}" CommandParameter="30D" /></Border.GestureRecognizers>
+                            <Label Text="30D" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsReport30D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- 90D -->
+                        <Border Grid.Column="3" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsReport90D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#FFFFFF'}"
+                                Stroke="{Binding IsReport90D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#E6F0EB'}"
+                                Padding="6,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetReportFilterCommand}" CommandParameter="90D" /></Border.GestureRecognizers>
+                            <Label Text="90D" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsReport90D, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- Custom -->
+                        <Border Grid.Column="4" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsReportCustom, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#FFFFFF'}"
+                                Stroke="{Binding IsReportCustom, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#E6F0EB'}"
+                                Padding="6,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetReportFilterCommand}" CommandParameter="Custom" /></Border.GestureRecognizers>
+                            <Label Text="Custom" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsReportCustom, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- Summary 2x3 Metric Cards Grid -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Summary" FontAttributes="Bold" FontSize="15" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="10">
+                            <!-- Average Glucose -->
+                            <controls:MetricCard Grid.Row="0" Grid.Column="0"
+                                                CardTitle="Average Glucose"
+                                                CardValue="{Binding ReportAvgGlucose}"
+                                                CardSubValue="{Binding ReportAvgDiffText}"
+                                                IconText="&#xF201;"
+                                                IconBgColor="{StaticResource BadgeGreenBg}"
+                                                ValueColor="{StaticResource TextPrimaryLight}" />
+
+                            <!-- Time in Range -->
+                            <controls:MetricCard Grid.Row="0" Grid.Column="1"
+                                                CardTitle="Time in Range"
+                                                CardValue="{Binding ReportTimeInRange}"
+                                                CardSubValue="Goal: > 70%"
+                                                IconText="&#xF140;"
+                                                IconBgColor="{StaticResource BadgeGreenBg}"
+                                                ValueColor="{StaticResource BadgeGreenText}" />
+
+                            <!-- Highest -->
+                            <controls:MetricCard Grid.Row="1" Grid.Column="0"
+                                                CardTitle="Highest"
+                                                CardValue="{Binding ReportHighest}"
+                                                CardSubValue="{Binding ReportHighestDate}"
+                                                IconText="&#xF062;"
+                                                IconBgColor="{StaticResource BadgeRedBg}"
+                                                ValueColor="{StaticResource Danger}" />
+
+                            <!-- Lowest -->
+                            <controls:MetricCard Grid.Row="1" Grid.Column="1"
+                                                CardTitle="Lowest"
+                                                CardValue="{Binding ReportLowest}"
+                                                CardSubValue="{Binding ReportLowestDate}"
+                                                IconText="&#xF063;"
+                                                IconBgColor="{StaticResource BadgeBlueBg}"
+                                                ValueColor="{StaticResource BadgeBlueText}" />
+
+                            <!-- Estimated HbA1c (GMI) -->
+                            <controls:MetricCard Grid.Row="2" Grid.Column="0"
+                                                CardTitle="Est. HbA1c (GMI)"
+                                                CardValue="{Binding ReportEstimatedA1c}"
+                                                CardSubValue="Clinical formula"
+                                                IconText="&#xF0F0;"
+                                                IconBgColor="{StaticResource BadgeGreenBg}"
+                                                ValueColor="{StaticResource TextPrimaryLight}" />
+
+                            <!-- Glucose Variability (%CV) -->
+                            <controls:MetricCard Grid.Row="2" Grid.Column="1"
+                                                CardTitle="Glucose Var. (%CV)"
+                                                CardValue="{Binding ReportGlucoseVariability}"
+                                                CardSubValue="Target: ≤ 36%"
+                                                IconText="&#xF201;"
+                                                IconBgColor="{StaticResource BadgeBlueBg}"
+                                                ValueColor="{StaticResource BadgeBlueText}" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- MODULAR WEEKLY DUAL REPORTS CHART -->
+                    <controls:WeeklyReportsChart />
+
+                    <!-- LIVECHARTS: PIE AND TRENDLINE -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Time in Range Breakdown" FontAttributes="Bold" FontSize="15" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                        <Border StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=#1E293B}" Stroke="{AppThemeBinding Light={StaticResource BorderLightColor}, Dark=#334155}" Padding="16" HeightRequest="250">
+                            <lvc:PieChart Series="{Binding ReportPieSeries}" LegendPosition="Right" />
+                        </Border>
+                    </VerticalStackLayout>
+                    
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Glucose Trend (Daily Average)" FontAttributes="Bold" FontSize="15" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                        <Border StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=#1E293B}" Stroke="{AppThemeBinding Light={StaticResource BorderLightColor}, Dark=#334155}" Padding="16" HeightRequest="250">
+                            <lvc:CartesianChart Series="{Binding ReportTrendSeries}" XAxes="{Binding ReportTrendXAxes}" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+</ContentView>

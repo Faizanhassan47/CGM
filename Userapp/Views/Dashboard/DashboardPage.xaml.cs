@@ -1,4 +1,5 @@
 using CGM.PatientApp.ViewModels.Dashboard;
+using CGM.PatientApp.Services.Diagnostics;
 
 namespace CGM.PatientApp.Views.Dashboard;
 
@@ -6,7 +7,9 @@ public partial class DashboardPage : ContentPage
 {
     private readonly DashboardViewModel _viewModel;
 
-    public DashboardPage() : this(IPlatformApplication.Current?.Services?.GetService<DashboardViewModel>() ?? throw new InvalidOperationException("DashboardViewModel not found"))
+    public DashboardPage() : this(
+        (IPlatformApplication.Current?.Services ?? Application.Current?.Handler?.MauiContext?.Services)?.GetService<DashboardViewModel>() 
+        ?? throw new InvalidOperationException("DashboardViewModel not found"))
     {
     }
 
@@ -16,15 +19,17 @@ public partial class DashboardPage : ContentPage
         BindingContext = _viewModel = viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.InitializeAsync();
+        _viewModel.Activate();
+        SafeAsync.Run(_viewModel.InitializeAsync, "DashboardPage.OnAppearing");
     }
 
     protected override void OnDisappearing()
     {
         _viewModel.StopBackgroundWork();
+        _viewModel.Deactivate();
         base.OnDisappearing();
     }
 }

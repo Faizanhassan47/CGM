@@ -3,85 +3,95 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CGM.PatientApp.Controls.HeroGlucoseCard"
              x:Name="thisHero">
-    <Border StrokeShape="RoundRectangle 22"
+    <Border x:Name="CardBorder"
+            StrokeShape="RoundRectangle 18"
             SemanticProperties.Description="Current glucose reading. Tap to open glucose history."
             Stroke="Transparent"
-            Padding="20,18"
-            Shadow="{AppThemeBinding Light={Shadow Brush={StaticResource PrimaryBrush}, Offset='0,6', Radius=16, Opacity=0.25}, Dark={Shadow Brush=Transparent}}">
-        <Border.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="{Binding GradientStartColor, Source={x:Reference thisHero}}" Offset="0.0" />
-                <GradientStop Color="{Binding GradientEndColor, Source={x:Reference thisHero}}" Offset="1.0" />
-            </LinearGradientBrush>
-        </Border.Background>
-
+            BackgroundColor="{Binding CardColor, Source={x:Reference thisHero}}"
+            Padding="20,18">
         <Border.GestureRecognizers>
             <TapGestureRecognizer Command="{Binding TapCommand, Source={x:Reference thisHero}}" />
         </Border.GestureRecognizers>
 
-        <VerticalStackLayout Spacing="12">
-            <!-- Top Row: Title & Trend Status Badge -->
-            <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                <Label Grid.Column="0"
-                       Text="{Binding TitleText, Source={x:Reference thisHero}}"
-                       FontSize="14"
-                       TextColor="#E0F2FE" />
-                
-                <Border Grid.Column="1"
-                        StrokeShape="RoundRectangle 12"
-                        BackgroundColor="#26FFFFFF"
-                        Padding="10,3">
+        <VerticalStackLayout Spacing="14">
+            <!-- Top Row: Title, Live Telemetry Status & Trend Status Badge -->
+            <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                    <Label Text="{Binding TitleText, Source={x:Reference thisHero}}"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="#FFFFFF" />
+
+                    <!-- Live Telemetry Pill -->
+                    <Border StrokeShape="RoundRectangle 8"
+                            BackgroundColor="#33FFFFFF"
+                            Padding="7,2"
+                            VerticalOptions="Center">
+                        <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                            <Ellipse WidthRequest="6" HeightRequest="6" Fill="#FFFFFF" VerticalOptions="Center" />
+                            <Label Text="LIVE" FontSize="9" FontAttributes="Bold" TextColor="#FFFFFF" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </HorizontalStackLayout>
+
+                <!-- Trend Status Pill -->
+                <Border Grid.Column="2"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="#33FFFFFF"
+                        Padding="10,4"
+                        VerticalOptions="Center">
                     <Label Text="{Binding TrendText, Source={x:Reference thisHero}}"
-                           FontSize="13"
+                           FontSize="12"
                            FontAttributes="Bold"
                            TextColor="{StaticResource White}" />
                 </Border>
             </Grid>
 
-            <!-- Big Metric Row: Glucose Value & Dynamic Trend Velocity Action Circle -->
+            <!-- Big Metric Row: Glucose Value, Unit, & Trend Arrow Badge -->
             <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                <HorizontalStackLayout Grid.Column="0" Spacing="6" VerticalOptions="Center">
+                <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
                     <Label Text="{Binding GlucoseValue, Source={x:Reference thisHero}}"
-                           FontSize="64"
+                           FontSize="58"
+                           FontFamily="ManropeBold"
                            FontAttributes="Bold"
                            TextColor="{StaticResource White}"
                            VerticalOptions="Center" />
-                    <Label Text="{Binding GlucoseUnit, Source={x:Reference thisHero}}"
-                           FontSize="15"
-                           TextColor="#E0F2FE"
-                           Margin="0,0,0,12"
-                           VerticalOptions="End" />
+                    <VerticalStackLayout Spacing="0" VerticalOptions="Center" Margin="0,4,0,0">
+                        <Label Text="{Binding GlucoseUnit, Source={x:Reference thisHero}}"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#FFFFFF" />
+                        <Label Text="{Binding DeltaText, Source={x:Reference thisHero}}"
+                               FontSize="11"
+                               TextColor="#FFFFFF" />
+                    </VerticalStackLayout>
                 </HorizontalStackLayout>
 
-                <!-- Dynamic Directional White Action Circle -->
+                <!-- Elevated Circular Trend Arrow Badge -->
                 <Border Grid.Column="1"
                         StrokeShape="RoundRectangle 24"
                         WidthRequest="48"
                         HeightRequest="48"
-                        BackgroundColor="{StaticResource White}"
+                        BackgroundColor="#33FFFFFF"
                         Stroke="Transparent"
                         VerticalOptions="Center">
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding TapCommand, Source={x:Reference thisHero}}" />
-                    </Border.GestureRecognizers>
                     <Label Text="{Binding TrendArrow, Source={x:Reference thisHero}}"
                            SemanticProperties.Description="Glucose trend direction"
                            FontSize="24"
                            FontAttributes="Bold"
-                           TextColor="{StaticResource PrimaryLight}"
+                           TextColor="{StaticResource White}"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
                 </Border>
             </Grid>
 
             <!-- Velocity / Clinical Status Pill -->
-            <Border StrokeShape="RoundRectangle 8"
-                    BackgroundColor="#26FFFFFF"
-                    Padding="9,3"
-                    HorizontalOptions="Start"
-                    Margin="0,-4,0,2">
-                <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
-                    <Label Text="&#xF06E;" FontFamily="FontAwesomeSolid" FontSize="10" TextColor="#E0F2FE" VerticalOptions="Center" />
+            <Border StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#33FFFFFF"
+                    Padding="10,5"
+                    HorizontalOptions="Start">
+                <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                    <Label Text="&#xF06E;" FontFamily="FontAwesomeSolid" FontSize="11" TextColor="#FFFFFF" VerticalOptions="Center" />
                     <Label Text="{Binding VelocityText, Source={x:Reference thisHero}}"
                            FontSize="11"
                            FontAttributes="Bold"
@@ -89,16 +99,55 @@
                 </HorizontalStackLayout>
             </Border>
 
+            <!-- Glycemic Target Corridor Micro-Bar -->
+            <VerticalStackLayout Spacing="4">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Label Grid.Column="0" Text="40" FontSize="9" TextColor="#FFFFFF" />
+                    <Label Grid.Column="1" Text="Target Range (70–180 mg/dL)" FontSize="9" TextColor="#FFFFFF" HorizontalOptions="Center" FontAttributes="Bold" />
+                    <Label Grid.Column="2" Text="300" FontSize="9" TextColor="#FFFFFF" />
+                </Grid>
+
+                <Grid x:Name="CorridorTrack" HeightRequest="8">
+                    <!-- Base Track Bar -->
+                    <Border StrokeShape="RoundRectangle 4"
+                            BackgroundColor="#FFFFFF"
+                            Stroke="Transparent"
+                            HeightRequest="8">
+                        <Grid ColumnDefinitions="30*,110*,120*">
+                            <!-- Low: 40-70 -->
+                            <BoxView Grid.Column="0" Color="#583295" CornerRadius="4,0,0,4" Margin="0" />
+                            <!-- Target: 70-180 -->
+                            <BoxView Grid.Column="1" Color="#01B4F1" Margin="1,0" />
+                            <!-- High: 180-300 -->
+                            <BoxView Grid.Column="2" Color="#583295" CornerRadius="0,4,4,0" Margin="1,0,0,0" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Positioned Needle Indicator -->
+                    <Border x:Name="CorridorPointer"
+                            StrokeShape="RoundRectangle 6"
+                            BackgroundColor="{StaticResource White}"
+                            Stroke="#01B4F1"
+                            StrokeThickness="1.5"
+                            WidthRequest="10"
+                            HeightRequest="12"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Center" />
+                </Grid>
+            </VerticalStackLayout>
+
             <!-- Bottom Row: Last Updated & Hint -->
             <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                <Label Grid.Column="0"
-                       Text="{Binding LastUpdatedText, Source={x:Reference thisHero}}"
-                       FontSize="12"
-                       TextColor="#E0F2FE" />
-                <Label Grid.Column="1"
-                       Text="Tap for history →"
-                       FontSize="11"
-                       TextColor="#BAE6FD" />
+                <HorizontalStackLayout Grid.Column="0" Spacing="6" VerticalOptions="Center">
+                    <Label Text="&#xF017;" FontFamily="FontAwesomeSolid" FontSize="11" TextColor="#FFFFFF" VerticalOptions="Center" />
+                    <Label Text="{Binding LastUpdatedText, Source={x:Reference thisHero}}"
+                           FontSize="12"
+                           TextColor="#FFFFFF" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                    <Label Text="View History" FontSize="11" FontAttributes="Bold" TextColor="#FFFFFF" />
+                    <Label Text="&#xF054;" FontFamily="FontAwesomeSolid" FontSize="9" TextColor="#FFFFFF" VerticalOptions="Center" />
+                </HorizontalStackLayout>
             </Grid>
         </VerticalStackLayout>
     </Border>

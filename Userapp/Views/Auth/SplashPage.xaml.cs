@@ -1,5 +1,6 @@
 using CGM.PatientApp.ViewModels.Auth;
 using Microsoft.Extensions.DependencyInjection;
+using CGM.PatientApp.Services.Diagnostics;
 
 namespace CGM.PatientApp.Views.Auth;
 
@@ -22,9 +23,6 @@ public partial class SplashPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        Dispatcher.Dispatch(async () =>
-        {
-            await _viewModel.InitializeAsync();
-        });
+        Dispatcher.Dispatch(() => SafeAsync.Run(_viewModel.InitializeAsync, "SplashPage.OnAppearing"));
     }
 }

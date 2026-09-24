@@ -17,7 +17,7 @@
                     WidthRequest="80"
                     HeightRequest="80"
                     HorizontalOptions="Center"
-                    BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#064E3B}"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
                     Stroke="{StaticResource Success}"
                     StrokeThickness="1.5">
                     <Label Text="&#xF00C;" FontFamily="FontAwesomeSolid"

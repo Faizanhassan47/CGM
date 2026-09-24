@@ -5,27 +5,18 @@
              x:Name="thisLogo">
     <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
         <!-- Circular Droplet Orbit Icon -->
-        <Border StrokeShape="RoundRectangle 36"
-                WidthRequest="72"
-                HeightRequest="72"
-                HorizontalOptions="Center"
-                BackgroundColor="{StaticResource White}"
-                Stroke="{StaticResource PrimaryLight}"
-                StrokeThickness="3"
-                Padding="8">
-            <Label Text="&#xF043;" FontFamily="FontAwesomeSolid"
-                   FontSize="30"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center" />
-        </Border>
+        <Image Source="logo.png"
+               WidthRequest="72"
+               HeightRequest="72"
+               HorizontalOptions="Center" />
 
         <!-- Brand Name -->
         <HorizontalStackLayout HorizontalOptions="Center" Spacing="0" Margin="0,4,0,0">
-            <Label Text="Gluco"
+            <Label Text="Ai"
                    FontSize="28"
                    FontAttributes="Bold"
-                   TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
-            <Label Text="Track"
+                   TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
+            <Label Text="ma"
                    FontSize="28"
                    FontAttributes="Bold"
                    TextColor="{StaticResource PrimaryLight}" />

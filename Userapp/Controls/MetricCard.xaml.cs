@@ -15,10 +15,10 @@ public partial class MetricCard : ContentView
         BindableProperty.Create(nameof(IconText), typeof(string), typeof(MetricCard), FontAwesomeIcons.Bullseye);
 
     public static readonly BindableProperty IconBgColorProperty =
-        BindableProperty.Create(nameof(IconBgColor), typeof(Color), typeof(MetricCard), Color.FromArgb("#E6F4EA"));
+        BindableProperty.Create(nameof(IconBgColor), typeof(Color), typeof(MetricCard), Color.FromArgb("#FFFFFF"));
 
     public static readonly BindableProperty ValueColorProperty =
-        BindableProperty.Create(nameof(ValueColor), typeof(Color), typeof(MetricCard), Color.FromArgb("#059669"));
+        BindableProperty.Create(nameof(ValueColor), typeof(Color), typeof(MetricCard), Color.FromArgb("#583295"));
 
     public string CardTitle
     {

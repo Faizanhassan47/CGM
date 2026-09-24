@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Auth"
+             x:Class="CGM.PatientApp.Views.Auth.VerifyEmailPage"
+             x:DataType="vm:VerifyEmailViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}">
+    <ScrollView>
+        <VerticalStackLayout Padding="28,72" Spacing="20">
+            <Label Text="Verify your email" FontSize="28" FontAttributes="Bold" />
+            <Label Text="{Binding Email}" FontSize="14" TextColor="{StaticResource PrimaryLight}" />
+            <Label Text="{Binding Message}" FontSize="14" TextColor="{StaticResource TextSecondaryLight}" />
+            <Entry Text="{Binding Code}" Placeholder="6-digit code" Keyboard="Numeric" MaxLength="6"
+                   FontSize="24" HorizontalTextAlignment="Center" />
+            <Button Text="Verify Email" Command="{Binding VerifyCommand}" HeightRequest="52"
+                    BackgroundColor="{StaticResource PrimaryLight}" TextColor="White" CornerRadius="12" />
+            <Button Text="Resend Code" Command="{Binding ResendCommand}" BackgroundColor="Transparent"
+                    TextColor="{StaticResource PrimaryLight}" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,117 +1,404 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels"
              x:Class="CGM.PatientApp.Views.FamilyPage"
-             Title="Family" BackgroundColor="#F6F8F8">
+             x:DataType="vm:FamilyViewModel"
+             Title="Family"
+             BackgroundColor="{AppThemeBinding Light=#F7F5FA, Dark=#120C1B}">
+
     <Grid RowDefinitions="Auto,*">
-        <Grid Padding="18,14,18,12" ColumnDefinitions="44,*,44" BackgroundColor="White">
-            <Border WidthRequest="40" HeightRequest="40" Stroke="#E5EDEC" StrokeShape="RoundRectangle 20" BackgroundColor="#F8FAFA">
-                <Border.GestureRecognizers><TapGestureRecognizer Tapped="BackClicked" /></Border.GestureRecognizers>
-                <Label Text="&#xF060;" FontFamily="FontAwesomeSolid" FontSize="15" TextColor="#163B38" HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-            <VerticalStackLayout Grid.Column="1" Spacing="0" HorizontalOptions="Center">
-                <Label Text="Family monitoring" FontFamily="ManropeBold" FontSize="19" HorizontalTextAlignment="Center" />
-                <Label Text="Keep your circle informed" FontSize="11" TextColor="#71817F" HorizontalTextAlignment="Center" />
-            </VerticalStackLayout>
-            <ActivityIndicator Grid.Column="2" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#0D9488" />
-        </Grid>
+        <!-- App bar -->
+        <Border Grid.Row="0"
+                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                StrokeThickness="0"
+                Padding="16,12">
+            <Grid ColumnDefinitions="44,*,44" ColumnSpacing="12">
+                <Border WidthRequest="42" HeightRequest="42"
+                        BackgroundColor="{AppThemeBinding Light=#F5F0FA, Dark=#302040}"
+                        StrokeThickness="0" StrokeShape="RoundRectangle 14">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="BackClicked" />
+                    </Border.GestureRecognizers>
+                    <Label Text="&#xF060;" FontFamily="FontAwesomeSolid" FontSize="15"
+                           TextColor="{AppThemeBinding Light=#583295, Dark=#D9C2F3}"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                    <Label Text="Family circle" FontFamily="ManropeBold" FontSize="19"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" />
+                    <Label Text="People you trust" FontSize="11"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" />
+                </VerticalStackLayout>
+
+                <ActivityIndicator Grid.Column="2" IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}" Color="#01B4F1"
+                                   WidthRequest="24" HeightRequest="24"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+            </Grid>
+        </Border>
 
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="18,18,18,34" Spacing="16">
-                <Border IsVisible="{Binding HasError}"
-                        Stroke="#FECACA" BackgroundColor="#FEF2F2" Padding="13" StrokeShape="RoundRectangle 12">
-                    <Grid ColumnDefinitions="22,*" ColumnSpacing="9">
-                        <Label Text="&#xF071;" FontFamily="FontAwesomeSolid" TextColor="#DC2626" />
-                        <Label Grid.Column="1" Text="{Binding ErrorMessage}" TextColor="#B91C1C" FontSize="12" />
+            <VerticalStackLayout Padding="18,20,18,44" Spacing="16">
+
+                <!-- Error -->
+                <Border IsVisible="{Binding HasError}" BackgroundColor="#FFF1F2"
+                        Stroke="#FECDD3" StrokeThickness="1" Padding="14,12"
+                        StrokeShape="RoundRectangle 14">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Text="&#xF071;" FontFamily="FontAwesomeSolid" FontSize="14"
+                               TextColor="#E11D48" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding ErrorMessage}" FontSize="12"
+                               TextColor="#9F1239" LineBreakMode="WordWrap" />
                     </Grid>
                 </Border>
 
-                <VerticalStackLayout IsVisible="{Binding HasFamily}" Spacing="16">
-                    <Border StrokeThickness="0" Padding="20" StrokeShape="RoundRectangle 22">
-                        <Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#0F9D8F" Offset="0"/><GradientStop Color="#087268" Offset="1"/></LinearGradientBrush></Border.Background>
-                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="12">
-                            <VerticalStackLayout>
-                                <Label Text="YOUR FAMILY" TextColor="#C9FFF8" FontSize="10" CharacterSpacing="1.5" FontFamily="ManropeBold" />
-                                <Label Text="{Binding FamilyName}" TextColor="White" FontSize="23" FontFamily="ManropeBold" />
-                            </VerticalStackLayout>
-                            <Border Grid.Column="1" BackgroundColor="#28FFFFFF" StrokeThickness="0" Padding="10,6" StrokeShape="RoundRectangle 14">
-                                <Label Text="Protected" TextColor="White" FontSize="11" />
-                            </Border>
-                            <BoxView Grid.Row="1" Grid.ColumnSpan="2" HeightRequest="1" BackgroundColor="#38FFFFFF" />
-                            <VerticalStackLayout Grid.Row="2" Grid.ColumnSpan="2" Spacing="3">
-                                <Label Text="INVITE CODE" TextColor="#C9FFF8" FontSize="10" CharacterSpacing="1.3" />
-                                <Label Text="{Binding ReferralCode}" TextColor="White" FontSize="29" CharacterSpacing="4" FontFamily="ManropeBold" />
-                                <Label Text="Share this code only with people you trust." TextColor="#DDFBF7" FontSize="11" />
-                            </VerticalStackLayout>
-                            <Grid Grid.Row="3" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="10">
-                                <Button Text="&#xF0C5;  Copy code" FontFamily="ManropeSemiBold" Command="{Binding CopyCommand}" BackgroundColor="White" TextColor="#087268" CornerRadius="12" HeightRequest="44" Padding="8" />
-                                <Button Grid.Column="1" Text="&#xF1E0;  Share invite" FontFamily="ManropeSemiBold" Command="{Binding ShareCommand}" BackgroundColor="#28FFFFFF" TextColor="White" BorderColor="#66FFFFFF" BorderWidth="1" CornerRadius="12" HeightRequest="44" Padding="8" />
-                            </Grid>
-                        </Grid>
-                    </Border>
-
-                    <Border Style="{StaticResource MedicalCard}" StrokeShape="RoundRectangle 18" Padding="18">
-                        <VerticalStackLayout Spacing="15">
-                            <Grid ColumnDefinitions="42,*">
-                                <Border WidthRequest="38" HeightRequest="38" StrokeThickness="0" BackgroundColor="#E8F7F5" StrokeShape="RoundRectangle 12">
-                                    <Label Text="&#xF0F3;" FontFamily="FontAwesomeSolid" TextColor="#0D9488" HorizontalOptions="Center" VerticalOptions="Center" />
-                                </Border>
-                                <VerticalStackLayout Grid.Column="1" Spacing="1">
-                                    <Label Text="Glucose alert range" FontFamily="ManropeBold" FontSize="16" />
-                                    <Label Text="Everyone is notified outside this range" FontSize="11" TextColor="#71817F" />
+                <!-- Existing family -->
+                <VerticalStackLayout IsVisible="{Binding HasFamily}" Spacing="18">
+                    <Border StrokeThickness="0" Padding="20" StrokeShape="RoundRectangle 24"
+                            BackgroundColor="#583295">
+                        <VerticalStackLayout Spacing="18">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Spacing="3">
+                                    <Label Text="YOUR CIRCLE" FontFamily="ManropeBold" FontSize="10"
+                                           CharacterSpacing="1.8" TextColor="#DCCCEE" />
+                                    <Label Text="{Binding FamilyName}" FontFamily="ManropeBold" FontSize="24"
+                                           TextColor="#FFFFFF" LineBreakMode="TailTruncation" />
                                 </VerticalStackLayout>
-                            </Grid>
-                            <Grid ColumnDefinitions="*,28,*" ColumnSpacing="8">
-                                <Border BackgroundColor="#FFF5F5" Stroke="#FECACA" Padding="12,8" StrokeShape="RoundRectangle 12">
-                                    <VerticalStackLayout Spacing="0"><Label Text="LOWER LIMIT" FontSize="9" TextColor="#B91C1C" CharacterSpacing="1"/><Grid ColumnDefinitions="*,Auto"><Entry Text="{Binding LowThreshold}" Keyboard="Numeric" FontSize="22" FontFamily="ManropeBold" IsReadOnly="{Binding IsOwner, Converter={StaticResource InverseBoolConverter}}"/><Label Grid.Column="1" Text="mg/dL" FontSize="9" TextColor="#9A6A6A" VerticalOptions="End" Margin="0,0,0,9"/></Grid></VerticalStackLayout>
+                                <Border Grid.Column="1" Padding="10,6" BackgroundColor="#24FFFFFF"
+                                        Stroke="#44FFFFFF" StrokeThickness="1" StrokeShape="RoundRectangle 12"
+                                        VerticalOptions="Start">
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label Text="&#xF3ED;" FontFamily="FontAwesomeSolid" FontSize="10"
+                                               TextColor="#FFFFFF" VerticalOptions="Center" />
+                                        <Label Text="Private" FontFamily="ManropeSemiBold" FontSize="11"
+                                               TextColor="#FFFFFF" />
+                                    </HorizontalStackLayout>
                                 </Border>
-                                <Label Grid.Column="1" Text="—" TextColor="#94A3B8" HorizontalOptions="Center" VerticalOptions="Center" />
-                                <Border Grid.Column="2" BackgroundColor="#FFF9EB" Stroke="#FDE68A" Padding="12,8" StrokeShape="RoundRectangle 12">
-                                    <VerticalStackLayout Spacing="0"><Label Text="UPPER LIMIT" FontSize="9" TextColor="#B45309" CharacterSpacing="1"/><Grid ColumnDefinitions="*,Auto"><Entry Text="{Binding HighThreshold}" Keyboard="Numeric" FontSize="22" FontFamily="ManropeBold" IsReadOnly="{Binding IsOwner, Converter={StaticResource InverseBoolConverter}}"/><Label Grid.Column="1" Text="mg/dL" FontSize="9" TextColor="#98784A" VerticalOptions="End" Margin="0,0,0,9"/></Grid></VerticalStackLayout>
-                                </Border>
                             </Grid>
-                            <Button Text="Save alert range" IsVisible="{Binding IsOwner}" Command="{Binding SaveThresholdsCommand}" CornerRadius="12" HeightRequest="46" />
+
+                            <Border BackgroundColor="#18FFFFFF" Stroke="#2EFFFFFF" StrokeThickness="1"
+                                    Padding="14" StrokeShape="RoundRectangle 16">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                    <VerticalStackLayout Spacing="3">
+                                        <Label Text="INVITE CODE" FontFamily="ManropeBold" FontSize="9"
+                                               CharacterSpacing="1.5" TextColor="#CFC0DE" />
+                                        <Label Text="{Binding ReferralCode}" FontFamily="ManropeBold" FontSize="25"
+                                               CharacterSpacing="3" TextColor="#FFFFFF" />
+                                    </VerticalStackLayout>
+                                    <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                                        <Button Text="&#xF0C5;" FontFamily="FontAwesomeSolid" FontSize="14"
+                                                Command="{Binding CopyCommand}" WidthRequest="42" HeightRequest="42"
+                                                Padding="0" CornerRadius="13" BackgroundColor="#FFFFFF" TextColor="#583295" />
+                                        <Button Text="&#xF1E0;" FontFamily="FontAwesomeSolid" FontSize="14"
+                                                Command="{Binding ShareCommand}" WidthRequest="42" HeightRequest="42"
+                                                Padding="0" CornerRadius="13" BackgroundColor="#2CFFFFFF"
+                                                BorderColor="#55FFFFFF" BorderWidth="1" TextColor="#FFFFFF" />
+                                    </HorizontalStackLayout>
+                                </Grid>
+                            </Border>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Grid ColumnDefinitions="*,Auto" Margin="2,4,2,0">
-                        <Label Text="Family members" FontFamily="ManropeBold" FontSize="17" />
-                        <Border Grid.Column="1" BackgroundColor="#E8F7F5" StrokeThickness="0" Padding="10,4" StrokeShape="RoundRectangle 12"><Label Text="{Binding Members.Count, StringFormat='{0} members'}" FontSize="10" TextColor="#087268" /></Border>
-                    </Grid>
-                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Members}" Spacing="10">
-                        <BindableLayout.ItemTemplate><DataTemplate>
-                            <Border Style="{StaticResource MedicalCard}" StrokeShape="RoundRectangle 16" Padding="14">
-                                <Grid ColumnDefinitions="48,*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="12">
-                                    <Border Grid.RowSpan="2" WidthRequest="44" HeightRequest="44" BackgroundColor="#E8F7F5" StrokeThickness="0" StrokeShape="RoundRectangle 22">
-                                        <Label Text="&#xF007;" FontFamily="FontAwesomeSolid" FontSize="17" TextColor="#0D9488" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <!-- Follower Mini-Dashboard -->
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Live Follower Dashboard" FontFamily="ManropeBold" FontSize="18"
+                               TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" Margin="2,0,0,0"/>
+                        
+                        <CollectionView ItemsSource="{Binding Members}" VerticalOptions="Start">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="8" VerticalItemSpacing="8" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:FamilyMemberItem">
+                                    <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                                            Stroke="{AppThemeBinding Light=#EAE4EF, Dark=#382848}"
+                                            StrokeThickness="1" Padding="14,16" StrokeShape="RoundRectangle 16">
+                                        <VerticalStackLayout Spacing="10">
+                                            <!-- Avatar & Name -->
+                                            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                                <Border WidthRequest="32" HeightRequest="32"
+                                                        BackgroundColor="{Binding AvatarColor}" StrokeThickness="0"
+                                                        StrokeShape="RoundRectangle 10" VerticalOptions="Center">
+                                                    <Label Text="{Binding Initials}" FontFamily="ManropeBold" FontSize="12"
+                                                           TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                                                </Border>
+                                                <Label Text="{Binding FullName}" FontFamily="ManropeBold" FontSize="13"
+                                                       TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}"
+                                                       LineBreakMode="TailTruncation" VerticalOptions="Center" MaxLines="1" />
+                                            </HorizontalStackLayout>
+                                            
+                                            <!-- Glucose & Trend -->
+                                            <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                                                <Label Text="{Binding CurrentGlucose}" FontFamily="ManropeBold" FontSize="26"
+                                                       TextColor="{Binding GlucoseColor}" VerticalOptions="Center" />
+                                                <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                                                    <Label Text="{Binding TrendArrow}" FontFamily="ManropeBold" FontSize="16"
+                                                           TextColor="{Binding GlucoseColor}" Margin="0,2,0,0" />
+                                                    <Label Text="mg/dL" FontSize="10" TextColor="{AppThemeBinding Light=#918699, Dark=#AFA0BD}" />
+                                                </VerticalStackLayout>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
                                     </Border>
-                                    <HorizontalStackLayout Grid.Column="1" Spacing="7"><Label Text="{Binding FullName}" FontFamily="ManropeBold" FontSize="14"/><Border BackgroundColor="#E8F7F5" StrokeThickness="0" Padding="7,2" StrokeShape="RoundRectangle 9"><Label Text="{Binding Role}" FontSize="9" TextColor="#087268"/></Border></HorizontalStackLayout>
-                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Email}" FontSize="11" TextColor="#71817F" LineBreakMode="TailTruncation" />
-                                    <VerticalStackLayout Grid.Column="2" Grid.RowSpan="2" Spacing="4">
-                                        <Button Text="{Binding AlertsText}" FontSize="10" HeightRequest="34" MinimumHeightRequest="34" Padding="9,3" CornerRadius="10" IsEnabled="{Binding CanToggleAlerts}" Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleAlertsCommand}" CommandParameter="{Binding .}" />
-                                        <Button Text="Remove" FontSize="9" HeightRequest="30" MinimumHeightRequest="30" Padding="8,2" CornerRadius="9" IsVisible="{Binding CanRemove}" BackgroundColor="#FEF2F2" TextColor="#DC2626" Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveCommand}" CommandParameter="{Binding .}" />
-                                    </VerticalStackLayout>
-                                </Grid>
-                            </Border>
-                        </DataTemplate></BindableLayout.ItemTemplate>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
                     </VerticalStackLayout>
-                    <Button Text="Leave family" Command="{Binding LeaveCommand}" Style="{StaticResource OutlineButton}" TextColor="#DC2626" BorderColor="#FECACA" CornerRadius="12" />
+
+                    <!-- Alert range -->
+                    <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                            Stroke="{AppThemeBinding Light=#EAE4EF, Dark=#382848}"
+                            StrokeThickness="1" Padding="18" StrokeShape="RoundRectangle 20">
+                        <VerticalStackLayout Spacing="16">
+                            <Grid ColumnDefinitions="42,*,Auto" ColumnSpacing="11">
+                                <Border WidthRequest="42" HeightRequest="42" StrokeThickness="0"
+                                        BackgroundColor="{AppThemeBinding Light=#E9F8FD, Dark=#173544}"
+                                        StrokeShape="RoundRectangle 13">
+                                    <Label Text="&#xF0F3;" FontFamily="FontAwesomeSolid" FontSize="16"
+                                           TextColor="#01A4DC" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Shared alert range" FontFamily="ManropeBold" FontSize="16"
+                                           TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" />
+                                    <Label Text="Members are notified outside this range" FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" />
+                                </VerticalStackLayout>
+                                <Border Grid.Column="2" Padding="8,4" BackgroundColor="#F0EAF7"
+                                        StrokeThickness="0" StrokeShape="RoundRectangle 10" VerticalOptions="Center">
+                                    <Label Text="mg/dL" FontFamily="ManropeSemiBold" FontSize="10" TextColor="#583295" />
+                                </Border>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="10">
+                                <Border BackgroundColor="{AppThemeBinding Light=#F8F6FA, Dark=#261A34}"
+                                        Stroke="{AppThemeBinding Light=#E8E1ED, Dark=#3C2B4D}"
+                                        StrokeThickness="1" Padding="13,10" StrokeShape="RoundRectangle 14">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="LOW" FontFamily="ManropeBold" FontSize="9"
+                                               CharacterSpacing="1.2" TextColor="#01A4DC" />
+                                        <Entry Text="{Binding LowThreshold}" Keyboard="Numeric" FontFamily="ManropeBold"
+                                               FontSize="18" TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}"
+                                               BackgroundColor="Transparent" Margin="0" HeightRequest="36"
+                                               VerticalOptions="Center" VerticalTextAlignment="Center"
+                                               IsReadOnly="{Binding IsOwner, Converter={StaticResource InverseBoolConverter}}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                                <Label Grid.Column="1" Text="—" FontSize="18" TextColor="#A79CAD"
+                                       VerticalOptions="Center" />
+                                <Border Grid.Column="2" BackgroundColor="{AppThemeBinding Light=#F8F6FA, Dark=#261A34}"
+                                        Stroke="{AppThemeBinding Light=#E8E1ED, Dark=#3C2B4D}"
+                                        StrokeThickness="1" Padding="13,10" StrokeShape="RoundRectangle 14">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="HIGH" FontFamily="ManropeBold" FontSize="9"
+                                               CharacterSpacing="1.2" TextColor="#E06A78" />
+                                        <Entry Text="{Binding HighThreshold}" Keyboard="Numeric" FontFamily="ManropeBold"
+                                               FontSize="18" TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}"
+                                               BackgroundColor="Transparent" Margin="0" HeightRequest="36"
+                                               VerticalOptions="Center" VerticalTextAlignment="Center"
+                                               IsReadOnly="{Binding IsOwner, Converter={StaticResource InverseBoolConverter}}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+
+                            <Button Text="Save alert range" IsVisible="{Binding IsOwner}"
+                                    Command="{Binding SaveThresholdsCommand}" HeightRequest="48" CornerRadius="14"
+                                    BackgroundColor="#583295" TextColor="#FFFFFF" FontFamily="ManropeBold" FontSize="13" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Members -->
+                    <Grid ColumnDefinitions="*,Auto" Margin="2,4,2,0">
+                        <VerticalStackLayout Spacing="1">
+                            <Label Text="Circle members" FontFamily="ManropeBold" FontSize="18"
+                                   TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" />
+                            <Label Text="Choose who receives glucose alerts" FontSize="11"
+                                   TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" />
+                        </VerticalStackLayout>
+                        <Border Grid.Column="1" BackgroundColor="{AppThemeBinding Light=#EEE8F4, Dark=#302040}"
+                                StrokeThickness="0" Padding="10,5" StrokeShape="RoundRectangle 11"
+                                VerticalOptions="Center">
+                            <Label Text="{Binding Members.Count}" FontFamily="ManropeBold" FontSize="12"
+                                   TextColor="{AppThemeBinding Light=#583295, Dark=#D9C2F3}" />
+                        </Border>
+                    </Grid>
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Members}" Spacing="10">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:FamilyMemberItem">
+                                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                                        Stroke="{AppThemeBinding Light=#EAE4EF, Dark=#382848}"
+                                        StrokeThickness="1" Padding="14" StrokeShape="RoundRectangle 18">
+                                    <Grid ColumnDefinitions="46,*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="12">
+                                        <Border Grid.RowSpan="2" WidthRequest="44" HeightRequest="44"
+                                                BackgroundColor="{Binding AvatarColor}" StrokeThickness="0"
+                                                StrokeShape="RoundRectangle 14" VerticalOptions="Center">
+                                            <Label Text="{Binding Initials}" FontFamily="ManropeBold" FontSize="14"
+                                                   TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Border>
+
+                                        <HorizontalStackLayout Grid.Column="1" Spacing="7">
+                                            <Label Text="{Binding FullName}" FontFamily="ManropeBold" FontSize="14"
+                                                   TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}"
+                                                   LineBreakMode="TailTruncation" VerticalOptions="Center" />
+                                            <Border BackgroundColor="{Binding RoleBadgeColor}" StrokeThickness="0"
+                                                    Padding="7,2" StrokeShape="RoundRectangle 8" VerticalOptions="Center">
+                                                <Label Text="{Binding Role}" FontFamily="ManropeSemiBold" FontSize="9"
+                                                       TextColor="{Binding RoleTextColor}" />
+                                            </Border>
+                                        </HorizontalStackLayout>
+                                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Email}" FontSize="11"
+                                               TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}"
+                                               LineBreakMode="TailTruncation" />
+
+                                        <VerticalStackLayout Grid.Column="2" Grid.RowSpan="2" Spacing="5" VerticalOptions="Center">
+                                            <Button Text="{Binding AlertsText}" FontFamily="ManropeSemiBold" FontSize="10"
+                                                    HeightRequest="30" MinimumHeightRequest="30" Padding="10,0" CornerRadius="10"
+                                                    BackgroundColor="{Binding AlertsBackgroundColor}" TextColor="{Binding AlertsTextColor}"
+                                                    IsEnabled="{Binding CanToggleAlerts}"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleAlertsCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            <Button Text="View Report" IsVisible="{Binding CanViewReport}" FontFamily="ManropeSemiBold"
+                                                    FontSize="10" HeightRequest="28" MinimumHeightRequest="28" Padding="10,0"
+                                                    CornerRadius="10" BackgroundColor="#E9F8FD" TextColor="#01A4DC"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ViewReportCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            <Button Text="Alert Owner" IsVisible="{Binding IsOwnerProfile}" FontFamily="ManropeSemiBold"
+                                                    FontSize="10" HeightRequest="28" MinimumHeightRequest="28" Padding="10,0"
+                                                    CornerRadius="10" BackgroundColor="#F1EAF8" TextColor="#583295"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AlertOwnerCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            <Button Text="Remove" IsVisible="{Binding CanRemove}" FontFamily="ManropeSemiBold"
+                                                    FontSize="10" HeightRequest="28" MinimumHeightRequest="28" Padding="10,0"
+                                                    CornerRadius="10" BackgroundColor="#FFF1F2" TextColor="#E11D48"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                    <Button Text="Leave this family" Command="{Binding LeaveCommand}"
+                            HeightRequest="48" CornerRadius="14" BackgroundColor="Transparent"
+                            BorderColor="#F3B9C1" BorderWidth="1" TextColor="#D63850"
+                            FontFamily="ManropeBold" FontSize="13" Margin="0,4,0,0" />
                 </VerticalStackLayout>
 
-                <VerticalStackLayout IsVisible="{Binding HasNoFamily}" Spacing="16">
-                    <VerticalStackLayout Margin="4,16,4,8" Spacing="6">
-                        <Label Text="Stay connected to the people who matter" FontFamily="ManropeBold" FontSize="25" HorizontalTextAlignment="Center" />
-                        <Label Text="Create a private monitoring circle or join one with an invite code." FontSize="13" TextColor="#71817F" HorizontalTextAlignment="Center" />
+                <!-- No-family state -->
+                <VerticalStackLayout IsVisible="{Binding HasNoFamily}" Spacing="18">
+                    <VerticalStackLayout Spacing="8" Margin="16,12,16,8">
+                        <Border WidthRequest="76" HeightRequest="76" HorizontalOptions="Center"
+                                BackgroundColor="{AppThemeBinding Light=#EEE8F7, Dark=#302040}"
+                                StrokeThickness="0" StrokeShape="RoundRectangle 25">
+                            <Label Text="&#xF0C0;" FontFamily="FontAwesomeSolid" FontSize="29"
+                                   TextColor="{AppThemeBinding Light=#583295, Dark=#D9C2F3}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Text="Stay connected" FontFamily="ManropeBold" FontSize="25"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" />
+                        <Label Text="Create a private circle for your family, or use an invite code to join one."
+                               FontSize="13" LineHeight="1.35" HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" />
                     </VerticalStackLayout>
-                    <Border Style="{StaticResource MedicalCard}" StrokeShape="RoundRectangle 18" Padding="18">
-                        <VerticalStackLayout Spacing="12"><Border WidthRequest="44" HeightRequest="44" HorizontalOptions="Start" BackgroundColor="#E8F7F5" StrokeThickness="0" StrokeShape="RoundRectangle 14"><Label Text="&#xF2B5;" FontFamily="FontAwesomeSolid" TextColor="#0D9488" HorizontalOptions="Center" VerticalOptions="Center"/></Border><Label Text="Join a family" FontFamily="ManropeBold" FontSize="18"/><Label Text="Enter the 8-character code shared by the family owner." FontSize="12" TextColor="#71817F"/><Border Style="{StaticResource InputContainerBorder}" Margin="0"><Entry Placeholder="e.g. F8K4P2QX" Text="{Binding JoinCode}" CharacterSpacing="2" MaxLength="12"/></Border><Button Text="Join family" Command="{Binding JoinCommand}" CornerRadius="12"/></VerticalStackLayout>
+
+                    <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                            Stroke="{AppThemeBinding Light=#EAE4EF, Dark=#382848}"
+                            StrokeThickness="1" Padding="18" StrokeShape="RoundRectangle 20">
+                        <VerticalStackLayout Spacing="14">
+                            <Grid ColumnDefinitions="42,*" ColumnSpacing="11">
+                                <Border WidthRequest="42" HeightRequest="42" BackgroundColor="#E9F8FD"
+                                        StrokeThickness="0" StrokeShape="RoundRectangle 13">
+                                    <Label Text="&#xF2B5;" FontFamily="FontAwesomeSolid" FontSize="17" TextColor="#019BCC"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Join a circle" FontFamily="ManropeBold" FontSize="16"
+                                           TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" />
+                                    <Label Text="Ask the owner for their invite code" FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                            <Border BackgroundColor="{AppThemeBinding Light=#F8F6FA, Dark=#261A34}"
+                                    Stroke="{AppThemeBinding Light=#E8E1ED, Dark=#3C2B4D}"
+                                    StrokeThickness="1" Padding="14,2" StrokeShape="RoundRectangle 14">
+                                <Entry Placeholder="Enter invite code" Text="{Binding JoinCode}" MaxLength="12"
+                                       CharacterSpacing="2" FontFamily="ManropeSemiBold" FontSize="15"
+                                       TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}"
+                                       PlaceholderColor="{AppThemeBinding Light=#A79CAD, Dark=#887996}" />
+                            </Border>
+                            <Button Text="Join family" Command="{Binding JoinCommand}" HeightRequest="48"
+                                    CornerRadius="14" BackgroundColor="#01A4DC" TextColor="#FFFFFF"
+                                    FontFamily="ManropeBold" FontSize="13" />
+                        </VerticalStackLayout>
                     </Border>
-                    <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="10"><BoxView HeightRequest="1" BackgroundColor="#DDE5E4" VerticalOptions="Center"/><Label Grid.Column="1" Text="OR" FontSize="10" TextColor="#94A3B8"/><BoxView Grid.Column="2" HeightRequest="1" BackgroundColor="#DDE5E4" VerticalOptions="Center"/></Grid>
-                    <Border Style="{StaticResource MedicalCard}" StrokeShape="RoundRectangle 18" Padding="18">
-                        <VerticalStackLayout Spacing="12"><Border WidthRequest="44" HeightRequest="44" HorizontalOptions="Start" BackgroundColor="#EEF2FF" StrokeThickness="0" StrokeShape="RoundRectangle 14"><Label Text="&#xF0C0;" FontFamily="FontAwesomeSolid" TextColor="#4F46E5" HorizontalOptions="Center" VerticalOptions="Center"/></Border><Label Text="Create your family" FontFamily="ManropeBold" FontSize="18"/><Label Text="You will become the owner and choose the alert range." FontSize="12" TextColor="#71817F"/><Border Style="{StaticResource InputContainerBorder}" Margin="0"><Entry Placeholder="Family name" Text="{Binding NewFamilyName}" MaxLength="150"/></Border><Button Text="Create family" Command="{Binding CreateCommand}" BackgroundColor="#4F46E5" CornerRadius="12"/></VerticalStackLayout>
+
+                    <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="12" Margin="14,0">
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light=#E3DDE8, Dark=#382848}" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="or start your own" FontSize="10"
+                               TextColor="{AppThemeBinding Light=#9A8FA3, Dark=#A899B5}" />
+                        <BoxView Grid.Column="2" HeightRequest="1" Color="{AppThemeBinding Light=#E3DDE8, Dark=#382848}" VerticalOptions="Center" />
+                    </Grid>
+
+                    <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                            Stroke="{AppThemeBinding Light=#EAE4EF, Dark=#382848}"
+                            StrokeThickness="1" Padding="18" StrokeShape="RoundRectangle 20">
+                        <VerticalStackLayout Spacing="14">
+                            <Grid ColumnDefinitions="42,*" ColumnSpacing="11">
+                                <Border WidthRequest="42" HeightRequest="42" BackgroundColor="#F1EAF8"
+                                        StrokeThickness="0" StrokeShape="RoundRectangle 13">
+                                    <Label Text="&#xF067;" FontFamily="FontAwesomeSolid" FontSize="15" TextColor="#583295"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Create a circle" FontFamily="ManropeBold" FontSize="16"
+                                           TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" />
+                                    <Label Text="You’ll manage members and alert settings" FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                            <Border BackgroundColor="{AppThemeBinding Light=#F8F6FA, Dark=#261A34}"
+                                    Stroke="{AppThemeBinding Light=#E8E1ED, Dark=#3C2B4D}"
+                                    StrokeThickness="1" Padding="14,2" StrokeShape="RoundRectangle 14">
+                                <Entry Placeholder="Family name" Text="{Binding NewFamilyName}" MaxLength="150"
+                                       FontFamily="ManropeSemiBold" FontSize="15"
+                                       TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}"
+                                       PlaceholderColor="{AppThemeBinding Light=#A79CAD, Dark=#887996}" />
+                            </Border>
+                            <Button Text="Create family" Command="{Binding CreateCommand}" HeightRequest="48"
+                                    CornerRadius="14" BackgroundColor="#583295" TextColor="#FFFFFF"
+                                    FontFamily="ManropeBold" FontSize="13" />
+                        </VerticalStackLayout>
                     </Border>
                 </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- Report Overlay -->
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsReportOverlayVisible}" BackgroundColor="#80000000">
+            <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                    Stroke="{AppThemeBinding Light=#EAE4EF, Dark=#382848}"
+                    StrokeThickness="1" Padding="24" StrokeShape="RoundRectangle 24"
+                    HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="320">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Select Date Range" FontFamily="ManropeBold" FontSize="18" TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" />
+                    
+                    <Label Text="From" FontFamily="ManropeSemiBold" FontSize="12" TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" Margin="0,0,0,-10" />
+                    <DatePicker Date="{Binding ReportStartDate}" TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" BackgroundColor="{AppThemeBinding Light=#F8F6FA, Dark=#261A34}" />
+                    
+                    <Label Text="To" FontFamily="ManropeSemiBold" FontSize="12" TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" Margin="0,0,0,-10" />
+                    <DatePicker Date="{Binding ReportEndDate}" TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" BackgroundColor="{AppThemeBinding Light=#F8F6FA, Dark=#261A34}" />
+                    
+                    <HorizontalStackLayout Spacing="12" HorizontalOptions="End" Margin="0,10,0,0">
+                        <Button Text="Cancel" Command="{Binding CancelReportCommand}" HeightRequest="40" CornerRadius="10" BackgroundColor="Transparent" TextColor="#81758C" FontFamily="ManropeSemiBold" FontSize="13" />
+                        <Button Text="Generate" Command="{Binding GenerateReportCommand}" HeightRequest="40" CornerRadius="10" BackgroundColor="#583295" TextColor="#FFFFFF" FontFamily="ManropeBold" FontSize="13" Padding="16,0" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </Grid>
 </ContentPage>

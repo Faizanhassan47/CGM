@@ -1,4 +1,5 @@
 using CGM.PatientApp.ViewModels.DeviceSetup;
+using CGM.PatientApp.Services.Diagnostics;
 
 namespace CGM.PatientApp.Views.DeviceSetup;
 
@@ -6,7 +7,9 @@ public partial class DeviceSelectionPage : ContentPage
 {
     private readonly DeviceSelectionViewModel _viewModel;
 
-    public DeviceSelectionPage() : this(IPlatformApplication.Current?.Services?.GetService<DeviceSelectionViewModel>() ?? throw new InvalidOperationException("DeviceSelectionViewModel not found"))
+    public DeviceSelectionPage() : this(
+        (IPlatformApplication.Current?.Services ?? Application.Current?.Handler?.MauiContext?.Services)?.GetService<DeviceSelectionViewModel>() 
+        ?? throw new InvalidOperationException("DeviceSelectionViewModel not found"))
     {
     }
 
@@ -16,9 +19,9 @@ public partial class DeviceSelectionPage : ContentPage
         BindingContext = _viewModel = viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.LoadDevicesAsync();
+        SafeAsync.Run(_viewModel.LoadDevicesAsync, "DeviceSelectionPage.OnAppearing");
     }
 }

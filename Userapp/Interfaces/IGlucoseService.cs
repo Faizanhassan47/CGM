@@ -9,4 +9,6 @@ public interface IGlucoseService
     Task<GlucoseMeasurement?> GetLatestReadingAsync();
     Task<GlucoseSummary> GetDashboardSummaryAsync();
     Task<IReadOnlyList<GlucoseMeasurement>> GetRecentReadingsAsync(TimeSpan timeSpan);
+    Task<IReadOnlyList<GlucoseMeasurement>> GetReadingsForDateAsync(DateTime localDate);
+    Task<PagedGlucoseReadings> GetReadingsForDateAsync(DateTime localDate, int page, int pageSize);
 }

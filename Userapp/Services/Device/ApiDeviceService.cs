@@ -46,6 +46,32 @@ public sealed class ApiDeviceService(HttpClient client) : IDeviceService
         });
         using var response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
+
+        try
+        {
+            var registeredDevice = await response.Content.ReadFromJsonAsync<DeviceDto>(JsonOptions);
+            if (registeredDevice is not null)
+            {
+                using var activeSensorReq = await AuthorizedAsync(HttpMethod.Get, "api/sensors/active");
+                using var activeSensorRes = await client.SendAsync(activeSensorReq);
+                if (!activeSensorRes.IsSuccessStatusCode)
+                {
+                    using var startSensorReq = await AuthorizedAsync(HttpMethod.Post, "api/sensors/start");
+                    startSensorReq.Content = JsonContent.Create(new
+                    {
+                        DeviceId = registeredDevice.Id,
+                        SensorIdentifier = string.IsNullOrWhiteSpace(device.SerialNumber) ? null : $"SN-{device.SerialNumber}",
+                        WarmupMinutes = 60
+                    });
+                    await client.SendAsync(startSensorReq);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ApiDeviceService] Auto-start sensor failed: {ex}");
+        }
+
         Preferences.Default.Set("cgm_device_configured", true);
     }
 

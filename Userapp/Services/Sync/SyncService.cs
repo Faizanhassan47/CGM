@@ -1,93 +1,182 @@
-using System.Text.Json;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using CGM.PatientApp.Interfaces;
 using CGM.PatientApp.Models;
-using CGM.PatientApp.Services.Cgm;
+using CGM.PatientApp.Services.Diagnostics;
+using CGM.PatientApp.Services.Api;
 
 namespace CGM.PatientApp.Services.Sync;
 
 public interface ISyncService
 {
-    Task EnqueueMeasurementAsync(CgmRawMeasurement measurement);
-    Task SyncNowAsync();
+    Task EnqueueMeasurementAsync(CgmRawMeasurement measurement, CancellationToken cancellationToken = default);
+    Task SyncNowAsync(CancellationToken cancellationToken = default);
 }
 
-public class SyncService : ISyncService
+public sealed class SyncService : ISyncService, IDisposable
 {
-    private readonly ILocalCacheService _localCache;
+    private const int BatchSize = 100;
+    private readonly ILocalMeasurementRepository _measurementRepo;
     private readonly HttpClient _client;
-    private const string QueueKey = "cgm_offline_measurement_queue";
-    private readonly System.Timers.Timer _syncTimer;
+    private readonly ICrashReporter _crashReporter;
+    private readonly SemaphoreSlim _syncLock = new(1, 1);
+    private readonly PeriodicTimer _timer = new(TimeSpan.FromMinutes(1));
+    private readonly CancellationTokenSource _lifetime = new();
+    private readonly Task _schedulerTask;
+    private bool _disposed;
 
-    public SyncService(ILocalCacheService localCache, HttpClient client)
+    public SyncService(ILocalMeasurementRepository measurementRepo, HttpClient client, ICrashReporter crashReporter)
     {
-        _localCache = localCache;
+        _measurementRepo = measurementRepo;
         _client = client;
-        
-        // Setup background sync every 60 seconds
-        _syncTimer = new System.Timers.Timer(60000);
-        _syncTimer.Elapsed += async (s, e) => await SyncNowAsync();
-        _syncTimer.Start();
+        _crashReporter = crashReporter;
+        _schedulerTask = RunSchedulerAsync(_lifetime.Token);
     }
 
-    public async Task EnqueueMeasurementAsync(CgmRawMeasurement measurement)
+    public async Task EnqueueMeasurementAsync(CgmRawMeasurement measurement, CancellationToken cancellationToken = default)
     {
-        var queue = await _localCache.GetAsync<List<CgmRawMeasurement>>(QueueKey) ?? new List<CgmRawMeasurement>();
-        queue.Add(measurement);
-        await _localCache.SetAsync(QueueKey, queue);
-        
-        // Try to sync immediately if possible
-        _ = SyncNowAsync();
-    }
-
-    public async Task SyncNowAsync()
-    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        await _syncLock.WaitAsync(cancellationToken);
         try
         {
-            var queue = await _localCache.GetAsync<List<CgmRawMeasurement>>(QueueKey);
-            if (queue == null || !queue.Any()) return;
+            var entity = new LocalMeasurement
+            {
+                SequenceNumber = measurement.SequenceNumber,
+                GlucoseValue = measurement.GlucoseValueMgDl,
+                MeasuredAt = measurement.ReceivedTime.Kind == DateTimeKind.Utc ? measurement.ReceivedTime : measurement.ReceivedTime.ToUniversalTime(),
+                SyncStatus = "Pending",
+                BatteryVoltageMv = (int)measurement.BatteryVoltageMv,
+                DeviceTemperatureC = measurement.TemperatureCelsius,
+                We1NanoAmps = measurement.We1NanoAmps
+            };
+
+            await _measurementRepo.SaveMeasurementAsync(entity);
+        }
+        finally { _syncLock.Release(); }
+
+        SafeAsync.Run(() => SyncNowAsync(_lifetime.Token), "SyncService.Enqueue");
+    }
+
+    public async Task SyncNowAsync(CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (!await _syncLock.WaitAsync(0, cancellationToken)) return;
+        try
+        {
+            var batch = await _measurementRepo.GetPendingMeasurementsAsync(BatchSize);
+            if (batch.Count == 0) return;
 
             var token = await SecureStorage.Default.GetAsync("cgm_access_token");
             if (string.IsNullOrWhiteSpace(token)) return;
 
-            var request = new HttpRequestMessage(HttpMethod.Post, "api/glucose/sync-bulk");
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var sensorId = await GetActiveSensorIdAsync(token, cancellationToken);
+            if (!sensorId.HasValue) return;
 
-            using var sensorRequest = new HttpRequestMessage(HttpMethod.Get, "api/sensors/active");
-            sensorRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            using var sensorResponse = await _client.SendAsync(sensorRequest);
-            if (!sensorResponse.IsSuccessStatusCode) return;
-            var sensor = await sensorResponse.Content.ReadFromJsonAsync<JsonElement>();
-            if (!sensor.TryGetProperty("id", out var sensorIdProperty)) return;
-            var sensorId = sensorIdProperty.GetInt32();
-            
-            // Map CgmRawMeasurement to what the API expects
-            var measurements = queue.Select(m => new
+            using var request = new HttpRequestMessage(HttpMethod.Post, ApiEndpoints.Glucose.BulkSync);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Content = JsonContent.Create(new
             {
-                SensorId = sensorId,
-                SequenceNumber = m.SequenceNumber,
-                GlucoseValue = (decimal)m.GlucoseValueMgDl,
-                GlucoseUnit = "mg/dL",
-                MeasurementTime = DateTimeOffset.FromUnixTimeSeconds(m.Timestamp).UtcDateTime,
-                Trend = (string?)null,
-                GlucoseStatus = m.GlucoseValueMgDl < 70 ? "Low" : m.GlucoseValueMgDl > 180 ? "High" : "In Range",
-                BatteryVoltageMv = (int)m.BatteryVoltageMv,
-                DeviceTemperatureC = (decimal)m.TemperatureCelsius,
-                WE1CurrentNa = (decimal)m.We1NanoAmps
-            }).ToList();
+                SensorId = sensorId.Value,
+                Measurements = batch.Select(x => new
+                {
+                    SensorId = sensorId.Value,
+                    x.SequenceNumber,
+                    GlucoseValue = (decimal)x.GlucoseValue,
+                    GlucoseUnit = "mg/dL",
+                    MeasurementTime = x.MeasuredAt,
+                    Trend = x.Trend,
+                    GlucoseStatus = x.GlucoseValue < 70 ? "Low" : x.GlucoseValue > 180 ? "High" : "In Range",
+                    BatteryVoltageMv = x.BatteryVoltageMv,
+                    DeviceTemperatureC = (decimal)x.DeviceTemperatureC,
+                    WE1CurrentNa = (decimal)x.We1NanoAmps
+                }).ToList()
+            });
 
-            request.Content = JsonContent.Create(new { SensorId = sensorId, Measurements = measurements });
-            var response = await _client.SendAsync(request);
-
+            using var response = await _client.SendAsync(request, cancellationToken);
             if (response.IsSuccessStatusCode)
             {
-                // Clear queue on success
-                await _localCache.RemoveAsync(QueueKey);
+                await _measurementRepo.MarkAsSyncedAsync(batch.Select(x => x.Id));
+            }
+            else
+            {
+                var error = $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}";
+                foreach (var item in batch)
+                {
+                    await _measurementRepo.MarkAsFailedAsync(item.Id, error);
+                }
             }
         }
-        catch (Exception ex)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
+        catch (Exception exception)
         {
-            System.Diagnostics.Debug.WriteLine($"[SyncService] Sync failed: {ex.Message}");
+            try
+            {
+                var batch = await _measurementRepo.GetPendingMeasurementsAsync(BatchSize);
+                foreach (var item in batch)
+                {
+                    await _measurementRepo.MarkAsFailedAsync(item.Id, exception.Message);
+                }
+            }
+            catch { }
+            await _crashReporter.ReportAsync(exception, "SyncService.SyncNow");
         }
+        finally { _syncLock.Release(); }
+    }
+
+    private async Task RunSchedulerAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (await _timer.WaitForNextTickAsync(cancellationToken))
+                await SyncNowAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
+        catch (Exception exception) { await _crashReporter.ReportAsync(exception, "SyncService.Scheduler"); }
+    }
+
+    private async Task<int?> GetActiveSensorIdAsync(string token, CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, ApiEndpoints.Sensors.Active);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        using var response = await _client.SendAsync(request, cancellationToken);
+        if (response.IsSuccessStatusCode)
+        {
+            var sensor = await response.Content.ReadFromJsonAsync<JsonElement>(cancellationToken);
+            return sensor.TryGetProperty("id", out var id) && id.TryGetInt32(out var value) ? value : null;
+        }
+
+        // Auto-provision an active sensor record if none exists yet so offline/BLE telemetry syncs seamlessly
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            try
+            {
+                using var startReq = new HttpRequestMessage(HttpMethod.Post, ApiEndpoints.Sensors.Start);
+                startReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                startReq.Content = JsonContent.Create(new { WarmupMinutes = 0, SensorIdentifier = "CGM-ACTIVE-001" });
+                using var startRes = await _client.SendAsync(startReq, cancellationToken);
+                if (startRes.IsSuccessStatusCode)
+                {
+                    var started = await startRes.Content.ReadFromJsonAsync<JsonElement>(cancellationToken);
+                    return started.TryGetProperty("id", out var sid) && sid.TryGetInt32(out var sval) ? sval : null;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[SyncService] Auto-start sensor failed: {ex}");
+            }
+        }
+
+        return null;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        _lifetime.Cancel();
+        _timer.Dispose();
+        _lifetime.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

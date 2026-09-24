@@ -13,8 +13,9 @@
                     BackgroundColor="{Binding IconBgColor, Source={x:Reference thisCard}}"
                     Stroke="Transparent"
                     VerticalOptions="Center">
-            <Label Text="{Binding IconText, Source={x:Reference thisCard}}"
-                   FontFamily="FontAwesomeSolid"
+                <Label Text="{Binding IconText, Source={x:Reference thisCard}}"
+                       TextColor="{Binding ValueColor, Source={x:Reference thisCard}}"
+                       FontFamily="FontAwesomeSolid"
                        FontSize="18"
                        HorizontalOptions="Center"
                        VerticalOptions="Center" />
@@ -23,14 +24,14 @@
             <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                 <Label Text="{Binding CardTitle, Source={x:Reference thisCard}}"
                        FontSize="11"
-                       TextColor="{StaticResource TextSecondaryLight}" />
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
                 <Label Text="{Binding CardValue, Source={x:Reference thisCard}}"
                        FontSize="18"
                        FontAttributes="Bold"
                        TextColor="{Binding ValueColor, Source={x:Reference thisCard}}" />
                 <Label Text="{Binding CardSubValue, Source={x:Reference thisCard}}"
                        FontSize="10"
-                       TextColor="{StaticResource TextMutedLight}" />
+                       TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
             </VerticalStackLayout>
         </Grid>
     </Border>

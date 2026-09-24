@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Dashboard"
+             xmlns:controls="clr-namespace:CGM.PatientApp.Controls"
+             x:Class="CGM.PatientApp.Views.Dashboard.HomeDashboardView"
+             x:DataType="vm:DashboardViewModel"
+             BackgroundColor="{AppThemeBinding Light=#F7F5FA, Dark=#120C1B}">
+
+    <VerticalStackLayout Padding="18,16,18,34" Spacing="16">
+
+        <!-- Welcome -->
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <VerticalStackLayout Spacing="1" VerticalOptions="Center">
+                <Label Text="{Binding PatientGreeting}" FontSize="12"
+                       TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" />
+                <Label Text="{Binding PatientName, FallbackValue='Welcome back', TargetNullValue='Welcome back'}"
+                       FontFamily="ManropeBold" FontSize="25" LineBreakMode="TailTruncation"
+                       TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" />
+            </VerticalStackLayout>
+
+            <Border Grid.Column="1" WidthRequest="44" HeightRequest="44"
+                    BackgroundColor="{AppThemeBinding Light=#EEE8F4, Dark=#302040}"
+                    StrokeThickness="0" StrokeShape="RoundRectangle 14">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="Profile" />
+                </Border.GestureRecognizers>
+                <Label Text="&#xF007;" FontFamily="FontAwesomeSolid" FontSize="16"
+                       TextColor="{AppThemeBinding Light=#583295, Dark=#D9C2F3}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Connection strip -->
+        <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                Stroke="{AppThemeBinding Light=#E9E3ED, Dark=#382848}"
+                StrokeThickness="1" Padding="12,10" StrokeShape="RoundRectangle 16">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding NavigateToPairingCommand}" />
+            </Border.GestureRecognizers>
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Border WidthRequest="34" HeightRequest="34" StrokeThickness="0"
+                        BackgroundColor="{Binding StatusBadgeBgColor}" StrokeShape="RoundRectangle 11">
+                    <Label Text="{Binding StatusBadgeIcon}" FontFamily="FontAwesomeSolid" FontSize="12"
+                           TextColor="{Binding StatusBadgeTextColor}"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                    <Label Text="Sensor status" FontSize="9" FontFamily="ManropeSemiBold"
+                           CharacterSpacing="0.8" TextColor="{AppThemeBinding Light=#918699, Dark=#AFA0BD}" />
+                    <Label Text="{Binding DeviceStatusText}" FontFamily="ManropeBold" FontSize="12"
+                           TextColor="{AppThemeBinding Light=#30213D, Dark=#FFFFFF}" />
+                </VerticalStackLayout>
+                <HorizontalStackLayout Grid.Column="2" Spacing="6" VerticalOptions="Center"
+                                       IsVisible="{Binding IsDeviceConnected}">
+                    <Label Text="&#xF241;" FontFamily="FontAwesomeSolid" FontSize="12" TextColor="#159B69" />
+                    <Label Text="{Binding BatteryPercent}" FontFamily="ManropeBold" FontSize="11"
+                           TextColor="{AppThemeBinding Light=#28664E, Dark=#83DDB5}" />
+                </HorizontalStackLayout>
+                <Label Grid.Column="2" Text="&#xF054;" IsVisible="{Binding IsDeviceDisconnected}"
+                       FontFamily="FontAwesomeSolid" FontSize="11"
+                       TextColor="{AppThemeBinding Light=#9A8FA3, Dark=#A899B5}"
+                       VerticalOptions="Center" />
+            </Grid>
+        </Border>
+
+        <!-- Disconnected action -->
+        <Border IsVisible="{Binding IsDeviceDisconnected}" BackgroundColor="#583295"
+                StrokeThickness="0" Padding="15" StrokeShape="RoundRectangle 18">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="11">
+                <Border WidthRequest="40" HeightRequest="40" BackgroundColor="#26FFFFFF"
+                        StrokeThickness="0" StrokeShape="RoundRectangle 12">
+                    <Label Text="&#xF1EB;" FontFamily="FontAwesomeSolid" FontSize="15" TextColor="#FFFFFF"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                    <Label Text="Connect a CGM sensor" FontFamily="ManropeBold" FontSize="13" TextColor="#FFFFFF" />
+                    <Label Text="See live glucose data on your dashboard" FontSize="10" TextColor="#E6D9F2" />
+                </VerticalStackLayout>
+                <Button Grid.Column="2" Text="Connect" Command="{Binding NavigateToPairingCommand}"
+                        HeightRequest="34" Padding="12,0" CornerRadius="11" BackgroundColor="#FFFFFF"
+                        TextColor="#583295" FontFamily="ManropeBold" FontSize="10" VerticalOptions="Center" />
+            </Grid>
+        </Border>
+
+        <!-- Current reading -->
+        <controls:HeroGlucoseCard GlucoseValue="{Binding CurrentGlucose}"
+                                  GlucoseUnit="{Binding GlucoseUnit}"
+                                  TrendText="{Binding TrendStatus}"
+                                  TrendArrow="{Binding TrendArrow}"
+                                  LastUpdatedText="{Binding LastUpdatedText}"
+                                  CardColor="{Binding HeroCardColor}"
+                                  VelocityText="{Binding VelocityRateText}"
+                                  TapCommand="{Binding OpenGlucoseDetailsCommand}" />
+
+        <!-- Daily snapshot -->
+        <VerticalStackLayout Spacing="10">
+            <Grid ColumnDefinitions="*,Auto" Margin="2,2,2,0">
+                <VerticalStackLayout Spacing="0">
+                    <Label Text="Today at a glance" FontFamily="ManropeBold" FontSize="17"
+                           TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" />
+                    <Label Text="Your current sensor summary" FontSize="10"
+                           TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" />
+                </VerticalStackLayout>
+                <Border Grid.Column="1" BackgroundColor="#E8F8F1" StrokeThickness="0"
+                        Padding="10,5" StrokeShape="RoundRectangle 11" VerticalOptions="Center">
+                    <Label Text="{Binding TimeInRange}" FontFamily="ManropeBold" FontSize="12" TextColor="#147A52" />
+                </Border>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="9">
+                <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                        Stroke="{AppThemeBinding Light=#E9E3ED, Dark=#382848}"
+                        StrokeThickness="1" Padding="12" StrokeShape="RoundRectangle 16">
+                    <VerticalStackLayout Spacing="7">
+                        <Border WidthRequest="30" HeightRequest="30" HorizontalOptions="Start"
+                                BackgroundColor="#E9F8FD" StrokeThickness="0" StrokeShape="RoundRectangle 9">
+                            <Label Text="&#xF2DB;" FontFamily="FontAwesomeSolid" FontSize="11" TextColor="#019BCC"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Text="Sensor" FontSize="9" TextColor="{AppThemeBinding Light=#918699, Dark=#AFA0BD}" />
+                        <Label Text="{Binding SensorStatus}" FontFamily="ManropeBold" FontSize="11"
+                               TextColor="{AppThemeBinding Light=#30213D, Dark=#FFFFFF}"
+                               LineBreakMode="TailTruncation" MaxLines="1" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="1" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                        Stroke="{AppThemeBinding Light=#E9E3ED, Dark=#382848}"
+                        StrokeThickness="1" Padding="12" StrokeShape="RoundRectangle 16">
+                    <VerticalStackLayout Spacing="7">
+                        <Border WidthRequest="30" HeightRequest="30" HorizontalOptions="Start"
+                                BackgroundColor="#F1EAF8" StrokeThickness="0" StrokeShape="RoundRectangle 9">
+                            <Label Text="&#xF017;" FontFamily="FontAwesomeSolid" FontSize="11" TextColor="#583295"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Text="Life left" FontSize="9" TextColor="{AppThemeBinding Light=#918699, Dark=#AFA0BD}" />
+                        <Label Text="{Binding SensorDaysLeft}" FontFamily="ManropeBold" FontSize="11"
+                               TextColor="{AppThemeBinding Light=#30213D, Dark=#FFFFFF}"
+                               LineBreakMode="TailTruncation" MaxLines="1" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="2" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                        Stroke="{AppThemeBinding Light=#E9E3ED, Dark=#382848}"
+                        StrokeThickness="1" Padding="12" StrokeShape="RoundRectangle 16">
+                    <VerticalStackLayout Spacing="7">
+                        <Border WidthRequest="30" HeightRequest="30" HorizontalOptions="Start"
+                                BackgroundColor="#E8F8F1" StrokeThickness="0" StrokeShape="RoundRectangle 9">
+                            <Label Text="&#xF2F1;" FontFamily="FontAwesomeSolid" FontSize="11" TextColor="#159B69"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Text="Last sync" FontSize="9" TextColor="{AppThemeBinding Light=#918699, Dark=#AFA0BD}" />
+                        <Label Text="{Binding LastSyncTime}" FontFamily="ManropeBold" FontSize="11"
+                               TextColor="{AppThemeBinding Light=#30213D, Dark=#FFFFFF}"
+                               LineBreakMode="TailTruncation" MaxLines="1" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+        </VerticalStackLayout>
+
+        <!-- Trend component already includes its own header and range controls -->
+        <controls:GlucoseTrendChart />
+
+        <!-- Smart Meal Recommendation -->
+        <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                Stroke="{AppThemeBinding Light=#E9E3ED, Dark=#382848}"
+                StrokeThickness="1" Padding="14,14,14,14" StrokeShape="RoundRectangle 16">
+            <VerticalStackLayout Spacing="8">
+                <Grid ColumnDefinitions="Auto, *">
+                    <Label Grid.Column="0" Text="&#xF805;" FontFamily="FontAwesomeSolid" FontSize="14" TextColor="{Binding MealRecommendationColor}" VerticalOptions="Center" Margin="0,0,8,0"/>
+                    <Label Grid.Column="1" Text="Smart Diet Assistant" FontFamily="ManropeBold" FontSize="14" TextColor="{AppThemeBinding Light=#30213D, Dark=#FFFFFF}" VerticalOptions="Center"/>
+                </Grid>
+                
+                <Border BackgroundColor="{AppThemeBinding Light=#F7F5FA, Dark=#2D1F3D}" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="12">
+                    <Grid ColumnDefinitions="Auto, *">
+                        <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" BackgroundColor="{Binding MealRecommendationColor}" StrokeThickness="0" StrokeShape="RoundRectangle 18" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,0,12,0">
+                            <Label Text="{Binding MealRecommendationIcon}" FontFamily="FontAwesomeSolid" FontSize="14" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="{Binding MealRecommendationTitle}" FontFamily="ManropeBold" FontSize="13" TextColor="{AppThemeBinding Light=#241632, Dark=#FFFFFF}" />
+                            <Label Text="{Binding MealRecommendationText}" FontFamily="ManropeRegular" FontSize="11" TextColor="{AppThemeBinding Light=#81758C, Dark=#B8A9C5}" LineHeight="1.2" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+                <Label Text="* Always consult your physician before making dietary changes." FontSize="10" TextColor="{AppThemeBinding Light=#918699, Dark=#AFA0BD}" Margin="4,0,0,0"/>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Target range key -->
+        <Border BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D1329}"
+                Stroke="{AppThemeBinding Light=#E9E3ED, Dark=#382848}"
+                StrokeThickness="1" Padding="14" StrokeShape="RoundRectangle 16">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Border WidthRequest="34" HeightRequest="34" BackgroundColor="#E8F8F1"
+                        StrokeThickness="0" StrokeShape="RoundRectangle 10">
+                    <Label Text="&#xF058;" FontFamily="FontAwesomeSolid" FontSize="13" TextColor="#159B69"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                    <Label Text="Target range" FontFamily="ManropeBold" FontSize="12"
+                           TextColor="{AppThemeBinding Light=#30213D, Dark=#FFFFFF}" />
+                    <Label Text="Recommended glucose corridor" FontSize="9"
+                           TextColor="{AppThemeBinding Light=#918699, Dark=#AFA0BD}" />
+                </VerticalStackLayout>
+                <Label Grid.Column="2" Text="70–180 mg/dL" FontFamily="ManropeBold" FontSize="12"
+                       TextColor="{AppThemeBinding Light=#147A52, Dark=#83DDB5}" VerticalOptions="Center" />
+            </Grid>
+        </Border>
+    </VerticalStackLayout>
+</ContentView>

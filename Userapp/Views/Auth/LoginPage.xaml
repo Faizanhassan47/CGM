@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Auth"
              x:Class="CGM.PatientApp.Views.Auth.LoginPage"
              x:DataType="vm:LoginViewModel"
-             BackgroundColor="{AppThemeBinding Light=#F8FAF9, Dark=#0F172A}"
+             BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
              Shell.NavBarIsVisible="False">
 
     <ScrollView>
@@ -13,30 +13,18 @@
             <!-- 1. TOP BRANDING SECTION (GlucoTrack Logo) -->
             <VerticalStackLayout Grid.Row="0" Spacing="6" Margin="0,10,0,24" HorizontalOptions="Center">
                 <!-- Circular Droplet Orbit Icon -->
-                <Border StrokeShape="RoundRectangle 36"
-                        WidthRequest="72"
-                        HeightRequest="72"
-                        HorizontalOptions="Center"
-                        BackgroundColor="{StaticResource White}"
-                        Stroke="{StaticResource PrimaryLight}"
-                        StrokeThickness="3"
-                        Padding="8">
-                    <Grid HorizontalOptions="Center" VerticalOptions="Center">
-                        <!-- Droplet Shape -->
-                    <Label Text="&#xF043;" FontFamily="FontAwesomeSolid"
-                               FontSize="30"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center" />
-                    </Grid>
-                </Border>
+                <Image Source="logo.png"
+                       WidthRequest="72"
+                       HeightRequest="72"
+                       HorizontalOptions="Center" />
 
                 <!-- Brand Name -->
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="0" Margin="0,8,0,0">
-                    <Label Text="Gluco"
+                    <Label Text="Ai"
                            FontSize="28"
                            FontAttributes="Bold"
-                           TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
-                    <Label Text="Track"
+                           TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
+                    <Label Text="ma"
                            FontSize="28"
                            FontAttributes="Bold"
                            TextColor="{StaticResource PrimaryLight}" />
@@ -61,7 +49,7 @@
                             <Label Text="Welcome back!"
                                    FontSize="20"
                                    FontAttributes="Bold"
-                                   TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                                   TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
                     <Label Text="&#xF256;" FontFamily="FontAwesomeSolid" FontSize="20" />
                         </HorizontalStackLayout>
                         <Label Text="Sign in to continue to your dashboard."
@@ -71,7 +59,7 @@
 
                     <!-- Error Banner -->
                     <Border StrokeShape="RoundRectangle 12"
-                            BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
                             Stroke="{StaticResource Danger}"
                             StrokeThickness="1"
                             Padding="12,10"
@@ -79,7 +67,7 @@
                         <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                         <Label Text="&#xF071;" FontFamily="FontAwesomeSolid" FontSize="14" VerticalOptions="Center"/>
                             <Label Text="{Binding ErrorMessage}"
-                                   TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                                   TextColor="{AppThemeBinding Light=#583295, Dark=#583295}"
                                    FontSize="13"
                                    VerticalOptions="Center"
                                    LineBreakMode="WordWrap" />
@@ -93,6 +81,7 @@
                             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" VerticalOptions="Center">
                             <Label Grid.Column="0" Text="&#xF0E0;" FontFamily="FontAwesomeRegular" FontSize="15" VerticalOptions="Center" />
                                 <Entry Grid.Column="1"
+                                       AutomationId="LoginEmail"
                                        Placeholder="you@example.com"
                                        Text="{Binding Email}"
                                        Keyboard="Email"
@@ -109,6 +98,7 @@
                             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
                             <Label Grid.Column="0" Text="&#xF023;" FontFamily="FontAwesomeSolid" FontSize="16" VerticalOptions="Center" />
                                 <Entry Grid.Column="1"
+                                       AutomationId="LoginPassword"
                                        Placeholder="Enter your password"
                                        Text="{Binding Password}"
                                        IsPassword="{Binding IsPasswordHidden}"
@@ -126,7 +116,7 @@
                                     <Label Text="&#xF06E;"
                                            FontFamily="FontAwesomeSolid"
                                            FontSize="18"
-                                           TextColor="{AppThemeBinding Light=#334155, Dark=#CBD5E1}"
+                                           TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center">
                                         <Label.GestureRecognizers>
@@ -150,6 +140,7 @@
 
                     <!-- Sign In Solid Button -->
                     <Button Text="Sign In"
+                            AutomationId="LoginSubmit"
                             Command="{Binding LoginCommand}"
                             IsEnabled="{Binding IsNotBusy}"
                             BackgroundColor="{StaticResource PrimaryLight}"
@@ -157,6 +148,27 @@
                             FontAttributes="Bold"
                             HeightRequest="48"
                             CornerRadius="14" />
+
+                    <!-- Google Sign In -->
+                    <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                        <BoxView Grid.Column="0" HeightRequest="1" BackgroundColor="#FFFFFF" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="or" FontSize="12" TextColor="{StaticResource TextSecondaryLight}" />
+                        <BoxView Grid.Column="2" HeightRequest="1" BackgroundColor="#FFFFFF" VerticalOptions="Center" />
+                    </Grid>
+                    <Button Text="Continue with Google"
+                            ImageSource="google_g.svg"
+                            ContentLayout="Left,14"
+                            Command="{Binding GoogleSignInCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                            TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
+                            BorderColor="#01B4F1"
+                            BorderWidth="1.5"
+                            FontFamily="ManropeSemiBold"
+                            FontSize="16"
+                            HeightRequest="54"
+                            CornerRadius="14"
+                            SemanticProperties.Description="Sign in using your Google account" />
 
                     <!-- Activity Indicator -->
                     <ActivityIndicator IsRunning="{Binding IsBusy}"

@@ -81,9 +81,9 @@ public partial class SignUpViewModel : BaseViewModel
             return;
         }
 
-        if (Password.Length < 6)
+        if (Password.Length < 8)
         {
-            SetError("Password must be at least 6 characters.");
+            SetError("Password must be at least 8 characters.");
             return;
         }
 
@@ -120,8 +120,21 @@ public partial class SignUpViewModel : BaseViewModel
                 return;
             }
 
-            // Navigate to Complete Profile page directly (skipping email verification)
-            await Shell.Current.GoToAsync("//CompleteProfilePage");
+            bool hasCompletedProfile = await _authService.HasCompletedProfileAsync();
+            if (!hasCompletedProfile)
+            {
+                await Shell.Current.GoToAsync("//CompleteProfilePage");
+                return;
+            }
+
+            bool hasDevice = await _authService.HasConfiguredDeviceAsync();
+            if (!hasDevice)
+            {
+                await Shell.Current.GoToAsync("//DeviceSelectionPage");
+                return;
+            }
+
+            await Shell.Current.GoToAsync("//DashboardPage");
         }
         catch (Exception)
         {

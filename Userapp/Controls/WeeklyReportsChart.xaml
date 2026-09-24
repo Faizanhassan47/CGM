@@ -11,26 +11,26 @@
                        Text="Glucose Trend (mg/dL)"
                        FontAttributes="Bold"
                        FontSize="14"
-                       TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}"
+                       TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
                        VerticalOptions="Center" />
 
                 <!-- Filters: Daily, Weekly, Monthly -->
                 <Border Grid.Column="1"
                         StrokeShape="RoundRectangle 10"
-                        BackgroundColor="{StaticResource SurfaceVariantLight}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
                         Padding="3">
                     <HorizontalStackLayout Spacing="2">
                         <Border x:Name="DailyBorder" StrokeShape="RoundRectangle 8" BackgroundColor="Transparent" Padding="8,3">
                             <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnDailyTapped" /></Border.GestureRecognizers>
-                            <Label x:Name="DailyLabel" Text="Daily" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                            <Label x:Name="DailyLabel" Text="Daily" FontSize="11" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
                         </Border>
-                        <Border x:Name="WeeklyBorder" StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource White}" Padding="8,3">
+                        <Border x:Name="WeeklyBorder" StrokeShape="RoundRectangle 8" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}" Padding="8,3">
                             <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnWeeklyTapped" /></Border.GestureRecognizers>
                             <Label x:Name="WeeklyLabel" Text="Weekly" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" />
                         </Border>
                         <Border x:Name="MonthlyBorder" StrokeShape="RoundRectangle 8" BackgroundColor="Transparent" Padding="8,3">
                             <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnMonthlyTapped" /></Border.GestureRecognizers>
-                            <Label x:Name="MonthlyLabel" Text="Monthly" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                            <Label x:Name="MonthlyLabel" Text="Monthly" FontSize="11" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
                         </Border>
                     </HorizontalStackLayout>
                 </Border>
@@ -40,11 +40,11 @@
             <HorizontalStackLayout Spacing="18" VerticalOptions="Center">
                 <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
                     <BoxView WidthRequest="12" HeightRequest="3" Color="{StaticResource PrimaryLight}" CornerRadius="1.5" VerticalOptions="Center" />
-                    <Label Text="Average Glucose" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" VerticalOptions="Center" />
+                    <Label Text="Average Glucose" FontSize="11" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" VerticalOptions="Center" />
                 </HorizontalStackLayout>
                 <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                    <BoxView WidthRequest="10" HeightRequest="10" Color="{StaticResource ChartTargetBandFill}" CornerRadius="2" VerticalOptions="Center" />
-                    <Label Text="Time in Range (%)" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" VerticalOptions="Center" />
+                    <BoxView WidthRequest="10" HeightRequest="10" Color="{AppThemeBinding Light={StaticResource ChartTargetBandFill}, Dark={StaticResource ChartTargetBandFillDark}}" CornerRadius="2" VerticalOptions="Center" />
+                    <Label Text="Time in Range (%)" FontSize="11" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" VerticalOptions="Center" />
                 </HorizontalStackLayout>
             </HorizontalStackLayout>
 
@@ -61,7 +61,7 @@
                     <VerticalStackLayout Grid.Column="0" VerticalOptions="End" HorizontalOptions="Center" Spacing="4">
                         <Label Text="102" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" HorizontalTextAlignment="Center" />
                         <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{StaticResource PrimaryLight}" HorizontalOptions="Center" />
-                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="78" BackgroundColor="{StaticResource ChartTargetBandFill}" Stroke="Transparent">
+                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="78" BackgroundColor="{AppThemeBinding Light={StaticResource ChartTargetBandFill}, Dark={StaticResource ChartTargetBandFillDark}}" Stroke="Transparent">
                             <Label Text="78%" FontSize="8" FontAttributes="Bold" TextColor="{StaticResource BadgeGreenText}" HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
@@ -70,7 +70,7 @@
                     <VerticalStackLayout Grid.Column="1" VerticalOptions="End" HorizontalOptions="Center" Spacing="4">
                         <Label Text="98" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" HorizontalTextAlignment="Center" />
                         <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{StaticResource PrimaryLight}" HorizontalOptions="Center" />
-                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="80" BackgroundColor="{StaticResource ChartTargetBandFill}" Stroke="Transparent">
+                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="80" BackgroundColor="{AppThemeBinding Light={StaticResource ChartTargetBandFill}, Dark={StaticResource ChartTargetBandFillDark}}" Stroke="Transparent">
                             <Label Text="80%" FontSize="8" FontAttributes="Bold" TextColor="{StaticResource BadgeGreenText}" HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
@@ -79,7 +79,7 @@
                     <VerticalStackLayout Grid.Column="2" VerticalOptions="End" HorizontalOptions="Center" Spacing="4">
                         <Label Text="95" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" HorizontalTextAlignment="Center" />
                         <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{StaticResource PrimaryLight}" HorizontalOptions="Center" />
-                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="83" BackgroundColor="{StaticResource ChartTargetBandFill}" Stroke="Transparent">
+                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="83" BackgroundColor="{AppThemeBinding Light={StaticResource ChartTargetBandFill}, Dark={StaticResource ChartTargetBandFillDark}}" Stroke="Transparent">
                             <Label Text="83%" FontSize="8" FontAttributes="Bold" TextColor="{StaticResource BadgeGreenText}" HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
@@ -88,7 +88,7 @@
                     <VerticalStackLayout Grid.Column="3" VerticalOptions="End" HorizontalOptions="Center" Spacing="4">
                         <Label Text="97" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" HorizontalTextAlignment="Center" />
                         <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{StaticResource PrimaryLight}" HorizontalOptions="Center" />
-                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="81" BackgroundColor="{StaticResource ChartTargetBandFill}" Stroke="Transparent">
+                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="81" BackgroundColor="{AppThemeBinding Light={StaticResource ChartTargetBandFill}, Dark={StaticResource ChartTargetBandFillDark}}" Stroke="Transparent">
                             <Label Text="81%" FontSize="8" FontAttributes="Bold" TextColor="{StaticResource BadgeGreenText}" HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
@@ -97,7 +97,7 @@
                     <VerticalStackLayout Grid.Column="4" VerticalOptions="End" HorizontalOptions="Center" Spacing="4">
                         <Label Text="93" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" HorizontalTextAlignment="Center" />
                         <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{StaticResource PrimaryLight}" HorizontalOptions="Center" />
-                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="79" BackgroundColor="{StaticResource ChartTargetBandFill}" Stroke="Transparent">
+                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="79" BackgroundColor="{AppThemeBinding Light={StaticResource ChartTargetBandFill}, Dark={StaticResource ChartTargetBandFillDark}}" Stroke="Transparent">
                             <Label Text="79%" FontSize="8" FontAttributes="Bold" TextColor="{StaticResource BadgeGreenText}" HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
@@ -106,7 +106,7 @@
                     <VerticalStackLayout Grid.Column="5" VerticalOptions="End" HorizontalOptions="Center" Spacing="4">
                         <Label Text="96" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" HorizontalTextAlignment="Center" />
                         <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{StaticResource PrimaryLight}" HorizontalOptions="Center" />
-                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="84" BackgroundColor="{StaticResource ChartTargetBandFill}" Stroke="Transparent">
+                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="84" BackgroundColor="{AppThemeBinding Light={StaticResource ChartTargetBandFill}, Dark={StaticResource ChartTargetBandFillDark}}" Stroke="Transparent">
                             <Label Text="84%" FontSize="8" FontAttributes="Bold" TextColor="{StaticResource BadgeGreenText}" HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
@@ -115,7 +115,7 @@
                     <VerticalStackLayout Grid.Column="6" VerticalOptions="End" HorizontalOptions="Center" Spacing="4">
                         <Label Text="92" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" HorizontalTextAlignment="Center" />
                         <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{StaticResource PrimaryLight}" HorizontalOptions="Center" />
-                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="82" BackgroundColor="{StaticResource ChartTargetBandFill}" Stroke="Transparent">
+                        <Border StrokeShape="RoundRectangle 6" WidthRequest="24" HeightRequest="82" BackgroundColor="{AppThemeBinding Light={StaticResource ChartTargetBandFill}, Dark={StaticResource ChartTargetBandFillDark}}" Stroke="Transparent">
                             <Label Text="82%" FontSize="8" FontAttributes="Bold" TextColor="{StaticResource BadgeGreenText}" HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
@@ -125,31 +125,31 @@
                 <Grid ColumnDefinitions="*,*,*,*,*,*,*" VerticalOptions="End">
                     <VerticalStackLayout Grid.Column="0" Spacing="0" HorizontalOptions="Center">
                         <Label Text="Thu" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="Center" />
-                        <Label Text="May 2" FontSize="8" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                        <Label Text="May 2" FontSize="8" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="1" Spacing="0" HorizontalOptions="Center">
                         <Label Text="Fri" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="Center" />
-                        <Label Text="May 3" FontSize="8" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                        <Label Text="May 3" FontSize="8" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="2" Spacing="0" HorizontalOptions="Center">
                         <Label Text="Sat" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="Center" />
-                        <Label Text="May 4" FontSize="8" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                        <Label Text="May 4" FontSize="8" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="3" Spacing="0" HorizontalOptions="Center">
                         <Label Text="Sun" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="Center" />
-                        <Label Text="May 5" FontSize="8" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                        <Label Text="May 5" FontSize="8" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="4" Spacing="0" HorizontalOptions="Center">
                         <Label Text="Mon" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="Center" />
-                        <Label Text="May 6" FontSize="8" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                        <Label Text="May 6" FontSize="8" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="5" Spacing="0" HorizontalOptions="Center">
                         <Label Text="Tue" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="Center" />
-                        <Label Text="May 7" FontSize="8" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                        <Label Text="May 7" FontSize="8" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="6" Spacing="0" HorizontalOptions="Center">
                         <Label Text="Wed" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="Center" />
-                        <Label Text="May 8" FontSize="8" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
+                        <Label Text="May 8" FontSize="8" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                 </Grid>
             </Grid>

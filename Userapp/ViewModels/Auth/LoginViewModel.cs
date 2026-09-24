@@ -189,7 +189,7 @@ public partial class LoginViewModel : BaseViewModel
     private async Task NavigateToSignUpAsync()
     {
         ClearError();
-        await Shell.Current.GoToAsync("SignUpPage");
+        await Shell.Current.GoToAsync("//SignUpPage");
     }
 
     [RelayCommand]

@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
              x:Class="CGM.PatientApp.Controls.GlucoseTrendChart">
     <Border Style="{StaticResource MedicalCard}" Padding="16,14">
         <VerticalStackLayout Spacing="12">
             <!-- Header & Filter Pills -->
             <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                <Label Grid.Column="0"
-                       Text="Glucose Trend"
-                       FontAttributes="Bold"
-                       FontSize="15"
-                       TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}"
-                       VerticalOptions="Center" />
+                <VerticalStackLayout Grid.Column="0" Spacing="1">
+                    <Label Text="Glucose Trend &amp; Corridor"
+                           FontAttributes="Bold"
+                           FontSize="15"
+                           TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
+                    <Label Text="Continuous telemetry curve &amp; glycemic target band"
+                           FontSize="11"
+                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                </VerticalStackLayout>
 
                 <!-- Filter Pills (3H, 6H, 12H, 24H) -->
-                <HorizontalStackLayout Grid.Column="1" Spacing="6">
+                <HorizontalStackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center">
                     <!-- 3H -->
                     <Border StrokeShape="RoundRectangle 10" Padding="8,4">
                         <Border.Style>
@@ -33,7 +37,7 @@
                         <Label Text="3H" FontSize="11">
                             <Label.Style>
                                 <Style TargetType="Label">
-                                    <Setter Property="TextColor" Value="{StaticResource TextMutedLight}" />
+                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
                                     <Setter Property="FontAttributes" Value="None" />
                                     <Style.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsTrend3H}" Value="True">
@@ -64,7 +68,7 @@
                         <Label Text="6H" FontSize="11">
                             <Label.Style>
                                 <Style TargetType="Label">
-                                    <Setter Property="TextColor" Value="{StaticResource TextMutedLight}" />
+                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
                                     <Setter Property="FontAttributes" Value="None" />
                                     <Style.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsTrend6H}" Value="True">
@@ -95,7 +99,7 @@
                         <Label Text="12H" FontSize="11">
                             <Label.Style>
                                 <Style TargetType="Label">
-                                    <Setter Property="TextColor" Value="{StaticResource TextMutedLight}" />
+                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
                                     <Setter Property="FontAttributes" Value="None" />
                                     <Style.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsTrend12H}" Value="True">
@@ -126,7 +130,7 @@
                         <Label Text="24H" FontSize="11">
                             <Label.Style>
                                 <Style TargetType="Label">
-                                    <Setter Property="TextColor" Value="{StaticResource TextMutedLight}" />
+                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
                                     <Setter Property="FontAttributes" Value="None" />
                                     <Style.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsTrend24H}" Value="True">
@@ -141,46 +145,73 @@
                 </HorizontalStackLayout>
             </Grid>
 
-            <!-- Chart Graphic Area with Target Band (70 - 180 mg/dL) -->
-            <Grid HeightRequest="130" Margin="0,4,0,0">
-                <!-- Target Range Band Background (70-180 mg/dL) -->
-                <Border Margin="0,32,45,36"
-                        StrokeShape="RoundRectangle 8"
-                        BackgroundColor="{StaticResource ChartTargetBandFill}"
-                        Stroke="{StaticResource ChartTargetBandStroke}"
-                        StrokeThickness="1" />
+            <!-- Mini Summary Metrics Strip (Average, Range, TIR) -->
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="6" Margin="0,2">
+                <!-- Average -->
+                <Border StrokeShape="RoundRectangle 8"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                        Padding="6,4">
+                    <VerticalStackLayout Spacing="1" HorizontalOptions="Center">
+                        <Label Text="AVG" FontSize="9" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding TrendWindowAverage, FallbackValue='116 mg/dL'}" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource PrimaryLight}" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
 
-                <!-- Target Reference Labels on Right Side -->
-                <Label Text="High" FontSize="10" TextColor="{StaticResource Danger}" FontAttributes="Bold" HorizontalOptions="End" VerticalOptions="Start" Margin="0,2,0,0" />
-                <Label Text="Target" FontSize="10" TextColor="{StaticResource BadgeGreenText}" FontAttributes="Bold" HorizontalOptions="End" VerticalOptions="Center" />
-                <Label Text="Low" FontSize="10" TextColor="{StaticResource BadgeBlueText}" FontAttributes="Bold" HorizontalOptions="End" VerticalOptions="End" Margin="0,0,0,10" />
+                <!-- Min -->
+                <Border StrokeShape="RoundRectangle 8"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                        Padding="6,4">
+                    <VerticalStackLayout Spacing="1" HorizontalOptions="Center">
+                        <Label Text="MIN" FontSize="9" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding TrendWindowMin, FallbackValue='78'}" FontSize="11" FontAttributes="Bold" TextColor="#01B4F1" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
 
-                <!-- Dynamic Glucose Trend Spline Path -->
-                <Path Data="{Binding TrendPathData}"
-                      Stroke="{Binding TrendLineColor}"
-                      StrokeThickness="2.5"
-                      StrokeLineCap="Round"
-                      Margin="0,0,45,0"
-                      HorizontalOptions="Fill" />
+                <!-- Max -->
+                <Border StrokeShape="RoundRectangle 8"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                        Padding="6,4">
+                    <VerticalStackLayout Spacing="1" HorizontalOptions="Center">
+                        <Label Text="MAX" FontSize="9" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding TrendWindowMax, FallbackValue='164'}" FontSize="11" FontAttributes="Bold" TextColor="#583295" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
 
-                <!-- Dynamic Pulse Endpoint Dot at Latest Reading -->
-                <Border HorizontalOptions="End"
-                        VerticalOptions="Start"
-                        Margin="{Binding TrendDotMargin}"
-                        StrokeShape="RoundRectangle 8"
-                        WidthRequest="14"
-                        HeightRequest="14"
-                        BackgroundColor="{Binding TrendDotColor}"
-                        Stroke="{StaticResource White}"
-                        StrokeThickness="2" />
+                <!-- TIR -->
+                <Border StrokeShape="RoundRectangle 8"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                        Padding="6,4">
+                    <VerticalStackLayout Spacing="1" HorizontalOptions="Center">
+                        <Label Text="IN TARGET" FontSize="9" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding TrendWindowTir, FallbackValue='88%'}" FontSize="11" FontAttributes="Bold" TextColor="#583295" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
             </Grid>
 
-            <!-- Dynamic Time Axis Row -->
-            <Grid ColumnDefinitions="*,*,*,*" Margin="0,0,45,0">
-                <Label Grid.Column="0" Text="{Binding TrendTime1}" FontSize="10" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
-                <Label Grid.Column="1" Text="{Binding TrendTime2}" FontSize="10" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
-                <Label Grid.Column="2" Text="{Binding TrendTime3}" FontSize="10" TextColor="{StaticResource TextMutedLight}" HorizontalTextAlignment="Center" />
-                <Label Grid.Column="3" Text="{Binding TrendTime4}" FontSize="10" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" HorizontalTextAlignment="Center" />
+            <!-- Chart Canvas Area with Target Shaded Corridor (70-180 mg/dL) -->
+            <Grid HeightRequest="200" Margin="0,2,0,0">
+                <!-- Base Chart Container Background -->
+                <Border StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                        Stroke="{AppThemeBinding Light={StaticResource BorderLightColor}, Dark={StaticResource BorderDarkColor}}"
+                        StrokeThickness="1" />
+
+                <!-- LiveCharts2 Cartesian Chart -->
+                <lvc:CartesianChart
+                    Series="{Binding TrendSeries}"
+                    XAxes="{Binding TrendXAxes}"
+                    YAxes="{Binding TrendYAxes}"
+                    Sections="{Binding TrendSections}"
+                    TooltipPosition="Hidden"
+                    Margin="10" />
+
+                <!-- Bottom Target Range Legend Strip -->
+                <HorizontalStackLayout VerticalOptions="End" HorizontalOptions="Center" Spacing="14" Margin="0,0,0,6">
+                    <Label Text="● In target (70–180)" FontSize="9" TextColor="#01B4F1" FontAttributes="Bold" />
+                    <Label Text="● Low (&lt;70)" FontSize="9" TextColor="#01B4F1" />
+                    <Label Text="● High (&gt;180)" FontSize="9" TextColor="#583295" />
+                    <Label Text="● Urgent (&lt;55 / &gt;250)" FontSize="9" TextColor="#583295" />
+                </HorizontalStackLayout>
             </Grid>
         </VerticalStackLayout>
     </Border>

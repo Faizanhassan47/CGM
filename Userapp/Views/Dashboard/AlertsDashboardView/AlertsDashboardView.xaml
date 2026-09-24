@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Dashboard"
+             xmlns:models="clr-namespace:CGM.PatientApp.Models"
+             xmlns:controls="clr-namespace:CGM.PatientApp.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="CGM.PatientApp.Views.Dashboard.AlertsDashboardView"
+             x:DataType="vm:DashboardViewModel">
+<VerticalStackLayout IsVisible="{Binding IsAlertsSelected}"
+                                     Spacing="14"
+                                     Padding="20,20,20,24">
+
+                    <!-- Header & Bell Outline Icon -->
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Text="Alerts"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                        
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 20"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                BackgroundColor="{StaticResource White}"
+                                Stroke="{StaticResource BorderLightColor}">
+                                <Label Text="&#xF0F3;" FontFamily="FontAwesomeRegular" FontSize="17" TextColor="{StaticResource PrimaryLight}" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- Filter Pills: All, Critical, Unread, Info -->
+                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="6">
+                        <!-- All -->
+                        <Border Grid.Column="0" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsAlertAll, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#FFFFFF'}"
+                                Stroke="{Binding IsAlertAll, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetAlertFilterCommand}" CommandParameter="All" /></Border.GestureRecognizers>
+                            <Label Text="All" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{Binding IsAlertAll, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- Critical -->
+                        <Border Grid.Column="1" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsAlertCritical, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#FFFFFF'}"
+                                Stroke="{Binding IsAlertCritical, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetAlertFilterCommand}" CommandParameter="Critical" /></Border.GestureRecognizers>
+                            <Label Text="Critical" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsAlertCritical, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- Unread -->
+                        <Border Grid.Column="2" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsAlertUnread, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#FFFFFF'}"
+                                Stroke="{Binding IsAlertUnread, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetAlertFilterCommand}" CommandParameter="Unread" /></Border.GestureRecognizers>
+                            <Label Text="Unread" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsAlertUnread, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+
+                        <!-- Info -->
+                        <Border Grid.Column="3" StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{Binding IsAlertInfo, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#FFFFFF'}"
+                                Stroke="{Binding IsAlertInfo, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#01B4F1:#E6F0EB'}"
+                                Padding="8,8">
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SetAlertFilterCommand}" CommandParameter="Info" /></Border.GestureRecognizers>
+                            <Label Text="Info" FontSize="11" FontAttributes="Bold"
+                                   TextColor="{Binding IsAlertInfo, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FFFFFF:#64748B'}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- CLINICAL GLYCEMIC SAFETY THRESHOLDS CARD -->
+                    <Border Style="{StaticResource MedicalCard}" Padding="16">
+                        <VerticalStackLayout Spacing="12">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                                <Border Grid.Column="0" StrokeShape="RoundRectangle 12" BackgroundColor="{StaticResource PrimaryContainerLight}" WidthRequest="36" HeightRequest="36" Stroke="Transparent">
+                                    <Label Text="&#xF1DE;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="{StaticResource PrimaryLight}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="Glycemic Safety Thresholds" FontSize="14" FontAttributes="Bold" TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                                    <Label Text="{Binding TargetRangeSummary}" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" />
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <!-- Dual Threshold Steppers (Low & High) -->
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <!-- Low Limit Stepper -->
+                                <Border Grid.Column="0" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#1E293B}" Stroke="{StaticResource BorderLightColor}" Padding="10,8">
+                                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                        <Label Text="Low Alert Limit" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" HorizontalOptions="Center" />
+                                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                                            <Border StrokeShape="RoundRectangle 8" BackgroundColor="{AppThemeBinding Light=#F1F5F9, Dark=#334155}" WidthRequest="28" HeightRequest="28">
+                                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding DecreaseTargetLowCommand}" /></Border.GestureRecognizers>
+                                                <Label Text="-" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            </Border>
+                                            <Label Text="{Binding TargetRangeLow, StringFormat='{0}'}" FontSize="16" FontAttributes="Bold" TextColor="#2563EB" VerticalOptions="Center" />
+                                            <Border StrokeShape="RoundRectangle 8" BackgroundColor="{AppThemeBinding Light=#F1F5F9, Dark=#334155}" WidthRequest="28" HeightRequest="28">
+                                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding IncreaseTargetLowCommand}" /></Border.GestureRecognizers>
+                                                <Label Text="+" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            </Border>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <!-- High Limit Stepper -->
+                                <Border Grid.Column="1" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#1E293B}" Stroke="{StaticResource BorderLightColor}" Padding="10,8">
+                                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                        <Label Text="High Alert Limit" FontSize="11" TextColor="{StaticResource TextSecondaryLight}" HorizontalOptions="Center" />
+                                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                                            <Border StrokeShape="RoundRectangle 8" BackgroundColor="{AppThemeBinding Light=#F1F5F9, Dark=#334155}" WidthRequest="28" HeightRequest="28">
+                                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding DecreaseTargetHighCommand}" /></Border.GestureRecognizers>
+                                                <Label Text="-" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            </Border>
+                                            <Label Text="{Binding TargetRangeHigh, StringFormat='{0}'}" FontSize="16" FontAttributes="Bold" TextColor="#D97706" VerticalOptions="Center" />
+                                            <Border StrokeShape="RoundRectangle 8" BackgroundColor="{AppThemeBinding Light=#F1F5F9, Dark=#334155}" WidthRequest="28" HeightRequest="28">
+                                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding IncreaseTargetHighCommand}" /></Border.GestureRecognizers>
+                                                <Label Text="+" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            </Border>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <CollectionView ItemsSource="{Binding VisibleAlerts}"
+                                    SelectionMode="None"
+                                    MaximumHeightRequest="560">
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout Padding="0,32" Spacing="6">
+                                <Label Text="No alerts in this category"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Center" />
+                                <Label Text="New sensor and glucose alerts will appear here."
+                                       FontSize="12"
+                                       TextColor="{StaticResource TextSecondaryLight}"
+                                       HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Alert">
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto"
+                                      Padding="0,12" RowSpacing="4">
+                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Title}"
+                                           FontAttributes="Bold" />
+                                    <Label Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding Timestamp, StringFormat='{0:g}'}"
+                                           FontSize="11" TextColor="{StaticResource TextMutedLight}" />
+                                    <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Message}"
+                                           FontSize="12" TextColor="{StaticResource TextSecondaryLight}"
+                                           LineBreakMode="WordWrap" />
+                                    <BoxView Grid.Row="2" Grid.ColumnSpan="2" HeightRequest="1"
+                                             Margin="0,8,0,0" Color="{StaticResource BorderLightColor}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Legacy preview alerts are intentionally hidden; live API alerts are rendered above. -->
+                    <VerticalStackLayout IsVisible="False">
+                    <!-- 1. Low Glucose Alert -->
+                    <controls:AlertCard AlertTitle="Low Glucose"
+                                        Command="{Binding OpenAlertCommand}" CommandParameter="Low Glucose — 68 mg/dL at 4:30 AM"
+                                        AlertValue="68 mg/dL"
+                                        AlertTime="4:30 AM"
+                                        BadgeText="Low"
+                                         IconText="&#xF063;"
+                                        IconBgColor="{StaticResource BadgeBlueBg}"
+                                        IconTextColor="{StaticResource BadgeBlueText}"
+                                        BadgeBgColor="{StaticResource BadgeBlueBg}"
+                                        BadgeTextColor="{StaticResource BadgeBlueText}"
+                                        DotColor="{StaticResource BadgeBlueText}" />
+
+                    <!-- 2. Connection Lost Alert -->
+                    <controls:AlertCard AlertTitle="Connection Lost"
+                                        Command="{Binding OpenAlertCommand}" CommandParameter="Connection Lost — 3:55 AM"
+                                        AlertDescription="We couldn't connect to your CGM. Reconnect to resume real-time updates."
+                                        AlertTime="3:55 AM"
+                                        BadgeText="Warning"
+                                         IconText="&#xF012;"
+                                        IconBgColor="{StaticResource BadgeAmberBg}"
+                                        IconTextColor="{StaticResource BadgeAmberText}"
+                                        BadgeBgColor="{StaticResource BadgeAmberBg}"
+                                        BadgeTextColor="{StaticResource BadgeAmberText}"
+                                        DotColor="{StaticResource Warning}" />
+
+                    <!-- 3. Sensor Expiring Alert -->
+                    <controls:AlertCard AlertTitle="Sensor Expiring"
+                                        Command="{Binding OpenAlertCommand}" CommandParameter="Sensor Expiring — 1 day left"
+                                        AlertDescription="Your sensor will expire soon. Replace it to avoid data gaps."
+                                        AlertTime="Yesterday"
+                                        BadgeText="Info"
+                                        SubBadgeText="1 day left"
+                                         IconText="&#xF017;"
+                                        IconBgColor="#F3E8FF"
+                                        IconTextColor="#7C3AED"
+                                        BadgeBgColor="#F3E8FF"
+                                        BadgeTextColor="#7C3AED"
+                                        DotColor="#7C3AED" />
+
+                    <!-- 4. High Glucose Alert -->
+                    <controls:AlertCard AlertTitle="High Glucose"
+                                        Command="{Binding OpenAlertCommand}" CommandParameter="High Glucose — 182 mg/dL"
+                                        AlertValue="182 mg/dL"
+                                        AlertTime="Yesterday, 9:15 PM"
+                                        BadgeText="High"
+                                         IconText="&#xF062;"
+                                        IconBgColor="{StaticResource BadgeRedBg}"
+                                        IconTextColor="{StaticResource BadgeRedText}"
+                                        BadgeBgColor="{StaticResource BadgeRedBg}"
+                                        BadgeTextColor="{StaticResource BadgeRedText}"
+                                        DotColor="{StaticResource Danger}" />
+
+                    <!-- 5. Sensor Started Alert -->
+                    <controls:AlertCard AlertTitle="Sensor Started"
+                                        Command="{Binding OpenAlertCommand}" CommandParameter="Sensor Started — May 12, 8:45 AM"
+                                        AlertDescription="Your new sensor is warming up and working properly."
+                                        AlertTime="May 12, 8:45 AM"
+                                        BadgeText="Info"
+                                         IconText="&#xF00C;"
+                                        IconBgColor="{StaticResource BadgeGreenBg}"
+                                        IconTextColor="{StaticResource BadgeGreenText}"
+                                        BadgeBgColor="{StaticResource BadgeGreenBg}"
+                                        BadgeTextColor="{StaticResource BadgeGreenText}"
+                                        DotColor="{StaticResource Success}" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+</ContentView>

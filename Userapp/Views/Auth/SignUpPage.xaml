@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:CGM.PatientApp.ViewModels.Auth"
              x:Class="CGM.PatientApp.Views.Auth.SignUpPage"
              x:DataType="vm:SignUpViewModel"
-             BackgroundColor="{AppThemeBinding Light=#F8FAF9, Dark=#0F172A}"
+             BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
              Shell.NavBarIsVisible="False">
 
     <ScrollView>
@@ -13,27 +13,18 @@
             <!-- 1. TOP BRANDING SECTION (GlucoTrack Logo) -->
             <VerticalStackLayout Grid.Row="0" Spacing="6" Margin="0,4,0,20" HorizontalOptions="Center">
                 <!-- Circular Droplet Orbit Icon -->
-                <Border StrokeShape="RoundRectangle 36"
-                        WidthRequest="64"
-                        HeightRequest="64"
-                        HorizontalOptions="Center"
-                        BackgroundColor="{StaticResource White}"
-                        Stroke="{StaticResource PrimaryLight}"
-                        StrokeThickness="3"
-                        Padding="8">
-                    <Label Text="&#xF043;" FontFamily="FontAwesomeSolid"
-                           FontSize="26"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center" />
-                </Border>
+                <Image Source="logo.png"
+                       WidthRequest="64"
+                       HeightRequest="64"
+                       HorizontalOptions="Center" />
 
                 <!-- Brand Name -->
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="0" Margin="0,4,0,0">
-                    <Label Text="Gluco"
+                    <Label Text="Ai"
                            FontSize="26"
                            FontAttributes="Bold"
-                           TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
-                    <Label Text="Track"
+                           TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
+                    <Label Text="ma"
                            FontSize="26"
                            FontAttributes="Bold"
                            TextColor="{StaticResource PrimaryLight}" />
@@ -66,7 +57,7 @@
                             <Label Text="Create Account"
                                    FontSize="18"
                                    FontAttributes="Bold"
-                                   TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                                   TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
                             <Label Text="Create your account to securely access your glucose data."
                                    FontSize="11"
                                    TextColor="{StaticResource TextSecondaryLight}"
@@ -76,7 +67,7 @@
 
                     <!-- Error Banner -->
                     <Border StrokeShape="RoundRectangle 12"
-                            BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
                             Stroke="{StaticResource Danger}"
                             StrokeThickness="1"
                             Padding="12,10"
@@ -84,7 +75,7 @@
                         <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                             <Label Text="&#xF071;" FontFamily="FontAwesomeSolid" FontSize="14" VerticalOptions="Center"/>
                             <Label Text="{Binding ErrorMessage}"
-                                   TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                                   TextColor="{AppThemeBinding Light=#583295, Dark=#583295}"
                                    FontSize="13"
                                    VerticalOptions="Center"
                                    LineBreakMode="WordWrap" />
@@ -144,7 +135,7 @@
                                     <Label Text="&#xF06E;"
                                            FontFamily="FontAwesomeSolid"
                                            FontSize="18"
-                                           TextColor="{AppThemeBinding Light=#334155, Dark=#CBD5E1}"
+                                           TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center">
                                         <Label.GestureRecognizers>
@@ -180,7 +171,7 @@
                                     <Label Text="&#xF06E;"
                                            FontFamily="FontAwesomeSolid"
                                            FontSize="18"
-                                           TextColor="{AppThemeBinding Light=#334155, Dark=#CBD5E1}"
+                                           TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center">
                                         <Label.GestureRecognizers>
@@ -205,11 +196,39 @@
                     <!-- Create Account Solid Button -->
                     <Button Text="Create Account"
                             Command="{Binding RegisterCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
                             BackgroundColor="{StaticResource PrimaryLight}"
                             TextColor="{StaticResource White}"
                             FontAttributes="Bold"
                             HeightRequest="48"
                             CornerRadius="14" />
+
+                    <!-- Google Account Creation -->
+                    <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                        <BoxView Grid.Column="0" HeightRequest="1" BackgroundColor="#FFFFFF" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="or" FontSize="12" TextColor="{StaticResource TextSecondaryLight}" />
+                        <BoxView Grid.Column="2" HeightRequest="1" BackgroundColor="#FFFFFF" VerticalOptions="Center" />
+                    </Grid>
+                    <Button Text="Continue with Google"
+                            ImageSource="google_g.svg"
+                            ContentLayout="Left,14"
+                            Command="{Binding GoogleSignUpCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                            TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
+                            BorderColor="#01B4F1"
+                            BorderWidth="1.5"
+                            FontFamily="ManropeSemiBold"
+                            FontSize="16"
+                            HeightRequest="54"
+                            CornerRadius="14"
+                            SemanticProperties.Description="Create an account using Google" />
+
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       HeightRequest="24"
+                                       WidthRequest="24"
+                                       HorizontalOptions="Center" />
 
                     <!-- Already have an account? Sign In -->
                     <HorizontalStackLayout HorizontalOptions="Center" Spacing="6" Margin="0,4,0,0">

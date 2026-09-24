@@ -5,7 +5,7 @@
              x:Class="CGM.PatientApp.Views.DeviceSetup.DeviceSelectionPage"
              x:DataType="vm:DeviceSelectionViewModel"
              Title="Device Setup"
-             BackgroundColor="{AppThemeBinding Light=#F8FAF9, Dark=#0F172A}"
+             BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
              Shell.NavBarIsVisible="False">
 
     <Grid Padding="20,20,20,16" RowDefinitions="Auto,*,Auto">
@@ -59,7 +59,7 @@
                     <Label Text="Choose Your CGM"
                            FontSize="24"
                            FontAttributes="Bold"
-                           TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}" />
+                           TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" />
                     <Label Text="Select the type of CGM device you'll be using. You can change this later in Settings."
                            FontSize="13"
                            TextColor="{StaticResource TextSecondaryLight}"
@@ -205,7 +205,7 @@
                             <Label Text="Reusable CGM"
                                    FontAttributes="Bold"
                                    FontSize="15"
-                                   TextColor="{AppThemeBinding Light=#0F172A, Dark=#F8FAFC}"
+                                   TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
                                    HorizontalTextAlignment="Center" />
                             <Label Text="Wear with replaceable sensors. Rechargeable transmitter."
                                    FontSize="11"

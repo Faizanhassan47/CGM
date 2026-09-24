@@ -23,3 +23,12 @@ public class FamilyMember
     public string Status { get; set; } = string.Empty;
     public DateTime JoinedAt { get; set; }
 }
+
+public class WeeklyReportItem
+{
+    public int UserId { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string AlertType { get; set; } = string.Empty;
+    public decimal? GlucoseValue { get; set; }
+    public DateTime TriggeredAt { get; set; }
+}

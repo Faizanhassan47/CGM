@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "203000957883",
+    "project_id": "cgm-app-e9a6c",
+    "storage_bucket": "cgm-app-e9a6c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203000957883:android:fc3385f69b3aa7dbd7d29e",
+        "android_client_info": {
+          "package_name": "com.companyname.cgm.patientapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "203000957883-58esulhtj8lnvvfu07bmilkks96bqju8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.companyname.cgm.patientapp",
+            "certificate_hash": "eaf704b8998d2ecca1cee58dd982f6838596ed69"
+          }
+        },
+        {
+          "client_id": "203000957883-r5lchnrp5e9mq03dt95fb0qg64io5hrg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhjB-cbD-3FwqL5sDLxzgYZVrdICOatCI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "203000957883-r5lchnrp5e9mq03dt95fb0qg64io5hrg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

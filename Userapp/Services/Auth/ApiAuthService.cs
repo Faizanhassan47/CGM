@@ -37,10 +37,13 @@ public sealed class ApiAuthService(HttpClient client) : IAuthService
         if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
             return new() { Message = "Please enter both email and password." };
 
+        var deviceId = GetOrCreateDeviceId();
         var result = await SendAuthAsync("api/auth/login", new
         {
             Email = request.Email.Trim(), request.Password, request.RememberMe,
-            DeviceInfo = DeviceInfo.Current.Platform.ToString()
+            DeviceInfo = $"{DeviceInfo.Current.Manufacturer} {DeviceInfo.Current.Model}",
+            DeviceId = deviceId, DeviceName = DeviceInfo.Current.Name,
+            Platform = DeviceInfo.Current.Platform.ToString()
         });
         return new() { Success = result.Success, Message = result.Message, User = result.User };
     }
@@ -60,15 +63,26 @@ public sealed class ApiAuthService(HttpClient client) : IAuthService
             Success = result.Success,
             Message = result.Message,
             Email = request.Email.Trim().ToLowerInvariant(),
-            RequiresVerification = result.User is { IsEmailVerified: false }
+            RequiresVerification = false
         };
     }
 
-    public Task<ApiResponse<bool>> VerifyEmailAsync(VerifyEmailRequest request) =>
-        Task.FromResult(Unavailable("Email verification is not enabled by the API yet."));
+    public async Task<ApiResponse<bool>> VerifyEmailAsync(VerifyEmailRequest request)
+    {
+        var result = await SendResetAsync("api/auth/verify-email", new { request.Email, Code = request.VerificationCode });
+        if (result.Success)
+        {
+            var user = await GetCurrentUserAsync();
+            if (user is not null) { user.IsEmailVerified = true; await StoreSessionAsync(user); }
+        }
+        return new() { Success = result.Success, Message = result.Message, Data = result.Success };
+    }
 
-    public Task<ApiResponse<bool>> ResendVerificationCodeAsync(ResendVerificationRequest request) =>
-        Task.FromResult(Unavailable("Email verification is not enabled by the API yet."));
+    public async Task<ApiResponse<bool>> ResendVerificationCodeAsync(ResendVerificationRequest request)
+    {
+        var result = await SendResetAsync("api/auth/resend-verification", new { request.Email });
+        return new() { Success = result.Success, Message = result.Message, Data = result.Success };
+    }
 
     public async Task<LoginResponse> LoginWithGoogleAsync(string idToken) =>
         await SocialLoginAsync(idToken, "Google", null);
@@ -166,7 +180,8 @@ public sealed class ApiAuthService(HttpClient client) : IAuthService
 
     private async Task<LoginResponse> SocialLoginAsync(string idToken, string provider, string? fullName)
     {
-        var result = await SendAuthAsync("api/auth/social", new { IdToken = idToken, Provider = provider, FullName = fullName });
+        var result = await SendAuthAsync("api/auth/social", new { IdToken = idToken, Provider = provider, FullName = fullName,
+            DeviceId = GetOrCreateDeviceId(), DeviceName = DeviceInfo.Current.Name, Platform = DeviceInfo.Current.Platform.ToString() });
         return new() { Success = result.Success, Message = result.Message, User = result.User };
     }
 
@@ -231,6 +246,7 @@ public sealed class ApiAuthService(HttpClient client) : IAuthService
         await SecureStorage.Default.SetAsync(UserKey, JsonSerializer.Serialize(user, JsonOptions));
         Preferences.Default.Set("cgm_user_name", user.FullName);
         Preferences.Default.Set("cgm_user_email", user.Email);
+        Preferences.Default.Set("cgm_user_id", user.UserId);
         Preferences.Default.Set("cgm_profile_complete", user.IsProfileComplete);
     }
 
@@ -239,9 +255,19 @@ public sealed class ApiAuthService(HttpClient client) : IAuthService
         SecureStorage.Default.Remove(AccessTokenKey);
         SecureStorage.Default.Remove(RefreshTokenKey);
         SecureStorage.Default.Remove(UserKey);
+        Preferences.Default.Remove("cgm_user_id");
     }
 
     private static ApiResponse<bool> Unavailable(string message) => new() { Success = false, Message = message, Data = false };
+    private static string GetOrCreateDeviceId()
+    {
+        const string key = "cgm_installation_device_id";
+        var value = Preferences.Default.Get(key, string.Empty);
+        if (!string.IsNullOrWhiteSpace(value)) return value;
+        value = Guid.NewGuid().ToString("N");
+        Preferences.Default.Set(key, value);
+        return value;
+    }
     private static string FriendlyError(HttpStatusCode code) => code == HttpStatusCode.Unauthorized
         ? "Invalid email or password." : "The request could not be completed. Please try again.";
 

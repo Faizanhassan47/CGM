@@ -5,77 +5,202 @@
              x:Class="CGM.PatientApp.Views.DeviceSetup.ScanningPage"
              x:DataType="vm:ScanningViewModel"
              Title="Searching for CGM"
+             BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
              Shell.NavBarIsVisible="False">
 
-    <Grid Padding="24,40,24,24" RowDefinitions="*,Auto">
+    <Grid Padding="24,32,24,24" RowDefinitions="Auto,*,Auto">
 
-        <!-- Center Scanning Graphic & Status -->
-        <VerticalStackLayout Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center" Spacing="24">
-
-            <!-- Radar / Scan Pulse Circle -->
-            <Border StrokeShape="RoundRectangle 60"
-                    WidthRequest="120"
-                    HeightRequest="120"
-                    HorizontalOptions="Center"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}"
-                    Stroke="{StaticResource PrimaryLight}"
-                    StrokeThickness="2">
-                <Grid HorizontalOptions="Center" VerticalOptions="Center">
-                    <ActivityIndicator IsRunning="{Binding IsScanning}"
-                                       IsVisible="{Binding IsScanning}"
-                                       WidthRequest="50"
-                                       HeightRequest="50"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center" />
-                        <Label Text="&#xF7C0;" FontFamily="FontAwesomeSolid"
-                           FontSize="28"
-                           IsVisible="{Binding IsScanning, Converter={StaticResource InverseBoolConverter}}"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center" />
-                </Grid>
+        <!-- Top Header Bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center" Margin="0,0,0,12">
+            <Border Grid.Column="0" StrokeShape="RoundRectangle 20" WidthRequest="40" HeightRequest="40"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                    Stroke="Transparent" VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CancelCommand}" />
+                </Border.GestureRecognizers>
+                <Label Text="✕" FontSize="16" FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>
 
-            <!-- Status Header -->
-            <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
-                <Label Text="{Binding StatusText}"
-                       Style="{StaticResource HeaderTitle}"
-                       FontSize="20"
-                       HorizontalTextAlignment="Center" />
-                
-                <Label Text="{Binding HelperText}"
-                       Style="{StaticResource SubTitle}"
-                       HorizontalTextAlignment="Center"
-                       LineBreakMode="WordWrap" />
-            </VerticalStackLayout>
+            <Label Grid.Column="1" Text="Device Pairing" FontSize="16" FontAttributes="Bold"
+                   TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
+                   HorizontalTextAlignment="Center" VerticalOptions="Center" />
 
-            <!-- Error / Timeout Banner -->
-            <Border StrokeShape="RoundRectangle 12"
-                    BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
-                    Stroke="{StaticResource Danger}"
-                    StrokeThickness="1"
-                    Padding="14,12"
-                    IsVisible="{Binding HasError}">
-                <VerticalStackLayout Spacing="4">
-                    <Label Text="Scan Timeout" FontAttributes="Bold" FontSize="13" TextColor="{StaticResource Danger}" />
-                    <Label Text="{Binding ErrorMessage}"
-                           TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
-                           FontSize="12"
+            <!-- BLE Status Capsule -->
+            <Border Grid.Column="2" StrokeShape="RoundRectangle 14" Padding="10,4"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                    Stroke="Transparent" VerticalOptions="Center">
+                <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                    <Label Text="&#xF293;" FontFamily="FontAwesomeBrands" FontSize="12"
+                           TextColor="{AppThemeBinding Light=#583295, Dark=#01B4F1}" VerticalOptions="Center" />
+                    <Label Text="BLE" FontSize="11" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#583295, Dark=#01B4F1}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Center Scanning Arena -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout Spacing="24" VerticalOptions="Center" HorizontalOptions="Center" Padding="0,16">
+
+                <!-- Concentric Radar Pulse Arena -->
+                <Grid WidthRequest="260" HeightRequest="260" HorizontalOptions="Center" VerticalOptions="Center">
+                    <!-- Outer Ring 3 -->
+                    <Border x:Name="RadarRing3"
+                            WidthRequest="250" HeightRequest="250"
+                            StrokeShape="RoundRectangle 125"
+                            Stroke="#01B4F1" StrokeThickness="1.5"
+                            Opacity="0.0" Scale="0.8"
+                            BackgroundColor="#01B4F1"
+                            HorizontalOptions="Center" VerticalOptions="Center" />
+
+                    <!-- Middle Ring 2 -->
+                    <Border x:Name="RadarRing2"
+                            WidthRequest="190" HeightRequest="190"
+                            StrokeShape="RoundRectangle 95"
+                            Stroke="#01B4F1" StrokeThickness="1.5"
+                            Opacity="0.0" Scale="0.8"
+                            BackgroundColor="#01B4F1"
+                            HorizontalOptions="Center" VerticalOptions="Center" />
+
+                    <!-- Inner Ring 1 -->
+                    <Border x:Name="RadarRing1"
+                            WidthRequest="130" HeightRequest="130"
+                            StrokeShape="RoundRectangle 65"
+                            Stroke="#01B4F1" StrokeThickness="2"
+                            Opacity="0.0" Scale="0.8"
+                            BackgroundColor="#01B4F1"
+                            HorizontalOptions="Center" VerticalOptions="Center" />
+
+                    <!-- Center Sensor Core Badge -->
+                    <Border WidthRequest="84" HeightRequest="84"
+                            StrokeShape="RoundRectangle 42"
+                            Stroke="#FFFFFF" StrokeThickness="3"
+                            HorizontalOptions="Center" VerticalOptions="Center">
+                        <Border.BackgroundColor>#01B4F1</Border.BackgroundColor>
+                        <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="&#xF293;" FontFamily="FontAwesomeBrands"
+                                   FontSize="32" TextColor="#FFFFFF"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Live Radar Status Pill -->
+                <Border StrokeShape="RoundRectangle 16" Padding="14,6"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                        Stroke="{StaticResource PrimaryLight}" StrokeThickness="1"
+                        HorizontalOptions="Center">
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <ActivityIndicator IsRunning="{Binding IsScanning}"
+                                           IsVisible="{Binding IsScanning}"
+                                           WidthRequest="16" HeightRequest="16"
+                                           Color="{StaticResource PrimaryLight}"
+                                           VerticalOptions="Center" />
+                        <Label Text="SCANNING BLE CHANNELS" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource PrimaryLight}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <!-- Status Header -->
+                <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                    <Label Text="{Binding StatusText}"
+                           FontSize="20" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}"
+                           HorizontalTextAlignment="Center" />
+                    
+                    <Label Text="{Binding HelperText}"
+                           FontSize="13"
+                           TextColor="{AppThemeBinding Light=#583295, Dark=#583295}"
+                           HorizontalTextAlignment="Center"
+                           HorizontalOptions="Center"
+                           MaximumWidthRequest="300"
                            LineBreakMode="WordWrap" />
                 </VerticalStackLayout>
-            </Border>
 
-        </VerticalStackLayout>
+                <!-- Quick Pairing Guidance Checklist Card -->
+                <Border StrokeShape="RoundRectangle 16"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                        Stroke="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                        StrokeThickness="1"
+                        Padding="16,14"
+                        MaximumWidthRequest="340"
+                        HorizontalOptions="Center">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="PAIRING CHECKLIST" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondaryLight}" />
+
+                        <!-- Step 1 -->
+                        <Grid ColumnDefinitions="24,*" ColumnSpacing="10" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="✓" FontSize="14" FontAttributes="Bold" TextColor="#01B4F1" HorizontalOptions="Center" />
+                            <Label Grid.Column="1" Text="Keep phone within 1 meter (3 ft) of sensor" FontSize="12" TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" VerticalOptions="Center" />
+                        </Grid>
+
+                        <BoxView HeightRequest="1" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}" />
+
+                        <!-- Step 2 -->
+                        <Grid ColumnDefinitions="24,*" ColumnSpacing="10" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="✓" FontSize="14" FontAttributes="Bold" TextColor="#01B4F1" HorizontalOptions="Center" />
+                            <Label Grid.Column="1" Text="Ensure Bluetooth and Location are ON" FontSize="12" TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" VerticalOptions="Center" />
+                        </Grid>
+
+                        <BoxView HeightRequest="1" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}" />
+
+                        <!-- Step 3 -->
+                        <Grid ColumnDefinitions="24,*" ColumnSpacing="10" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="✓" FontSize="14" FontAttributes="Bold" TextColor="#01B4F1" HorizontalOptions="Center" />
+                            <Label Grid.Column="1" Text="Press applicator button if applying new sensor" FontSize="12" TextColor="{AppThemeBinding Light=#583295, Dark=#FFFFFF}" VerticalOptions="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Error / Timeout Banner -->
+                <Border StrokeShape="RoundRectangle 14"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                        Stroke="{StaticResource Danger}"
+                        StrokeThickness="1"
+                        Padding="16,14"
+                        MaximumWidthRequest="340"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding HasError}">
+                    <VerticalStackLayout Spacing="4">
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="⚠️" FontSize="13" />
+                            <Label Text="Scan Timeout" FontAttributes="Bold" FontSize="13" TextColor="{StaticResource Danger}" />
+                        </HorizontalStackLayout>
+                        <Label Text="{Binding ErrorMessage}"
+                               TextColor="{AppThemeBinding Light=#583295, Dark=#583295}"
+                               FontSize="12"
+                               LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
 
         <!-- Bottom Action Buttons -->
-        <VerticalStackLayout Grid.Row="1" Spacing="10" Margin="0,0,0,10">
+        <VerticalStackLayout Grid.Row="2" Spacing="10" Margin="0,12,0,0">
             <!-- Retry Button (Visible on timeout/error) -->
-            <Button Text="Retry Scan"
+            <Button Text="Retry Scanning"
                     Command="{Binding StartScanCommand}"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    TextColor="{StaticResource White}"
+                    FontAttributes="Bold"
+                    FontSize="14"
+                    HeightRequest="48"
+                    CornerRadius="14"
                     IsVisible="{Binding HasTimedOut}" />
 
-            <Button Text="Cancel"
+            <Button Text="Cancel Pairing"
                     Command="{Binding CancelCommand}"
-                    Style="{StaticResource OutlineButton}" />
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+                    TextColor="{AppThemeBinding Light=#583295, Dark=#583295}"
+                    FontAttributes="Bold"
+                    FontSize="13"
+                    HeightRequest="44"
+                    CornerRadius="14" />
         </VerticalStackLayout>
 
     </Grid>

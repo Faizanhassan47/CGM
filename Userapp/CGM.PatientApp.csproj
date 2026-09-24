@@ -13,11 +13,14 @@
 		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
 		<OutputType>Exe</OutputType>
-		<RootNamespace>CGM.PatientApp</RootNamespace>
+		<RootNamespace>Aima</RootNamespace>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+
+		<!-- Enable Hot Reload for rapid UI iteration -->
+		<MauiEnableXamlHotReload>true</MauiEnableXamlHotReload>
 
 		<!-- Enable XAML source generation for faster build times and improved performance.
 		     This generates C# code from XAML at compile time instead of runtime inflation.
@@ -29,7 +32,7 @@
 		<MauiXamlInflator>SourceGen</MauiXamlInflator>
 
 		<!-- Display name -->
-		<ApplicationTitle>CGM.PatientApp</ApplicationTitle>
+		<ApplicationTitle>Aima</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.cgm.patientapp</ApplicationId>
@@ -43,25 +46,36 @@
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">23.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-		<JavaSdkDirectory Condition="'$(JavaSdkDirectory)' == ''">C:\Users\faiza\jdk-21\jdk-21.0.6+7</JavaSdkDirectory>
-		<AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == ''">C:\Users\faiza\AppData\Local\Android\Sdk</AndroidSdkDirectory>
+
+		<!-- Portable SDK Directory resolution: uses env vars or standard LocalAppData path, avoiding hardcoded user directories -->
+		<JavaSdkDirectory Condition="'$(JavaSdkDirectory)' == '' and '$(JAVA_HOME)' != ''">$(JAVA_HOME)</JavaSdkDirectory>
+		<AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and '$(ANDROID_HOME)' != ''">$(ANDROID_HOME)</AndroidSdkDirectory>
+		<AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and Exists('$(LocalAppData)\Android\Sdk')">$(LocalAppData)\Android\Sdk</AndroidSdkDirectory>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-		<AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
 		<AndroidEnablePreloadAssemblies>true</AndroidEnablePreloadAssemblies>
 	</PropertyGroup>
 
+<!-- Faster Android development deployment -->
+<PropertyGroup Condition="'$(Configuration)' == 'Debug' And '$(TargetFramework)' == 'net10.0-android'">
+    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
+    <AndroidFastDeployment>true</AndroidFastDeployment>
+</PropertyGroup>
+	<!-- Release APKs remain self-contained. -->
+<PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(TargetFramework)' == 'net10.0-android'">
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\Splash\splash.svg" Color="#FFFFFF" ForegroundScale="0.65" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#583295" BaseSize="128,128" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
@@ -69,29 +83,44 @@
 		<MauiImage Update="Resources\Images\device_reusable.png" Resize="True" BaseSize="256,256" />
 		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
 		
-		<!-- Custom Fonts -->
-		<MauiFont Include="Resources\Fonts\*" />
+		<!-- Custom Fonts: include only real font files. Including the license .txt
+		     as a MauiFont prevents Android from resolving the registered aliases. -->
+		<MauiFont Include="Resources\Fonts\*.otf" />
+		<MauiFont Include="Resources\Fonts\*.ttf" />
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+		<MauiAsset Include="app.env" LogicalName="app.env" Condition="Exists('app.env')" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<GoogleServicesJson Include="google-services.json" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="15.0.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="LiveChartsCore.SkiaSharpView.Maui" Version="2.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.12" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.90" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="Plugin.LocalNotification" Version="14.1.2" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
+		<PackageReference Include="SQLitePCLRaw.core" Version="2.1.10" />
+		<PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.10" />
+		<!-- Removed explicit SQLitePCLRaw packages to let sqlite-net-pcl resolve its own native assets -->
+		<!-- Keep this binding aligned with MAUI 10's AndroidX Fragment dependency.
+		     Newer Auth bindings replace Fragment and crash ShellContentFragment. -->
+		<PackageReference Include="Xamarin.GooglePlayServices.Auth" Version="121.3.0.3" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
 	</ItemGroup>
 
+	<!-- Removed conflicting SQLitePCLRaw.lib.e_sqlite3.android -->
+
 	<!-- Prevent a future project edit from restoring the startup XAML resource crash. -->
-	<Target Name="ValidateAndroidStartupPackaging"
-	        BeforeTargets="PrepareForBuild"
-	        Condition="'$(TargetFramework)' == 'net10.0-android'">
-		<Error Condition="'$(MauiXamlInflator)' != 'SourceGen'"
-		       Text="Android builds require MauiXamlInflator=SourceGen to prevent missing App.xaml resources at startup." />
-		<Error Condition="!Exists('$(MSBuildProjectDirectory)\App.xaml')"
-		       Text="App.xaml is required for Android startup." />
+	<Target Name="ValidateAndroidStartupPackaging" BeforeTargets="PrepareForBuild" Condition="'$(TargetFramework)' == 'net10.0-android'">
+		<Error Condition="'$(MauiXamlInflator)' != 'SourceGen'" Text="Android builds require MauiXamlInflator=SourceGen to prevent missing App.xaml resources at startup." />
+		<Error Condition="!Exists('$(MSBuildProjectDirectory)\App.xaml')" Text="App.xaml is required for Android startup." />
 	</Target>
 
 </Project>

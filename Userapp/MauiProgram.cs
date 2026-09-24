@@ -1,7 +1,9 @@
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Plugin.LocalNotification;
 using SkiaSharp.Views.Maui.Controls.Hosting;
+using LiveChartsCore.SkiaSharpView.Maui;
 using CGM.PatientApp.Interfaces;
 using CGM.PatientApp.Services.Auth;
 using CGM.PatientApp.Services.Ble;
@@ -19,6 +21,7 @@ using CGM.PatientApp.Views.DeviceSetup;
 using CGM.PatientApp.Views.Details;
 using CGM.PatientApp.Services.Family;
 using CGM.PatientApp.Views;
+using CGM.PatientApp.Services.Diagnostics;
 
 namespace CGM.PatientApp;
 
@@ -31,6 +34,8 @@ public static class MauiProgram
 			.UseMauiApp<App>()
 			.UseMauiCommunityToolkit()
 			.UseSkiaSharp()
+			.UseLiveCharts()
+			.UseLocalNotification()
 			.ConfigureMauiHandlers(handlers =>
 			{
 #if ANDROID
@@ -53,10 +58,13 @@ public static class MauiProgram
 #endif
 
 		// Register Services
+		builder.Services.AddSingleton<ICrashReporter, LocalCrashReporter>();
+		builder.Services.AddSingleton<IApplicationErrorHandler, ApplicationErrorHandler>();
 		builder.Services.AddSingleton<MockAuthService>();
 		// Initialize environment configuration from .env file or bundled asset
 		EnvConfig.Initialize();
 
+#if DEBUG
 		var useMockServices = EnvConfig.GetBool("CGM_USE_MOCK_SERVICES",
 			Preferences.Default.Get("cgm_use_mock_services", false));
 
@@ -72,27 +80,50 @@ public static class MauiProgram
 		var apiBaseUrl = !string.IsNullOrWhiteSpace(prefUrl)
 			? prefUrl
 			: EnvConfig.Get("CGM_API_BASE_URL", defaultUrl);
-
-		builder.Services.AddSingleton(new HttpClient
+#else
+        var useMockServices = false;
+        var apiBaseUrl = EnvConfig.Get("CGM_API_BASE_URL", "https://api.glucotrack.com/");
+#endif
+		
+		var parsedBaseAddress = new Uri(apiBaseUrl);
+		var environment = EnvConfig.Get("CGM_ENVIRONMENT", "Development");
+		if (environment.Equals("Production", StringComparison.OrdinalIgnoreCase) && parsedBaseAddress.Scheme != Uri.UriSchemeHttps)
+			throw new InvalidOperationException("Production API URL must use HTTPS.");
+#if !DEBUG
+        if (parsedBaseAddress.Scheme != Uri.UriSchemeHttps)
+            throw new InvalidOperationException("Release builds must use HTTPS.");
+#endif
+		builder.Services.AddSingleton(new HttpClient(new AuthenticatedHttpHandler(parsedBaseAddress))
 		{
-			BaseAddress = new Uri(apiBaseUrl),
+			BaseAddress = parsedBaseAddress,
 			Timeout = TimeSpan.FromSeconds(15)
 		});
+		builder.Services.AddSingleton<IAuthenticationStateService>(CGM.PatientApp.Services.Auth.AuthenticationStateService.Current);
 		builder.Services.AddSingleton<ApiAuthService>();
+		builder.Services.AddSingleton<ISessionService, ApiSessionService>();
 		builder.Services.AddSingleton<ApiProfileService>();
 		builder.Services.AddSingleton<ApiDeviceService>();
 		builder.Services.AddSingleton<UnavailableSocialAuthService>();
+#if ANDROID
+		builder.Services.AddSingleton<Platforms.Android.Services.GoogleSocialAuthService>();
+#endif
 		builder.Services.AddSingleton<IAuthService>(sp => useMockServices
 			? sp.GetRequiredService<MockAuthService>()
 			: sp.GetRequiredService<ApiAuthService>());
 		builder.Services.AddSingleton<ISocialAuthService>(sp => useMockServices
 			? sp.GetRequiredService<MockAuthService>()
-			: sp.GetRequiredService<UnavailableSocialAuthService>());
+			:
+#if ANDROID
+			sp.GetRequiredService<Platforms.Android.Services.GoogleSocialAuthService>());
+#else
+			sp.GetRequiredService<UnavailableSocialAuthService>());
+#endif
 		builder.Services.AddSingleton<IProfileService>(sp => useMockServices
 			? sp.GetRequiredService<MockAuthService>()
 			: sp.GetRequiredService<ApiProfileService>());
 
 		builder.Services.AddSingleton<ILocalCacheService>(sp => new LocalCacheService());
+		builder.Services.AddSingleton<ILocalMeasurementRepository, CGM.PatientApp.Services.Database.SqliteMeasurementRepository>();
 		builder.Services.AddSingleton<IDeviceService>(sp => useMockServices
 			? new MockDeviceService()
 			: sp.GetRequiredService<ApiDeviceService>());
@@ -117,20 +148,31 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IGlucoseService>(sp => useMockServices
 			? sp.GetRequiredService<MockGlucoseService>()
 			: sp.GetRequiredService<ApiGlucoseService>());
+		builder.Services.AddSingleton<RealtimeGlucoseService>();
 
 		builder.Services.AddSingleton<ApiAlertService>();
+		builder.Services.AddSingleton<INotificationEndpointService, ApiNotificationEndpointService>();
 		builder.Services.AddSingleton<MockAlertService>();
 		builder.Services.AddSingleton<IAlertService>(sp => useMockServices
 			? sp.GetRequiredService<MockAlertService>()
 			: sp.GetRequiredService<ApiAlertService>());
 
+#if ANDROID
+		builder.Services.AddSingleton<IForegroundMonitoringService, Platforms.Android.Services.AndroidForegroundMonitoringService>();
+		builder.Services.AddSingleton<ICriticalAlertEngine, Platforms.Android.Services.AndroidCriticalAlertEngine>();
+#else
+		builder.Services.AddSingleton<IForegroundMonitoringService, CGM.PatientApp.Services.NoOpForegroundMonitoringService>();
+		builder.Services.AddSingleton<ICriticalAlertEngine, CGM.PatientApp.Services.CrossPlatformCriticalAlertEngine>();
+#endif
         builder.Services.AddSingleton<CGM.PatientApp.Services.Sync.ISyncService, CGM.PatientApp.Services.Sync.SyncService>();
 
 		builder.Services.AddSingleton<ICgmProtocolParser>(sp => new CgmProtocolParser());
 		builder.Services.AddSingleton<CgmCommandBuilder>();
 		builder.Services.AddSingleton<ICgmDeviceService, CgmDeviceService>();
 		builder.Services.AddSingleton<CGM.PatientApp.Services.Reports.IPdfReportService, CGM.PatientApp.Services.Reports.PdfReportService>();
+		builder.Services.AddSingleton<IReportService, CGM.PatientApp.Services.Reports.ApiReportService>();
 		builder.Services.AddSingleton<IFamilyService, ApiFamilyService>();
+		builder.Services.AddSingleton<ISmartDietService, CGM.PatientApp.Services.SpoonacularDietService>();
 
 		// Register ViewModels
 		builder.Services.AddTransient<SplashViewModel>();
@@ -138,6 +180,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<SignUpViewModel>();
 		builder.Services.AddTransient<ForgotPasswordViewModel>();
 		builder.Services.AddTransient<ResetPasswordViewModel>();
+		builder.Services.AddTransient<VerifyEmailViewModel>();
 		builder.Services.AddTransient<CompleteProfileViewModel>();
 		builder.Services.AddTransient<DeviceSelectionViewModel>();
 		builder.Services.AddTransient<DevicePreparationViewModel>();
@@ -155,6 +198,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<SignUpPage>();
 		builder.Services.AddTransient<ForgotPasswordPage>();
 		builder.Services.AddTransient<ResetPasswordPage>();
+		builder.Services.AddTransient<VerifyEmailPage>();
 		builder.Services.AddTransient<CompleteProfilePage>();
 		builder.Services.AddTransient<FamilyPage>();
 		builder.Services.AddTransient<DeviceSelectionPage>();

@@ -3,81 +3,86 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- GlucoTrack Primary Teal Palette -->
-    <Color x:Key="PrimaryLight">#0D9488</Color>
-    <Color x:Key="PrimaryDark">#14B8A6</Color>
-    <Color x:Key="PrimaryVariant">#047857</Color>
-    <Color x:Key="PrimaryContainerLight">#E6F4EA</Color>
-    <Color x:Key="PrimaryContainerDark">#134E4A</Color>
-
-    <!-- Teal Hero Gradient Colors -->
-    <Color x:Key="TealGradientStart">#0D9488</Color>
-    <Color x:Key="TealGradientEnd">#047857</Color>
+    <!-- Custom Primary Palette -->
+    <Color x:Key="PrimaryLight"> #583295</Color>
+    <Color x:Key="PrimaryDark"> #01B4F1</Color>
+    <Color x:Key="PrimaryVariant"> #01B4F1</Color>
+        <Color x:Key="PrimaryContainerLight">#FFFFFF</Color>
+        <Color x:Key="PrimaryContainerDark">#583295</Color>
 
     <!-- Badge Colors -->
-    <Color x:Key="BadgeGreenBg">#E6F4EA</Color>
-    <Color x:Key="BadgeGreenText">#059669</Color>
-    <Color x:Key="BadgeBlueBg">#EFF6FF</Color>
-    <Color x:Key="BadgeBlueText">#2563EB</Color>
-    <Color x:Key="BadgeAmberBg">#FEF3C7</Color>
-    <Color x:Key="BadgeAmberText">#D97706</Color>
-    <Color x:Key="BadgeRedBg">#FEE2E2</Color>
-    <Color x:Key="BadgeRedText">#DC2626</Color>
+    <Color x:Key="BadgeGreenBg">#FFFFFF</Color>
+    <Color x:Key="BadgeGreenText">#583295</Color>
+    <Color x:Key="BadgeGreenBgDark">#583295</Color>
+    <Color x:Key="BadgeGreenTextDark">#01B4F1</Color>
+    <Color x:Key="BadgeBlueBg">#FFFFFF</Color>
+    <Color x:Key="BadgeBlueText">#01B4F1</Color>
+    <Color x:Key="BadgeBlueBgDark">#583295</Color>
+    <Color x:Key="BadgeBlueTextDark">#01B4F1</Color>
+    <Color x:Key="BadgeAmberBg">#FFFFFF</Color>
+    <Color x:Key="BadgeAmberText">#583295</Color>
+    <Color x:Key="BadgeAmberBgDark">#583295</Color>
+    <Color x:Key="BadgeAmberTextDark">#FFFFFF</Color>
+    <Color x:Key="BadgeRedBg">#FFFFFF</Color>
+    <Color x:Key="BadgeRedText">#583295</Color>
+    <Color x:Key="BadgeRedBgDark">#583295</Color>
+    <Color x:Key="BadgeRedTextDark">#583295</Color>
 
     <!-- Semantic App Theme Colors -->
-    <Color x:Key="PrimaryColor">#0D9488</Color>
-    <Color x:Key="Primary">#0D9488</Color>
-    <Color x:Key="Secondary">#0284C7</Color>
+    <Color x:Key="PrimaryColor">#583295</Color>
+    <Color x:Key="Primary">#583295</Color>
+    <Color x:Key="Secondary">#01B4F1</Color>
 
     <!-- Neutral & Backgrounds -->
-    <Color x:Key="PageBgLight">#F8FAF9</Color>
-    <Color x:Key="PageBgDark">#0F172A</Color>
+    <Color x:Key="PageBgLight">#FFFFFF</Color>
+    <Color x:Key="PageBgDark">#583295</Color>
     
     <Color x:Key="CardBgLight">#FFFFFF</Color>
-    <Color x:Key="CardBgDark">#1E293B</Color>
+    <Color x:Key="CardBgDark">#583295</Color>
 
-    <Color x:Key="SurfaceVariantLight">#F1F5F3</Color>
-    <Color x:Key="SurfaceVariantDark">#334155</Color>
+    <Color x:Key="SurfaceVariantLight">#FFFFFF</Color>
+    <Color x:Key="SurfaceVariantDark">#583295</Color>
 
-    <Color x:Key="BorderLightColor">#E6F0EB</Color>
-    <Color x:Key="BorderDarkColor">#334155</Color>
+    <Color x:Key="BorderLightColor">#FFFFFF</Color>
+    <Color x:Key="BorderDarkColor">#583295</Color>
 
     <!-- Typography Colors -->
-    <Color x:Key="TextPrimaryLight">#1E293B</Color>
-    <Color x:Key="TextPrimaryDark">#F8FAFC</Color>
+    <Color x:Key="TextPrimaryLight">#583295</Color>
+    <Color x:Key="TextPrimaryDark">#FFFFFF</Color>
 
-    <Color x:Key="TextSecondaryLight">#64748B</Color>
-    <Color x:Key="TextSecondaryDark">#94A3B8</Color>
+    <Color x:Key="TextSecondaryLight">#583295</Color>
+    <Color x:Key="TextSecondaryDark">#583295</Color>
 
-    <Color x:Key="TextMutedLight">#94A3B8</Color>
-    <Color x:Key="TextMutedDark">#64748B</Color>
+    <Color x:Key="TextMutedLight">#583295</Color>
+    <Color x:Key="TextMutedDark">#583295</Color>
 
     <!-- Medical & Alert States -->
-    <Color x:Key="GlucoseNormal">#10B981</Color>
-    <Color x:Key="GlucoseLow">#EF4444</Color>
-    <Color x:Key="GlucoseHigh">#F59E0B</Color>
-    <Color x:Key="GlucoseUrgentLow">#B91C1C</Color>
+    <Color x:Key="GlucoseNormal">#01B4F1</Color>
+    <Color x:Key="GlucoseLow">#583295</Color>
+    <Color x:Key="GlucoseHigh">#583295</Color>
+    <Color x:Key="GlucoseUrgentLow">#583295</Color>
     
-    <Color x:Key="Success">#059669</Color>
-    <Color x:Key="Warning">#F59E0B</Color>
-    <Color x:Key="Danger">#EF4444</Color>
-    <Color x:Key="Info">#0D9488</Color>
+    <Color x:Key="Success">#583295</Color>
+    <Color x:Key="Warning">#583295</Color>
+    <Color x:Key="Danger">#583295</Color>
+    <Color x:Key="Info">#01B4F1</Color>
 
     <!-- Chart Target Band -->
-    <Color x:Key="ChartTargetBandFill">#E6F4EA</Color>
-    <Color x:Key="ChartTargetBandStroke">#86EFAC</Color>
+    <Color x:Key="ChartTargetBandFill">#FFFFFF</Color>
+    <Color x:Key="ChartTargetBandFillDark">#583295</Color>
+    <Color x:Key="ChartTargetBandStroke">#FFFFFF</Color>
 
     <!-- Standard Neutrals -->
-    <Color x:Key="Gray100">#F3F4F6</Color>
-    <Color x:Key="Gray200">#E5E7EB</Color>
-    <Color x:Key="Gray300">#D1D5DB</Color>
-    <Color x:Key="Gray400">#9CA3AF</Color>
-    <Color x:Key="Gray500">#6B7280</Color>
-    <Color x:Key="Gray600">#4B5563</Color>
-    <Color x:Key="Gray900">#111827</Color>
-    <Color x:Key="Gray950">#0B0F19</Color>
+    <Color x:Key="Gray100">#FFFFFF</Color>
+    <Color x:Key="Gray200">#FFFFFF</Color>
+    <Color x:Key="Gray300">#FFFFFF</Color>
+    <Color x:Key="Gray400">#583295</Color>
+    <Color x:Key="Gray500">#583295</Color>
+    <Color x:Key="Gray600">#583295</Color>
+    <Color x:Key="Gray900">#583295</Color>
+    <Color x:Key="Gray950">#583295</Color>
     <Color x:Key="White">#FFFFFF</Color>
-    <Color x:Key="Black">#000000</Color>
+    <Color x:Key="Black">#583295</Color>
     <Color x:Key="Transparent">Transparent</Color>
 
     <!-- Solid Brushes -->

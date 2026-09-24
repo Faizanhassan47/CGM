@@ -3,6 +3,7 @@ using CGM.PatientApp.Interfaces;
 using CGM.PatientApp.Models;
 using CGM.PatientApp.Services.Ble;
 using CGM.PatientApp.Services.Config;
+using CGM.PatientApp.Services.Diagnostics;
 namespace CGM.PatientApp.Services.Cgm;
 
 public sealed class CgmDeviceService : ICgmDeviceService, IDisposable
@@ -11,15 +12,23 @@ public sealed class CgmDeviceService : ICgmDeviceService, IDisposable
     private readonly ICgmProtocolParser _parser;
     private readonly CgmCommandBuilder _commands;
     private readonly CGM.PatientApp.Services.Sync.ISyncService? _syncService;
+    private readonly IForegroundMonitoringService? _foregroundService;
     private readonly object _responseGate = new();
     private TaskCompletionSource<byte[]>? _pendingResponse;
     private byte _pendingCommand;
 
-    public CgmDeviceService(IBleService ble, ICgmProtocolParser parser, CgmCommandBuilder commands, CGM.PatientApp.Services.Sync.ISyncService? syncService = null)
+    public CgmDeviceService(IBleService ble, ICgmProtocolParser parser, CgmCommandBuilder commands, CGM.PatientApp.Services.Sync.ISyncService? syncService = null, IForegroundMonitoringService? foregroundService = null)
     {
-        _ble = ble; _parser = parser; _commands = commands; _syncService = syncService;
+        _ble = ble; _parser = parser; _commands = commands; _syncService = syncService; _foregroundService = foregroundService;
         _ble.NotificationReceived += OnNotification;
-        _ble.ConnectionStateChanged += (_, state) => ConnectionStateChanged?.Invoke(this, state);
+        _ble.ConnectionStateChanged += (_, state) =>
+        {
+            if (state == CgmConnectionState.Disconnected)
+            {
+                _foregroundService?.StopService();
+            }
+            ConnectionStateChanged?.Invoke(this, state);
+        };
     }
 
     public event EventHandler<CgmRawMeasurement>? RawMeasurementReceived;
@@ -116,6 +125,7 @@ public sealed class CgmDeviceService : ICgmDeviceService, IDisposable
             };
 
             System.Diagnostics.Debug.WriteLine("[CGM] Device successfully verified (E7-E3 complete).");
+            _foregroundService?.StartService(ConnectedDevice.DeviceName);
             return ConnectedDevice;
         }
         catch (Exception ex)
@@ -166,7 +176,9 @@ public sealed class CgmDeviceService : ICgmDeviceService, IDisposable
             if (measurement != null)
             {
                 RawMeasurementReceived?.Invoke(this, measurement);
-                _syncService?.EnqueueMeasurementAsync(measurement);
+                _foregroundService?.UpdateReading(ConnectedDevice?.DeviceName ?? "CGM Sensor", measurement.GlucoseValueMgDl);
+                if (_syncService is not null)
+                    SafeAsync.Run(() => _syncService.EnqueueMeasurementAsync(measurement), "CgmDeviceService.EnqueueMeasurement");
             }
             return;
         }

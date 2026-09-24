@@ -19,7 +19,7 @@ public partial class DeviceFoundViewModel : BaseViewModel
     private string _signalStrength = "Strong Signal";
 
     [ObservableProperty]
-    private string _signalBadgeColor = "#10B981";
+    private string _signalBadgeColor = "#01B4F1";
 
     public DeviceFoundViewModel(IDeviceService deviceService)
     {

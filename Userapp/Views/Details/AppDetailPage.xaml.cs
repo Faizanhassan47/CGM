@@ -134,10 +134,10 @@ public partial class AppDetailPage : ContentPage
     private void AddCard(string title, string text) => ContentHost.Add(new Border
     {
         StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 16 },
-        Stroke = Color.FromArgb("#E2E8F0"),
+        Stroke = Color.FromArgb("#FFFFFF"),
         BackgroundColor = Colors.White,
         Padding = 18,
-        Content = new VerticalStackLayout { Spacing = 7, Children = { new Label { Text = title, FontSize = 17, FontAttributes = FontAttributes.Bold }, new Label { Text = text, FontSize = 13, TextColor = Color.FromArgb("#64748B") } } }
+        Content = new VerticalStackLayout { Spacing = 7, Children = { new Label { Text = title, FontSize = 17, FontAttributes = FontAttributes.Bold }, new Label { Text = text, FontSize = 13, TextColor = Color.FromArgb("#583295") } } }
     });
 
     private void AddEntry(string label, string value, Keyboard? keyboard = null) => ContentHost.Add(new VerticalStackLayout
@@ -150,14 +150,14 @@ public partial class AppDetailPage : ContentPage
     {
         var toggle = new Switch { IsToggled = Preferences.Default.Get(key, defaultValue), HorizontalOptions = LayoutOptions.End };
         toggle.Toggled += (_, e) => Preferences.Default.Set(key, e.Value);
-        ContentHost.Add(new Border { StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 14 }, Stroke = Color.FromArgb("#E2E8F0"), BackgroundColor = Colors.White, Padding = 14, Content = new Grid { ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) }, Children = { new Label { Text = label, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center }, toggle } } });
+        ContentHost.Add(new Border { StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 14 }, Stroke = Color.FromArgb("#FFFFFF"), BackgroundColor = Colors.White, Padding = 14, Content = new Grid { ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) }, Children = { new Label { Text = label, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center }, toggle } } });
         Grid.SetColumn(toggle, 1);
     }
 
     private void AddSaveButton(string text) => AddButton(text, () => DisplayAlertAsync("Saved", "Your changes have been saved.", "OK"));
     private void AddButton(string text, Func<Task> action, bool danger = false)
     {
-        var button = new Button { Text = text, CornerRadius = 12, HeightRequest = 48, BackgroundColor = danger ? Color.FromArgb("#DC2626") : Color.FromArgb("#0D9488"), TextColor = Colors.White };
+        var button = new Button { Text = text, CornerRadius = 12, HeightRequest = 48, BackgroundColor = danger ? Color.FromArgb("#583295") : Color.FromArgb("#01B4F1"), TextColor = Colors.White };
         button.Clicked += async (_, _) => await action();
         ContentHost.Add(button);
     }
@@ -203,5 +203,6 @@ public partial class AppDetailPage : ContentPage
         else
             await DisplayAlertAsync("Not deleted", result?.Message ?? "Account service is unavailable.", "OK");
     }
-    private async void OnBackTapped(object? sender, TappedEventArgs e) => await Shell.Current.GoToAsync("..");
+    private void OnBackTapped(object? sender, TappedEventArgs e) =>
+        CGM.PatientApp.Services.Diagnostics.SafeAsync.Run(() => Shell.Current.GoToAsync(".."), "AppDetailPage.Back");
 }

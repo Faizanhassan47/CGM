@@ -73,9 +73,9 @@ public partial class ResetPasswordViewModel : BaseViewModel
             return;
         }
 
-        if (NewPassword.Length < 6)
+        if (NewPassword.Length < 8)
         {
-            ErrorMessage = "Password must be at least 6 characters long.";
+            ErrorMessage = "Password must be at least 8 characters long.";
             HasError = true;
             return;
         }

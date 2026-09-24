@@ -31,6 +31,12 @@ public class MockGlucoseService : IGlucoseService
         return Task.FromResult<IReadOnlyList<GlucoseMeasurement>>(new List<GlucoseMeasurement>());
     }
 
+    public Task<IReadOnlyList<GlucoseMeasurement>> GetReadingsForDateAsync(DateTime localDate) =>
+        GetRecentReadingsAsync(TimeSpan.FromDays(1));
+
+    public Task<PagedGlucoseReadings> GetReadingsForDateAsync(DateTime localDate, int page, int pageSize) =>
+        Task.FromResult(new PagedGlucoseReadings([], page, pageSize, 0, 0));
+
     public void SimulateReading(GlucoseMeasurement reading)
     {
         GlucoseReadingReceived?.Invoke(this, reading);

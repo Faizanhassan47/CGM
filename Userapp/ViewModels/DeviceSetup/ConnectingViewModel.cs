@@ -11,6 +11,7 @@ public partial class ConnectingViewModel : BaseViewModel
     private readonly ICgmDeviceService _cgmDeviceService;
     private readonly IDeviceService _deviceService;
     private readonly ISensorService _sensorService;
+    private bool _connectionSequenceRunning;
 
     [ObservableProperty]
     private string _currentStepDescription = "Initiating secure connection...";
@@ -45,6 +46,10 @@ public partial class ConnectingViewModel : BaseViewModel
     [RelayCommand]
     public async Task StartConnectionSequenceAsync()
     {
+        if (_connectionSequenceRunning)
+            return;
+
+        _connectionSequenceRunning = true;
         ClearError();
         IsConnecting = true;
         IsFailed = false;
@@ -71,7 +76,7 @@ public partial class ConnectingViewModel : BaseViewModel
             var id = Preferences.Default.Get("found_device_id", string.Empty);
             var name = Preferences.Default.Get("found_device_name", string.Empty);
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(65));
-            var device = await _cgmDeviceService.ConnectAndVerifyAsync(id, name, timeout.Token);
+            var device = await Task.Run(() => _cgmDeviceService.ConnectAndVerifyAsync(id, name, timeout.Token));
             if (device is null) throw new InvalidOperationException("CGM verification failed.");
 
             IsTelemetryVerified = true;
@@ -85,18 +90,42 @@ public partial class ConnectingViewModel : BaseViewModel
             Preferences.Default.Set("cgm_device_temp", device.TemperatureCelsius);
             Preferences.Default.Set("cgm_device_configured", true);
 
-            await _deviceService.SaveConfiguredDeviceAsync(device);
-
-            // Fetch measurement state again or assume from the E3 verification (we don't store it in CgmDeviceInfo but we can read it)
-            var (isMeasuring, latestSn) = await _cgmDeviceService.ReadMeasurementStateAsync();
-            if (!isMeasuring)
+            // BLE verification is authoritative for local setup. Cloud registration is
+            // best-effort and must never turn a verified BLE connection into a false
+            // "Unable to connect" error when the API is unavailable.
+            try
             {
-                System.Diagnostics.Debug.WriteLine("[CGM] Sensor is not measuring. Starting sensor (D1)...");
-                await _cgmDeviceService.StartMeasurementAsync();
+                await _deviceService.SaveConfiguredDeviceAsync(device);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[CGM] Device cloud registration deferred: {ex}");
             }
 
-            // Always ensure the backend sensor session is active
-            await _sensorService.StartSensorSessionAsync(device.SerialNumber);
+            try
+            {
+                var (isMeasuring, _) = await _cgmDeviceService.ReadMeasurementStateAsync();
+                if (!isMeasuring)
+                {
+                    System.Diagnostics.Debug.WriteLine("[CGM] Sensor is not measuring. Starting sensor (D1)...");
+                    await _cgmDeviceService.StartMeasurementAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // E3 already succeeded during ConnectAndVerifyAsync. A follow-up read
+                // failure should not invalidate the established connection.
+                System.Diagnostics.Debug.WriteLine($"[CGM] Follow-up measurement-state read skipped: {ex}");
+            }
+
+            try
+            {
+                await _sensorService.StartSensorSessionAsync(device.SerialNumber);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[CGM] Sensor-session cloud sync deferred: {ex}");
+            }
 
             // Small delay so user sees all checkmarks complete
             await Task.Delay(400);
@@ -104,14 +133,16 @@ public partial class ConnectingViewModel : BaseViewModel
             // Navigate to Connection Success
             await Shell.Current.GoToAsync("ConnectionSuccessPage");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"[CGM] Connection sequence failed before verification completed: {ex}");
             IsFailed = true;
             SetError("Unable to connect to your CGM. Please ensure it is nearby and Bluetooth is enabled.");
         }
         finally
         {
             IsConnecting = false;
+            _connectionSequenceRunning = false;
         }
     }
 

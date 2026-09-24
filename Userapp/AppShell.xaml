@@ -20,6 +20,10 @@
         <ShellContent ContentTemplate="{DataTemplate auth:LoginPage}" />
     </ShellItem>
 
+    <ShellItem Route="SignUpPage">
+        <ShellContent ContentTemplate="{DataTemplate auth:SignUpPage}" />
+    </ShellItem>
+
     <ShellItem Route="ResetPasswordPage">
         <ShellContent ContentTemplate="{DataTemplate auth:ResetPasswordPage}" />
     </ShellItem>

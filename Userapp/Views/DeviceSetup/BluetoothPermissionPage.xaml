@@ -61,13 +61,13 @@
 
                 <!-- Error Banner if permission fails -->
                 <Border StrokeShape="RoundRectangle 12"
-                        BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
                         Stroke="{StaticResource Danger}"
                         StrokeThickness="1"
                         Padding="12,10"
                         IsVisible="{Binding HasError}">
                     <Label Text="{Binding ErrorMessage}"
-                           TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                           TextColor="{AppThemeBinding Light=#583295, Dark=#583295}"
                            FontSize="13"
                            LineBreakMode="WordWrap" />
                 </Border>

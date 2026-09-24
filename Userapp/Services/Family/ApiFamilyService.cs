@@ -22,6 +22,22 @@ public sealed class ApiFamilyService(HttpClient client) : IFamilyService
     public async Task RemoveAsync(int userId) { using var r = await SendAsync(HttpMethod.Delete, $"api/family/members/{userId}"); await EnsureAsync(r); }
     public async Task LeaveAsync() { using var r = await SendAsync(HttpMethod.Post, "api/family/leave"); await EnsureAsync(r); }
     public Task<CGM.PatientApp.Models.Family> UpdateThresholdsAsync(double low, double high) => SendFamilyPutAsync("api/family/thresholds", new { lowGlucoseThreshold = low, highGlucoseThreshold = high });
+    public async Task SendNotificationAsync(string message, string target) { using var r = await SendAsync(HttpMethod.Post, "api/family/notify", new { message, target }); await EnsureAsync(r); }
+    public async Task<IReadOnlyList<WeeklyReportItem>> GetWeeklyReportAsync()
+    {
+        using var r = await SendAsync(HttpMethod.Get, "api/family/weekly-report");
+        await EnsureAsync(r);
+        return (await r.Content.ReadFromJsonAsync<List<WeeklyReportItem>>()) ?? new List<WeeklyReportItem>();
+    }
+    public async Task<PdfReportSummary> GetMemberReportSummaryAsync(int targetUserId, DateTime start, DateTime end)
+    {
+        var startEncoded = Uri.EscapeDataString(start.ToString("yyyy-MM-dd"));
+        var endEncoded = Uri.EscapeDataString(end.ToString("yyyy-MM-dd"));
+        using var r = await SendAsync(HttpMethod.Get, $"api/family/members/{targetUserId}/report-summary?start={startEncoded}&end={endEncoded}");
+        await EnsureAsync(r);
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        return (await r.Content.ReadFromJsonAsync<PdfReportSummary>(options)) ?? new PdfReportSummary();
+    }
     private async Task<CGM.PatientApp.Models.Family> SendFamilyAsync(string path, object body) { using var r = await SendAsync(HttpMethod.Post, path, body); await EnsureAsync(r); return (await r.Content.ReadFromJsonAsync<CGM.PatientApp.Models.Family>())!; }
     private async Task<CGM.PatientApp.Models.Family> SendFamilyPutAsync(string path, object body) { using var r = await SendAsync(HttpMethod.Put, path, body); await EnsureAsync(r); return (await r.Content.ReadFromJsonAsync<CGM.PatientApp.Models.Family>())!; }
     private async Task<HttpResponseMessage> SendAsync(HttpMethod method, string path, object? body = null)

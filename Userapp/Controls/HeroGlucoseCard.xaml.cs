@@ -5,28 +5,37 @@ namespace CGM.PatientApp.Controls;
 public partial class HeroGlucoseCard : ContentView
 {
     public static readonly BindableProperty TitleTextProperty =
-        BindableProperty.Create(nameof(TitleText), typeof(string), typeof(HeroGlucoseCard), "Glucose Now");
+        BindableProperty.Create(nameof(TitleText), typeof(string), typeof(HeroGlucoseCard), "Glucose Telemetry");
 
     public static readonly BindableProperty TrendTextProperty =
-        BindableProperty.Create(nameof(TrendText), typeof(string), typeof(HeroGlucoseCard), "Stable");
+        BindableProperty.Create(nameof(TrendText), typeof(string), typeof(HeroGlucoseCard), "In Range");
 
     public static readonly BindableProperty TrendArrowProperty =
         BindableProperty.Create(nameof(TrendArrow), typeof(string), typeof(HeroGlucoseCard), "→");
 
     public static readonly BindableProperty GlucoseValueProperty =
-        BindableProperty.Create(nameof(GlucoseValue), typeof(string), typeof(HeroGlucoseCard), "112");
+        BindableProperty.Create(
+            nameof(GlucoseValue),
+            typeof(string),
+            typeof(HeroGlucoseCard),
+            "112",
+            propertyChanged: (b, _, _) => ((HeroGlucoseCard)b).UpdateCorridorPointer());
 
     public static readonly BindableProperty GlucoseUnitProperty =
         BindableProperty.Create(nameof(GlucoseUnit), typeof(string), typeof(HeroGlucoseCard), "mg/dL");
 
+    public static readonly BindableProperty DeltaTextProperty =
+        BindableProperty.Create(nameof(DeltaText), typeof(string), typeof(HeroGlucoseCard), "Target: 70–180");
+
     public static readonly BindableProperty LastUpdatedTextProperty =
         BindableProperty.Create(nameof(LastUpdatedText), typeof(string), typeof(HeroGlucoseCard), "Updated just now");
 
-    public static readonly BindableProperty GradientStartColorProperty =
-        BindableProperty.Create(nameof(GradientStartColor), typeof(Color), typeof(HeroGlucoseCard), Color.FromArgb("#0D9488"));
-
-    public static readonly BindableProperty GradientEndColorProperty =
-        BindableProperty.Create(nameof(GradientEndColor), typeof(Color), typeof(HeroGlucoseCard), Color.FromArgb("#10B981"));
+    public static readonly BindableProperty CardColorProperty =
+        BindableProperty.Create(
+            nameof(CardColor),
+            typeof(Color),
+            typeof(HeroGlucoseCard),
+            Color.FromArgb("#01B4F1"));
 
     public static readonly BindableProperty VelocityTextProperty =
         BindableProperty.Create(nameof(VelocityText), typeof(string), typeof(HeroGlucoseCard), "Stable velocity (±0.5 mg/dL/min)");
@@ -64,22 +73,22 @@ public partial class HeroGlucoseCard : ContentView
         set => SetValue(GlucoseUnitProperty, value);
     }
 
+    public string DeltaText
+    {
+        get => (string)GetValue(DeltaTextProperty);
+        set => SetValue(DeltaTextProperty, value);
+    }
+
     public string LastUpdatedText
     {
         get => (string)GetValue(LastUpdatedTextProperty);
         set => SetValue(LastUpdatedTextProperty, value);
     }
 
-    public Color GradientStartColor
+    public Color CardColor
     {
-        get => (Color)GetValue(GradientStartColorProperty);
-        set => SetValue(GradientStartColorProperty, value);
-    }
-
-    public Color GradientEndColor
-    {
-        get => (Color)GetValue(GradientEndColorProperty);
-        set => SetValue(GradientEndColorProperty, value);
+        get => (Color)GetValue(CardColorProperty);
+        set => SetValue(CardColorProperty, value);
     }
 
     public string VelocityText
@@ -97,5 +106,33 @@ public partial class HeroGlucoseCard : ContentView
     public HeroGlucoseCard()
     {
         InitializeComponent();
+        SizeChanged += OnCardSizeChanged;
+        Loaded += OnCardLoaded;
+    }
+
+    private void OnCardLoaded(object? sender, EventArgs e)
+    {
+        UpdateCorridorPointer();
+    }
+
+    private void OnCardSizeChanged(object? sender, EventArgs e)
+    {
+        UpdateCorridorPointer();
+    }
+
+    private void UpdateCorridorPointer()
+    {
+        if (CorridorTrack == null || CorridorPointer == null) return;
+
+        double width = CorridorTrack.Width;
+        if (width <= 0) return;
+
+        if (double.TryParse(GlucoseValue, out var val))
+        {
+            // Scale: 40 to 300 mg/dL
+            double ratio = Math.Clamp((val - 40.0) / 260.0, 0.0, 1.0);
+            double targetX = ratio * (width - CorridorPointer.Width);
+            _ = CorridorPointer.TranslateTo(targetX, 0, 300, Easing.CubicOut);
+        }
     }
 }

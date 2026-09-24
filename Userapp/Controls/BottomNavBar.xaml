@@ -3,93 +3,238 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:converters="clr-namespace:CGM.PatientApp.Converters"
              x:Class="CGM.PatientApp.Controls.BottomNavBar">
-    <Border StrokeShape="RoundRectangle 0"
-            BackgroundColor="{StaticResource White}"
-            Stroke="{StaticResource BorderLightColor}"
+    <Border StrokeShape="RoundRectangle 24,24,0,0"
+            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
+            Stroke="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
             StrokeThickness="1"
-            Padding="10,10,10,12"
-            Shadow="{AppThemeBinding Light={Shadow Brush={StaticResource Gray300}, Offset='0,-3', Radius=8, Opacity=0.15}, Dark={Shadow Brush=Transparent}}">
+            Padding="8,8,8,12">
+
         <Grid ColumnDefinitions="*,*,*,*,*">
 
             <!-- 1. HOME -->
-            <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="2">
-                <Label Text="&#xF015;" FontFamily="FontAwesomeSolid"
-                       FontSize="18"
-                       Opacity="{Binding IsHomeSelected, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter='1.0:0.4'}"
-                       HorizontalOptions="Center" />
-                <Label Text="Home"
-                       FontSize="11"
-                       FontAttributes="Bold"
-                       TextColor="{Binding IsHomeSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#94A3B8'}"
-                       HorizontalOptions="Center" />
-                <VerticalStackLayout.GestureRecognizers>
+            <Border Grid.Column="0" StrokeShape="RoundRectangle 16" Padding="6,6" HorizontalOptions="Center" VerticalOptions="Center">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BackgroundColor" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsHomeSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#583295}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="Home" />
-                </VerticalStackLayout.GestureRecognizers>
-            </VerticalStackLayout>
+                </Border.GestureRecognizers>
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                    <Label Text="&#xF015;" FontFamily="FontAwesomeSolid" FontSize="18" HorizontalOptions="Center">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light=#583295, Dark=#583295}" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsHomeSelected}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                    <Label Text="Home" FontSize="11" HorizontalOptions="Center">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light=#583295, Dark=#583295}" />
+                                <Setter Property="FontAttributes" Value="None" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsHomeSelected}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                        <Setter Property="FontAttributes" Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
 
             <!-- 2. HISTORY -->
-            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="2">
-                <Label Text="&#xF017;" FontFamily="FontAwesomeRegular"
-                       FontSize="18"
-                       Opacity="{Binding IsHistorySelected, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter='1.0:0.4'}"
-                       HorizontalOptions="Center" />
-                <Label Text="History"
-                       FontSize="11"
-                       FontAttributes="Bold"
-                       TextColor="{Binding IsHistorySelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#94A3B8'}"
-                       HorizontalOptions="Center" />
-                <VerticalStackLayout.GestureRecognizers>
+            <Border Grid.Column="1" StrokeShape="RoundRectangle 16" Padding="6,6" HorizontalOptions="Center" VerticalOptions="Center">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BackgroundColor" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsHistorySelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#583295}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="History" />
-                </VerticalStackLayout.GestureRecognizers>
-            </VerticalStackLayout>
+                </Border.GestureRecognizers>
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                    <Label Text="&#xF017;" FontFamily="FontAwesomeRegular" FontSize="18" HorizontalOptions="Center">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light=#583295, Dark=#583295}" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsHistorySelected}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                    <Label Text="History" FontSize="11" HorizontalOptions="Center">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light=#583295, Dark=#583295}" />
+                                <Setter Property="FontAttributes" Value="None" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsHistorySelected}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                        <Setter Property="FontAttributes" Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
 
             <!-- 3. REPORTS -->
-            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="2">
-                <Label Text="&#xF080;" FontFamily="FontAwesomeSolid"
-                       FontSize="18"
-                       Opacity="{Binding IsReportsSelected, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter='1.0:0.4'}"
-                       HorizontalOptions="Center" />
-                <Label Text="Reports"
-                       FontSize="11"
-                       FontAttributes="Bold"
-                       TextColor="{Binding IsReportsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#94A3B8'}"
-                       HorizontalOptions="Center" />
-                <VerticalStackLayout.GestureRecognizers>
+            <Border Grid.Column="2" StrokeShape="RoundRectangle 16" Padding="6,6" HorizontalOptions="Center" VerticalOptions="Center">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BackgroundColor" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsReportsSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#583295}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="Reports" />
-                </VerticalStackLayout.GestureRecognizers>
-            </VerticalStackLayout>
+                </Border.GestureRecognizers>
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                    <Label Text="&#xF080;" FontFamily="FontAwesomeSolid" FontSize="18" HorizontalOptions="Center">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light=#583295, Dark=#583295}" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsReportsSelected}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                    <Label Text="Reports" FontSize="11" HorizontalOptions="Center">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light=#583295, Dark=#583295}" />
+                                <Setter Property="FontAttributes" Value="None" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsReportsSelected}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                        <Setter Property="FontAttributes" Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
 
             <!-- 4. ALERTS -->
-            <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" Spacing="2">
-                <Label Text="&#xF0F3;" FontFamily="FontAwesomeRegular"
-                       FontSize="18"
-                       Opacity="{Binding IsAlertsSelected, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter='1.0:0.4'}"
-                       HorizontalOptions="Center" />
-                <Label Text="Alerts"
-                       FontSize="11"
-                       FontAttributes="Bold"
-                       TextColor="{Binding IsAlertsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#94A3B8'}"
-                       HorizontalOptions="Center" />
-                <VerticalStackLayout.GestureRecognizers>
+            <Border Grid.Column="3" StrokeShape="RoundRectangle 16" Padding="6,6" HorizontalOptions="Center" VerticalOptions="Center">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BackgroundColor" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsAlertsSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#583295}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="Alerts" />
-                </VerticalStackLayout.GestureRecognizers>
-            </VerticalStackLayout>
+                </Border.GestureRecognizers>
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                    <Label Text="&#xF0F3;" FontFamily="FontAwesomeRegular" FontSize="18" HorizontalOptions="Center">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light=#583295, Dark=#583295}" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsAlertsSelected}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                    <Label Text="Alerts" FontSize="11" HorizontalOptions="Center">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light=#583295, Dark=#583295}" />
+                                <Setter Property="FontAttributes" Value="None" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsAlertsSelected}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                        <Setter Property="FontAttributes" Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
 
             <!-- 5. PROFILE -->
-            <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center" Spacing="2">
-                <Label Text="&#xF007;" FontFamily="FontAwesomeRegular"
-                       FontSize="18"
-                       Opacity="{Binding IsProfileSelected, Converter={StaticResource BoolToDoubleConverter}, ConverterParameter='1.0:0.4'}"
-                       HorizontalOptions="Center" />
-                <Label Text="Profile"
-                       FontSize="11"
-                       FontAttributes="Bold"
-                       TextColor="{Binding IsProfileSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#0D9488:#94A3B8'}"
-                       HorizontalOptions="Center" />
-                <VerticalStackLayout.GestureRecognizers>
+            <Border Grid.Column="4" StrokeShape="RoundRectangle 16" Padding="6,6" HorizontalOptions="Center" VerticalOptions="Center">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BackgroundColor" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsProfileSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#583295}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="Profile" />
-                </VerticalStackLayout.GestureRecognizers>
-            </VerticalStackLayout>
+                </Border.GestureRecognizers>
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                    <Label Text="&#xF007;" FontFamily="FontAwesomeRegular" FontSize="18" HorizontalOptions="Center">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light=#583295, Dark=#583295}" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsProfileSelected}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                    <Label Text="Profile" FontSize="11" HorizontalOptions="Center">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light=#583295, Dark=#583295}" />
+                                <Setter Property="FontAttributes" Value="None" />
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsProfileSelected}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PrimaryLight}" />
+                                        <Setter Property="FontAttributes" Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
 
         </Grid>
     </Border>

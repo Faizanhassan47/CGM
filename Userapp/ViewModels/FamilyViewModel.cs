@@ -4,9 +4,11 @@ using CommunityToolkit.Mvvm.Input;
 using CGM.PatientApp.Interfaces;
 using CGM.PatientApp.Models;
 
+using CGM.PatientApp.Services.Reports;
+
 namespace CGM.PatientApp.ViewModels;
 
-public partial class FamilyViewModel(IFamilyService service) : ObservableObject
+public partial class FamilyViewModel(IFamilyService service, IPdfReportService pdfService) : ObservableObject
 {
     [ObservableProperty] private bool isBusy;
     [ObservableProperty] private bool hasFamily;
@@ -19,6 +21,11 @@ public partial class FamilyViewModel(IFamilyService service) : ObservableObject
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
     [ObservableProperty] private string lowThreshold = "70";
     [ObservableProperty] private string highThreshold = "180";
+    [ObservableProperty] private bool isReportOverlayVisible;
+    [ObservableProperty] private DateTime reportStartDate = DateTime.Today.AddDays(-7);
+    [ObservableProperty] private DateTime reportEndDate = DateTime.Today;
+    private FamilyMemberItem? _selectedMemberForReport;
+
     public bool HasNoFamily => !HasFamily;
     public ObservableCollection<FamilyMemberItem> Members { get; } = new();
     partial void OnHasFamilyChanged(bool value) => OnPropertyChanged(nameof(HasNoFamily));
@@ -87,6 +94,45 @@ public partial class FamilyViewModel(IFamilyService service) : ObservableObject
         { await service.LeaveAsync(); Apply(null); }
     });
 
+    [RelayCommand]
+    private void ViewReport(FamilyMemberItem member)
+    {
+        _selectedMemberForReport = member;
+        IsReportOverlayVisible = true;
+    }
+
+    [RelayCommand]
+    private void CancelReport()
+    {
+        IsReportOverlayVisible = false;
+        _selectedMemberForReport = null;
+    }
+
+    [RelayCommand]
+    private async Task GenerateReportAsync()
+    {
+        if (_selectedMemberForReport == null) return;
+        
+        IsReportOverlayVisible = false;
+        await RunAsync(async () =>
+        {
+            var summary = await service.GetMemberReportSummaryAsync(_selectedMemberForReport.UserId, ReportStartDate, ReportEndDate);
+            
+            var pdfPath = await pdfService.GenerateReportPdfAsync(summary);
+
+            await Launcher.Default.OpenAsync(new OpenFileRequest("Glucose Report", new ReadOnlyFile(pdfPath)));
+        });
+    }
+
+    [RelayCommand]
+    private async Task AlertOwnerAsync(FamilyMemberItem member) => await RunAsync(async () =>
+    {
+        await service.SendNotificationAsync("Instant Alert to Owner", "Owner");
+        await Shell.Current.DisplayAlert("Alert Sent", "Instant alert sent to the family owner.", "OK");
+    });
+
+
+
     private async Task LoadCoreAsync() => Apply(await service.GetAsync());
     private void Apply(CGM.PatientApp.Models.Family? family)
     {
@@ -111,6 +157,35 @@ public sealed class FamilyMemberItem(FamilyMember member, bool currentUserIsOwne
     public string Role => member.Role;
     public bool ReceiveAlerts => member.ReceiveAlerts;
     public string AlertsText => ReceiveAlerts ? "Alerts: ON" : "Alerts: OFF";
+    public string Initials
+    {
+        get
+        {
+            var parts = FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length switch
+            {
+                0 => "?",
+                1 => parts[0][0].ToString().ToUpperInvariant(),
+                _ => $"{parts[0][0]}{parts[^1][0]}".ToUpperInvariant()
+            };
+        }
+    }
+    public Color AvatarColor => string.Equals(Role, "Owner", StringComparison.OrdinalIgnoreCase)
+        ? Color.FromArgb("#583295") : Color.FromArgb("#01A4DC");
+    public Color RoleBadgeColor => string.Equals(Role, "Owner", StringComparison.OrdinalIgnoreCase)
+        ? Color.FromArgb("#F1EAF8") : Color.FromArgb("#E9F8FD");
+    public Color RoleTextColor => string.Equals(Role, "Owner", StringComparison.OrdinalIgnoreCase)
+        ? Color.FromArgb("#583295") : Color.FromArgb("#087EA4");
+    public Color AlertsBackgroundColor => ReceiveAlerts ? Color.FromArgb("#E8F8F1") : Color.FromArgb("#F1EEF3");
+    public Color AlertsTextColor => ReceiveAlerts ? Color.FromArgb("#147A52") : Color.FromArgb("#746A7D");
     public bool CanRemove => currentUserIsOwner && !string.Equals(Role, "Owner", StringComparison.OrdinalIgnoreCase);
     public bool CanToggleAlerts => currentUserIsOwner || UserId == currentUserId;
+    public bool IsOwnerProfile => string.Equals(Role, "Owner", StringComparison.OrdinalIgnoreCase);
+    public bool CanViewReport => UserId == currentUserId || currentUserIsOwner;
+
+    // Follower Dashboard Mock Properties
+    public string CurrentGlucose => (85 + (UserId * 37 % 60)).ToString(); // 85 - 145 range
+    public string TrendArrow => UserId % 3 == 0 ? "↗" : (UserId % 2 == 0 ? "→" : "↘");
+    public Color GlucoseColor => (85 + (UserId * 37 % 60)) < 90 ? Color.FromArgb("#F43F5E") : Color.FromArgb("#159B69");
+    public bool IsLow => (85 + (UserId * 37 % 60)) < 90;
 }

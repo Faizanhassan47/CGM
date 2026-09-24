@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CGM.PatientApp.Controls.SecurityFooter">
     <Border StrokeShape="RoundRectangle 16"
-            BackgroundColor="{StaticResource PrimaryContainerLight}"
+            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}"
             Stroke="{StaticResource PrimaryContainerLight}"
             Padding="16,12">
         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" VerticalOptions="Center">
@@ -26,7 +26,7 @@
                        TextColor="{StaticResource BadgeGreenText}" />
                 <Label Text="Readings support monitoring and do not replace emergency medical care."
                        FontSize="11"
-                       TextColor="{StaticResource TextSecondaryLight}"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
                        LineBreakMode="WordWrap" />
             </VerticalStackLayout>
         </Grid>

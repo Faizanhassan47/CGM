@@ -24,7 +24,7 @@
 
                 <!-- Error Banner -->
                 <Border StrokeShape="RoundRectangle 12"
-                        BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#450A0A}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#583295}"
                         Stroke="{StaticResource Danger}"
                         StrokeThickness="1"
                         Padding="12,10"
@@ -32,7 +32,7 @@
                     <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                         <Label Text="&#xF071;" FontFamily="FontAwesomeSolid" FontSize="14" VerticalOptions="Center"/>
                         <Label Text="{Binding ErrorMessage}"
-                               TextColor="{AppThemeBinding Light=#991B1B, Dark=#FCA5A5}"
+                               TextColor="{AppThemeBinding Light=#583295, Dark=#583295}"
                                FontSize="13"
                                VerticalOptions="Center"
                                LineBreakMode="WordWrap" />

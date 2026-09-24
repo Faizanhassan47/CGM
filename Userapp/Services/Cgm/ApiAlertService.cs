@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using CGM.PatientApp.Interfaces;
 using CGM.PatientApp.Models;
+using CGM.PatientApp.Enums;
 
 namespace CGM.PatientApp.Services.Cgm;
 
@@ -33,8 +34,22 @@ public class ApiAlertService : IAlertService
             using var response = await _client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                var alerts = await response.Content.ReadFromJsonAsync<List<Alert>>();
-                return alerts ?? new List<Alert>();
+                var dtos = await response.Content.ReadFromJsonAsync<List<BackendAlertDto>>();
+                if (dtos != null)
+                {
+                    return dtos.Select(d => new Alert
+                    {
+                        Id = d.Id ?? Guid.NewGuid().ToString(),
+                        Category = (AlertCategory)d.Category,
+                        Title = d.Title ?? string.Empty,
+                        Message = d.Message ?? string.Empty,
+                        Timestamp = d.Timestamp,
+                        GlucoseValue = d.GlucoseValue,
+                        Unit = d.Unit.HasValue ? (GlucoseUnit)d.Unit.Value : GlucoseUnit.MgDl,
+                        IsRead = d.IsRead,
+                        IsCritical = d.IsCritical
+                    }).ToList();
+                }
             }
         }
         catch (Exception ex)
@@ -81,5 +96,18 @@ public class ApiAlertService : IAlertService
     public void NotifyAlertTriggered(Alert alert)
     {
         AlertTriggered?.Invoke(this, alert);
+    }
+
+    private sealed class BackendAlertDto
+    {
+        public string? Id { get; set; }
+        public int Category { get; set; }
+        public string? Title { get; set; }
+        public string? Message { get; set; }
+        public DateTime Timestamp { get; set; }
+        public double? GlucoseValue { get; set; }
+        public int? Unit { get; set; }
+        public bool IsRead { get; set; }
+        public bool IsCritical { get; set; }
     }
 }

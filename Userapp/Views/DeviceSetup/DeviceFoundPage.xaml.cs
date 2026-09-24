@@ -1,4 +1,5 @@
 using CGM.PatientApp.ViewModels.DeviceSetup;
+using CGM.PatientApp.Services.Diagnostics;
 
 namespace CGM.PatientApp.Views.DeviceSetup;
 
@@ -6,7 +7,9 @@ public partial class DeviceFoundPage : ContentPage
 {
     private readonly DeviceFoundViewModel _viewModel;
 
-    public DeviceFoundPage() : this(IPlatformApplication.Current?.Services?.GetService<DeviceFoundViewModel>() ?? throw new InvalidOperationException("DeviceFoundViewModel not found"))
+    public DeviceFoundPage() : this(
+        (IPlatformApplication.Current?.Services ?? Application.Current?.Handler?.MauiContext?.Services)?.GetService<DeviceFoundViewModel>() 
+        ?? throw new InvalidOperationException("DeviceFoundViewModel not found"))
     {
     }
 
@@ -16,9 +19,9 @@ public partial class DeviceFoundPage : ContentPage
         BindingContext = _viewModel = viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.InitializeAsync();
+        SafeAsync.Run(_viewModel.InitializeAsync, "DeviceFoundPage.OnAppearing");
     }
 }
