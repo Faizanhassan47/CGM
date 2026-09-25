@@ -103,7 +103,7 @@
             <VerticalStackLayout Spacing="4">
                 <Grid ColumnDefinitions="Auto,*,Auto">
                     <Label Grid.Column="0" Text="40" FontSize="9" TextColor="#FFFFFF" />
-                    <Label Grid.Column="1" Text="Target Range (70–180 mg/dL)" FontSize="9" TextColor="#FFFFFF" HorizontalOptions="Center" FontAttributes="Bold" />
+                    <Label Grid.Column="1" Text="Target Range (90–130 mg/dL)" FontSize="9" TextColor="#FFFFFF" HorizontalOptions="Center" FontAttributes="Bold" />
                     <Label Grid.Column="2" Text="300" FontSize="9" TextColor="#FFFFFF" />
                 </Grid>
 
@@ -113,12 +113,12 @@
                             BackgroundColor="#FFFFFF"
                             Stroke="Transparent"
                             HeightRequest="8">
-                        <Grid ColumnDefinitions="30*,110*,120*">
-                            <!-- Low: 40-70 -->
+                        <Grid ColumnDefinitions="50*,40*,170*">
+                            <!-- Low: 40-90 -->
                             <BoxView Grid.Column="0" Color="#583295" CornerRadius="4,0,0,4" Margin="0" />
-                            <!-- Target: 70-180 -->
+                            <!-- Target: 90-130 -->
                             <BoxView Grid.Column="1" Color="#01B4F1" Margin="1,0" />
-                            <!-- High: 180-300 -->
+                            <!-- High: 130-300 -->
                             <BoxView Grid.Column="2" Color="#583295" CornerRadius="0,4,4,0" Margin="1,0,0,0" />
                         </Grid>
                     </Border>

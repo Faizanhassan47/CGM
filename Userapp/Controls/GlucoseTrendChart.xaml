@@ -188,7 +188,7 @@
                 </Border>
             </Grid>
 
-            <!-- Chart Canvas Area with Target Shaded Corridor (70-180 mg/dL) -->
+            <!-- Chart Canvas Area with Target Shaded Corridor (90-130 mg/dL) -->
             <Grid HeightRequest="200" Margin="0,2,0,0">
                 <!-- Base Chart Container Background -->
                 <Border StrokeShape="RoundRectangle 10"
@@ -207,9 +207,9 @@
 
                 <!-- Bottom Target Range Legend Strip -->
                 <HorizontalStackLayout VerticalOptions="End" HorizontalOptions="Center" Spacing="14" Margin="0,0,0,6">
-                    <Label Text="● In target (70–180)" FontSize="9" TextColor="#01B4F1" FontAttributes="Bold" />
-                    <Label Text="● Low (&lt;70)" FontSize="9" TextColor="#01B4F1" />
-                    <Label Text="● High (&gt;180)" FontSize="9" TextColor="#583295" />
+                    <Label Text="● In target (90–130)" FontSize="9" TextColor="#01B4F1" FontAttributes="Bold" />
+                    <Label Text="● Low (&lt;90)" FontSize="9" TextColor="#01B4F1" />
+                    <Label Text="● High (&gt;130)" FontSize="9" TextColor="#583295" />
                     <Label Text="● Urgent (&lt;55 / &gt;250)" FontSize="9" TextColor="#583295" />
                 </HorizontalStackLayout>
             </Grid>

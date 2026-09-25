@@ -136,14 +136,14 @@ public partial class DashboardViewModel : BaseViewModel, IDisposable
                 TrendArrow = "↑↑";
                 MealRecommendationColor = Color.FromArgb("#F43F5E");
             }
-            else if (g > 180)
+            else if (g > 130)
             {
                 HeroCardColor = Color.FromArgb("#583295");
                 VelocityRateText = "Above Target • Rising";
                 TrendArrow = "↗";
                 MealRecommendationColor = Color.FromArgb("#583295");
             }
-            else if (g < 70)
+            else if (g < 90)
             {
                 HeroCardColor = Color.FromArgb("#583295");
                 VelocityRateText = "Hypoglycemia • Take 15g Carbs";
@@ -168,7 +168,7 @@ public partial class DashboardViewModel : BaseViewModel, IDisposable
                     {
                         MealRecommendationTitle = rec.Title;
                         MealRecommendationText = rec.Description;
-                        MealRecommendationIcon = g < 70 ? "\uf0fc" : (g > 180 ? "\uf70c" : "\uf5d1");
+                        MealRecommendationIcon = g < 90 ? "\uf0fc" : (g > 130 ? "\uf70c" : "\uf5d1");
                     });
                 }, "Spoonacular.GetRecommendation");
             }
@@ -257,7 +257,7 @@ public partial class DashboardViewModel : BaseViewModel, IDisposable
             MinStep = 40,
             TextSize = 10,
             LabelsPaint = new SolidColorPaint(SKColor.Parse("#583295")),
-            CustomSeparators = new double[] { 70, 180 },
+            CustomSeparators = new double[] { 90, 130 },
             SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#FFFFFF")) { StrokeThickness = 1, PathEffect = new LiveChartsCore.SkiaSharpView.Painting.Effects.DashEffect(new float[] { 3, 3 }) }
         }
     };
@@ -267,8 +267,8 @@ public partial class DashboardViewModel : BaseViewModel, IDisposable
     {
         new RectangularSection
         {
-            Yi = 70,
-            Yj = 180,
+            Yi = 90,
+            Yj = 130,
             Fill = new SolidColorPaint(SKColor.Parse("#01B4F1").WithAlpha(20))
         }
     };
@@ -749,9 +749,9 @@ public partial class DashboardViewModel : BaseViewModel, IDisposable
 
             if (SelectedCalendarDay?.Date.Date == DateTime.Today)
             {
-                var bg = m.GlucoseValueMgDl < 70 ? Color.FromArgb("#FFFFFF") : m.GlucoseValueMgDl > 180 ? Color.FromArgb("#FFFFFF") : Color.FromArgb("#FFFFFF");
-                var fg = m.GlucoseValueMgDl < 70 ? Color.FromArgb("#01B4F1") : m.GlucoseValueMgDl > 180 ? Color.FromArgb("#583295") : Color.FromArgb("#583295");
-                var st = m.GlucoseValueMgDl < 70 ? "Low" : m.GlucoseValueMgDl > 180 ? "High" : "In range";
+                var bg = m.GlucoseValueMgDl < 90 ? Color.FromArgb("#FFFFFF") : m.GlucoseValueMgDl > 130 ? Color.FromArgb("#FFFFFF") : Color.FromArgb("#FFFFFF");
+                var fg = m.GlucoseValueMgDl < 90 ? Color.FromArgb("#01B4F1") : m.GlucoseValueMgDl > 130 ? Color.FromArgb("#583295") : Color.FromArgb("#583295");
+                var st = m.GlucoseValueMgDl < 90 ? "Low" : m.GlucoseValueMgDl > 130 ? "High" : "In range";
                 _allHistoryReadings.Insert(0, new(
                     m.ReceivedTime.ToLocalTime().ToString("h:mm tt"),
                     m.GlucoseValueMgDl.ToString("0"),
@@ -804,6 +804,26 @@ public partial class DashboardViewModel : BaseViewModel, IDisposable
         await UpdateTrendChartAsync(ActiveTrendFilter ?? "3H");
         if (string.Equals(Environment.GetEnvironmentVariable("CGM_USE_MOCK_SERVICES"), "true", StringComparison.OrdinalIgnoreCase))
             StartLiveSimulationTimer();
+
+        await UpdateLastSyncTimeAsync();
+    }
+
+    private async Task UpdateLastSyncTimeAsync()
+    {
+        if (_localRepo != null)
+        {
+            try
+            {
+                var recent = await _localRepo.GetRecentMeasurementsAsync(50);
+                var lastSynced = recent.Where(m => m.SyncStatus == "Synced" && m.SyncedAt.HasValue).OrderByDescending(m => m.SyncedAt).FirstOrDefault();
+                if (lastSynced != null)
+                {
+                    LastSyncTime = lastSynced.SyncedAt.Value.ToLocalTime().ToString("h:mm tt");
+                    LastSyncDate = lastSynced.SyncedAt.Value.ToLocalTime().ToString("MMM dd, yyyy");
+                }
+            }
+            catch { }
+        }
     }
 
     private async Task RefreshDeviceStateAsync()
@@ -853,37 +873,32 @@ public partial class DashboardViewModel : BaseViewModel, IDisposable
         {
             try
             {
-                var reconnect = await Shell.Current.DisplayAlert(
-                    "Sensor Disconnected",
-                    $"Your CGM sensor is currently disconnected. Would you like to reconnect now?",
-                    "Reconnect", "Not Now");
-
-                if (reconnect)
+                DeviceStatusText = "Reconnecting...";
+                int retryCount = 0;
+                while (retryCount < 3)
                 {
-                    DeviceStatusText = "Connecting...";
                     try
                     {
-                        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
                         var verifiedDevice = await Task.Run(() => _cgmDeviceService.ConnectAndVerifyAsync(device.BluetoothId, device.DeviceName, timeout.Token));
                         if (verifiedDevice != null)
                         {
                             ApplyConnectionState(CgmConnectionState.Ready);
-                            await Shell.Current.DisplayAlert("Connected", "Successfully reconnected to your sensor.", "OK");
+                            return; // Auto-reconnect succeeded
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"[CGM] Reconnect failed: {ex}");
-                        await Shell.Current.DisplayAlert("Connection Failed", "Unable to connect. Please ensure your sensor is nearby and Bluetooth is enabled.", "OK");
-                        DeviceStatusText = "Disconnected";
-                    }
+                    catch { }
+                    
+                    retryCount++;
+                    if (retryCount < 3) await Task.Delay(3000);
                 }
+                DeviceStatusText = "Disconnected";
             }
             finally
             {
                 _isShowingReconnectPrompt = false;
             }
-        }, "Dashboard.ReconnectPrompt"));
+        }, "Dashboard.AutoReconnect"));
     }
 
     private static bool IsCurrentThemeDark => Application.Current?.RequestedTheme == AppTheme.Dark;
@@ -1360,9 +1375,9 @@ public partial class DashboardViewModel : BaseViewModel, IDisposable
 
         HistoryEmptyMessage = HistoryExcursionFilter switch
         {
-            "Lows" => "No low readings (<70 mg/dL)",
-            "Highs" => "No high readings (>180 mg/dL)",
-            "Target" => "No in-target readings (70–180 mg/dL)",
+            "Lows" => "No low readings (<90 mg/dL)",
+            "Highs" => "No high readings (>130 mg/dL)",
+            "Target" => "No in-target readings (90–130 mg/dL)",
             _ => "No readings for this date"
         };
     }

@@ -21,7 +21,7 @@ public partial class AppDetailPage : ContentPage
 
     public AppDetailPage() => InitializeComponent();
 
-    private void BuildContent()
+    private async void BuildContent()
     {
         if (ContentHost is null || string.IsNullOrWhiteSpace(Section)) return;
         TitleLabel.Text = Section == "Alert" ? "Alert Details" : Section == "Reading" ? "Glucose Reading" : Section;
@@ -118,11 +118,79 @@ public partial class AppDetailPage : ContentPage
                 AddButton("Contact support", () => Launcher.Default.OpenAsync("mailto:support@glucotrack.example"));
                 break;
             case "Target Glucose Range":
-                AddCard("Target Range (TIR)", "Standard clinical consensus recommends spending at least 70% of time in target range (70 – 180 mg/dL).");
-                AddCard("Clinical Thresholds", "• Urgent Low: < 55 mg/dL\n• Hypoglycemia (Low): < 70 mg/dL\n• Normal In-Range: 70 – 180 mg/dL\n• Hyperglycemia (High): > 180 mg/dL\n• Urgent High: > 250 mg/dL");
+                AddCard("Target Range (TIR)", "Standard clinical consensus recommends spending at least 70% of time in target range (90 – 130 mg/dL).");
+                AddCard("Clinical Thresholds", "• Urgent Low: < 55 mg/dL\n• Hypoglycemia (Low): < 90 mg/dL\n• Normal In-Range: 90 – 130 mg/dL\n• Hyperglycemia (High): > 130 mg/dL\n• Urgent High: > 250 mg/dL");
                 break;
             case "All Readings":
-                AddCard("Recent readings", "9:30 AM   112 mg/dL\n8:30 AM   105 mg/dL\n7:30 AM   98 mg/dL\n6:30 AM   86 mg/dL\n5:30 AM   78 mg/dL\n4:30 AM   68 mg/dL");
+                var repo = IPlatformApplication.Current?.Services?.GetService<CGM.PatientApp.Interfaces.ILocalMeasurementRepository>();
+                if (repo != null)
+                {
+                    int offset = 0;
+                    var grid = new Grid
+                    {
+                        ColumnDefinitions =
+                        {
+                            new ColumnDefinition { Width = GridLength.Star },
+                            new ColumnDefinition { Width = GridLength.Star },
+                            new ColumnDefinition { Width = GridLength.Auto }
+                        },
+                        RowSpacing = 12
+                    };
+                    grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                    grid.Add(new Label { Text = "Time", FontAttributes = FontAttributes.Bold, FontSize = 15 }, 0, 0);
+                    grid.Add(new Label { Text = "Glucose", FontAttributes = FontAttributes.Bold, FontSize = 15 }, 1, 0);
+                    grid.Add(new Label { Text = "Status", FontAttributes = FontAttributes.Bold, FontSize = 15 }, 2, 0);
+
+                    ContentHost.Add(new Border
+                    {
+                        StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 16 },
+                        Stroke = Color.FromArgb("#FFFFFF"),
+                        BackgroundColor = Colors.White,
+                        Padding = 18,
+                        Content = grid
+                    });
+
+                    var loadMoreBtn = new Button { Text = "Load More", Margin = new Thickness(0, 10, 0, 0), HeightRequest = 44, CornerRadius = 12, BackgroundColor = Color.FromArgb("#01B4F1"), TextColor = Colors.White };
+                    ContentHost.Add(loadMoreBtn);
+
+                    Func<Task> loadData = async () =>
+                    {
+                        var readings = await repo.GetRecentMeasurementsAsync(50, offset);
+                        if (readings.Count == 0)
+                        {
+                            loadMoreBtn.IsVisible = false;
+                            if (offset == 0) AddCard("No Data", "No readings available yet.");
+                            return;
+                        }
+
+                        int row = grid.RowDefinitions.Count;
+                        foreach (var r in readings)
+                        {
+                            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                            grid.Add(new Label { Text = r.MeasuredAt.ToLocalTime().ToString("MMM dd, h:mm tt"), FontSize = 14 }, 0, row);
+                            grid.Add(new Label { Text = $"{r.GlucoseValue:F0} mg/dL", FontSize = 14 }, 1, row);
+                            grid.Add(new Label { Text = r.SyncStatus, FontSize = 14, TextColor = r.SyncStatus == "Synced" ? Colors.Green : (r.SyncStatus == "Failed" ? Colors.Red : Colors.Orange) }, 2, row);
+                            row++;
+                        }
+                        offset += 50;
+                        if (readings.Count < 50) loadMoreBtn.IsVisible = false;
+                    };
+                    
+                    loadMoreBtn.Clicked += async (_, _) => 
+                    { 
+                        loadMoreBtn.Text = "Loading..."; 
+                        loadMoreBtn.IsEnabled = false; 
+                        await loadData(); 
+                        loadMoreBtn.Text = "Load More"; 
+                        loadMoreBtn.IsEnabled = true; 
+                    };
+                    
+                    await loadData();
+                }
+                else
+                {
+                    AddCard("Error", "Could not load measurement repository.");
+                }
                 break;
         }
     }

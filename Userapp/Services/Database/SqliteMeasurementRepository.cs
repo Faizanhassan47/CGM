@@ -99,7 +99,7 @@ public sealed class SqliteMeasurementRepository : ILocalMeasurementRepository
         {
             item.RetryCount++;
             item.LastError = error;
-            if (item.RetryCount >= 5)
+            if (item.RetryCount >= 2)
             {
                 item.SyncStatus = "Failed";
             }
@@ -107,11 +107,12 @@ public sealed class SqliteMeasurementRepository : ILocalMeasurementRepository
         }
     }
 
-    public async Task<List<LocalMeasurement>> GetRecentMeasurementsAsync(int limit = 50)
+    public async Task<List<LocalMeasurement>> GetRecentMeasurementsAsync(int limit = 50, int offset = 0)
     {
         var db = await GetDatabaseAsync();
         return await db.Table<LocalMeasurement>()
             .OrderByDescending(m => m.MeasuredAt)
+            .Skip(offset)
             .Take(limit)
             .ToListAsync();
     }
@@ -146,5 +147,19 @@ public sealed class SqliteMeasurementRepository : ILocalMeasurementRepository
         return await db.Table<LocalMeasurement>()
             .Where(m => m.SyncStatus == "Pending")
             .CountAsync();
+    }
+
+    public async Task DeleteOldSyncedMeasurementsAsync(int olderThanDays)
+    {
+        var db = await GetDatabaseAsync();
+        var cutoff = DateTime.UtcNow.AddDays(-olderThanDays);
+        var oldRecords = await db.Table<LocalMeasurement>()
+            .Where(m => m.SyncStatus == "Synced" && m.MeasuredAt < cutoff)
+            .ToListAsync();
+
+        foreach (var record in oldRecords)
+        {
+            await db.DeleteAsync(record);
+        }
     }
 }

@@ -24,6 +24,12 @@ public sealed class AndroidForegroundMonitoringService : IForegroundMonitoringSe
         var trendSuffix = !string.IsNullOrWhiteSpace(trend) ? $" ({trend})" : "";
         var readingText = $"{glucoseMgDl:F0} mg/dL{trendSuffix}";
         CgmBleForegroundService.UpdateReading(context, deviceName, readingText);
+
+        if (glucoseMgDl < 90)
+        {
+            var alertEngine = new AndroidCriticalAlertEngine();
+            alertEngine.TriggerHypoEmergencyAlarm(glucoseMgDl);
+        }
     }
 }
 #endif

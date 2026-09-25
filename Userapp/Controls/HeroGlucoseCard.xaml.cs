@@ -25,7 +25,7 @@ public partial class HeroGlucoseCard : ContentView
         BindableProperty.Create(nameof(GlucoseUnit), typeof(string), typeof(HeroGlucoseCard), "mg/dL");
 
     public static readonly BindableProperty DeltaTextProperty =
-        BindableProperty.Create(nameof(DeltaText), typeof(string), typeof(HeroGlucoseCard), "Target: 70–180");
+        BindableProperty.Create(nameof(DeltaText), typeof(string), typeof(HeroGlucoseCard), "Target: 90–130");
 
     public static readonly BindableProperty LastUpdatedTextProperty =
         BindableProperty.Create(nameof(LastUpdatedText), typeof(string), typeof(HeroGlucoseCard), "Updated just now");

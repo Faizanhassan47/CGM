@@ -64,6 +64,8 @@ public sealed class SyncService : ISyncService, IDisposable
         if (!await _syncLock.WaitAsync(0, cancellationToken)) return;
         try
         {
+            if (Microsoft.Maui.Networking.Connectivity.Current.NetworkAccess != Microsoft.Maui.Networking.NetworkAccess.Internet) return;
+
             var batch = await _measurementRepo.GetPendingMeasurementsAsync(BatchSize);
             if (batch.Count == 0) return;
 
@@ -86,7 +88,7 @@ public sealed class SyncService : ISyncService, IDisposable
                     GlucoseUnit = "mg/dL",
                     MeasurementTime = x.MeasuredAt,
                     Trend = x.Trend,
-                    GlucoseStatus = x.GlucoseValue < 70 ? "Low" : x.GlucoseValue > 180 ? "High" : "In Range",
+                    GlucoseStatus = x.GlucoseValue < 90 ? "Low" : x.GlucoseValue > 130 ? "High" : "In Range",
                     BatteryVoltageMv = x.BatteryVoltageMv,
                     DeviceTemperatureC = (decimal)x.DeviceTemperatureC,
                     WE1CurrentNa = (decimal)x.We1NanoAmps
@@ -129,7 +131,10 @@ public sealed class SyncService : ISyncService, IDisposable
         try
         {
             while (await _timer.WaitForNextTickAsync(cancellationToken))
+            {
                 await SyncNowAsync(cancellationToken);
+                try { await _measurementRepo.DeleteOldSyncedMeasurementsAsync(30); } catch { }
+            }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
         catch (Exception exception) { await _crashReporter.ReportAsync(exception, "SyncService.Scheduler"); }

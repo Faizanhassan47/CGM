@@ -203,7 +203,7 @@
                     <Label Text="Recommended glucose corridor" FontSize="9"
                            TextColor="{AppThemeBinding Light=#918699, Dark=#AFA0BD}" />
                 </VerticalStackLayout>
-                <Label Grid.Column="2" Text="70–180 mg/dL" FontFamily="ManropeBold" FontSize="12"
+                <Label Grid.Column="2" Text="90–130 mg/dL" FontFamily="ManropeBold" FontSize="12"
                        TextColor="{AppThemeBinding Light=#147A52, Dark=#83DDB5}" VerticalOptions="Center" />
             </Grid>
         </Border>
